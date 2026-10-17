@@ -21,7 +21,7 @@ class ResourceSeeder extends Seeder
             [
                 'name' => 'Lecture Hall 101',
                 'description' => 'Tiered amphitheater equipped with a smart podium, laser projector, and acoustic sound system.',
-                'image' => 'images/Audio-Visual.jpg',
+                'image' => 'images/Outdoor_Student_Pavilion.jpg',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -85,7 +85,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Shure Wireless Microphone Set',
                 'description' => 'Dual-channel handheld UHF wireless microphone system with crystal-clear audio transmission for seminars.',
                 'total_stock' => 10,
-                'image' => 'images/Wireless_Microphone_Set.jpg',
+                'image' => 'images/Wireless_Microphone_one_Set.jpg',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
