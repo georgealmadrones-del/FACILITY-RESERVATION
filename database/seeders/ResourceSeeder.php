@@ -16,12 +16,12 @@ class ResourceSeeder extends Seeder
         Equipment::truncate();
         Schema::enableForeignKeyConstraints();
 
-        // 1. Real-World Facilities & Rooms with Local Photos
+        // 1. Real-World Facilities & Rooms with Exact Local Photos
         Facility::insert([
             [
                 'name' => 'Lecture Hall 101',
                 'description' => 'Tiered amphitheater equipped with a smart podium, laser projector, and acoustic sound system.',
-                'image' => 'images/Outdoor_Student_Pavilion.jpg',
+                'image' => 'images/Audio-Visual.jpg',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -52,13 +52,13 @@ class ResourceSeeder extends Seeder
             ],
         ]);
 
-        // 2. Real-World Equipment with Quantities and Local Photos
+        // 2. Real-World Equipment with Quantities and Exact Local Photos
         Equipment::insert([
             [
                 'name' => 'Epson Short-Throw Classroom Projector',
                 'description' => 'Portable classroom projector with HDMI, wireless casting, and wide-angle projection lens.',
                 'total_stock' => 12,
-                'image' => 'images/Epson_Multimedia_Projector.jpg',
+                'image' => 'images/Epson_Multimedia.jpg',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
