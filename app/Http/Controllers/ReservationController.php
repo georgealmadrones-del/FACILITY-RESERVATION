@@ -8,6 +8,7 @@ use App\Models\Reservation;
 use App\Notifications\ReservationStatusChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class ReservationController extends Controller
@@ -30,7 +31,17 @@ class ReservationController extends Controller
     public function create()
     {
         $facilities = Facility::whereIn('status', ['available', 'Available'])->get();
-        $equipment = Equipment::whereIn('status', ['available', 'Available'])->get();
+        
+        // Map equipment with real-time dynamic available stock calculation for creation form view
+        $equipment = Equipment::whereIn('status', ['available', 'Available'])->get()->map(function($item) {
+            $bookedCount = $item->reservations()
+                ->whereIn('status', ['pending', 'approved'])
+                ->where('end_time', '>=', now())
+                ->sum('quantity');
+                
+            $item->live_available_stock = max(0, $item->total_stock - $bookedCount);
+            return $item;
+        });
 
         return view('reservations.create', compact('facilities', 'equipment'));
     }
@@ -51,83 +62,89 @@ class ReservationController extends Controller
         $end = Carbon::parse($request->end_time)->toDateTimeString();
         $userId = Auth::id();
 
-        // 0. DUPLICATE SUBMISSION CHECK (Prevent same user booking twice simultaneously)
-        $duplicateCheck = Reservation::where('user_id', $userId)
-            ->where('start_time', $start)
-            ->where('end_time', $end)
-            ->whereIn('status', ['pending', 'approved'])
-            ->when($request->facility_id, function($q) use ($request) {
-                return $q->where('facility_id', $request->facility_id);
-            })
-            ->when($request->equipment_id, function($q) use ($request) {
-                return $q->where('equipment_id', $request->equipment_id);
-            })
-            ->exists();
-
-        if ($duplicateCheck) {
-            return back()->withInput()->withErrors([
-                'start_time' => 'Duplicate Notice: You already have a pending or approved request for this item during this exact time slot.'
-            ]);
-        }
-
-        // 1. FACILITY CONFLICT DETECTION (Prevent Double-Booking Rooms)
-        if ($request->facility_id) {
-            $facilityConflict = Reservation::where('facility_id', $request->facility_id)
+        return DB::transaction(function () use ($request, $start, $end, $userId) {
+            // 0. DUPLICATE SUBMISSION CHECK (Prevent same user booking twice simultaneously)
+            $duplicateCheck = Reservation::where('user_id', $userId)
+                ->where('start_time', $start)
+                ->where('end_time', $end)
                 ->whereIn('status', ['pending', 'approved'])
-                ->where(function ($query) use ($start, $end) {
-                    $query->where('start_time', '<', $end)
-                          ->where('end_time', '>', $start);
-                })->exists();
+                ->when($request->facility_id, function($q) use ($request) {
+                    return $q->where('facility_id', $request->facility_id);
+                })
+                ->when($request->equipment_id, function($q) use ($request) {
+                    return $q->where('equipment_id', $request->equipment_id);
+                })
+                ->exists();
 
-            if ($facilityConflict) {
+            if ($duplicateCheck) {
                 return back()->withInput()->withErrors([
-                    'start_time' => 'Conflict Error: This facility is already reserved or has a pending request during this time slot.'
-                ]);
-            }
-        }
-
-        // 2. EQUIPMENT QUANTITY & OVERLAP DETECTION (Dynamic stock calculation)
-        if ($request->equipment_id) {
-            $equipment = Equipment::findOrFail($request->equipment_id);
-            $requestedQty = (int) ($request->quantity ?? 0);
-
-            if ($requestedQty < 1) {
-                return back()->withInput()->withErrors([
-                    'quantity' => 'The quantity must be at least 1 when booking equipment.'
+                    'start_time' => 'Duplicate Notice: You already have a pending or approved request for this item during this exact time slot.'
                 ]);
             }
 
-            // Sum up units already booked in this time window
-            $bookedQuantity = Reservation::where('equipment_id', $request->equipment_id)
-                ->whereIn('status', ['pending', 'approved'])
-                ->where(function ($query) use ($start, $end) {
-                    $query->where('start_time', '<', $end)
-                          ->where('end_time', '>', $start);
-                })->sum('quantity');
+            // 1. FACILITY CONFLICT DETECTION (Prevent Double-Booking Rooms)
+            if ($request->facility_id) {
+                $facilityConflict = Reservation::where('facility_id', $request->facility_id)
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->where(function ($query) use ($start, $end) {
+                        $query->where('start_time', '<', $end)
+                              ->where('end_time', '>', $start);
+                    })->exists();
 
-            // Check if remaining stock is sufficient
-            if (($bookedQuantity + $requestedQty) > $equipment->total_stock) {
+                if ($facilityConflict) {
+                    return back()->withInput()->withErrors([
+                        'start_time' => 'Conflict Error: This facility is already reserved or has a pending request during this time slot.'
+                    ]);
+                }
+            }
+
+            // 2. EQUIPMENT QUANTITY & OVERLAP DETECTION (Dynamic stock calculation)
+            if ($request->equipment_id) {
+                $equipment = Equipment::lockForUpdate()->findOrFail($request->equipment_id);
+                $requestedQty = (int) ($request->quantity ?? 1);
+
+                if ($requestedQty < 1) {
+                    return back()->withInput()->withErrors([
+                        'quantity' => 'The quantity must be at least 1 when booking equipment.'
+                    ]);
+                }
+
+                // Sum up units already booked in this time window
+                $bookedQuantity = Reservation::where('equipment_id', $request->equipment_id)
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->where(function ($query) use ($start, $end) {
+                        $query->where('start_time', '<', $end)
+                              ->where('end_time', '>', $start);
+                    })->sum('quantity');
+
                 $availableStock = max(0, $equipment->total_stock - $bookedQuantity);
-                return back()->withInput()->withErrors([
-                    'quantity' => "Conflict Error: Only {$availableStock} units of this equipment are available for the selected time window."
-                ]);
+
+                // Check if remaining stock is sufficient
+                if (($bookedQuantity + $requestedQty) > $equipment->total_stock) {
+                    return back()->withInput()->withErrors([
+                        'quantity' => "Conflict Error: Only {$availableStock} units of this equipment are available for the selected time window."
+                    ]);
+                }
+
+                // Decrement the physical stock count when booked
+                $equipment->decrement('total_stock', $requestedQty);
             }
-        }
 
-        // 3. CREATE THE RESERVATION (Passed all checks!)
-        Reservation::create([
-            'user_id' => $userId,
-            'facility_id' => $request->facility_id,
-            'equipment_id' => $request->equipment_id,
-            'quantity' => $request->equipment_id ? ($request->quantity ?? 1) : null,
-            'start_time' => $start,
-            'end_time' => $end,
-            'purpose' => $request->purpose,
-            'status' => 'pending',
-        ]);
+            // 3. CREATE THE RESERVATION (Passed all checks!)
+            Reservation::create([
+                'user_id' => $userId,
+                'facility_id' => $request->facility_id,
+                'equipment_id' => $request->equipment_id,
+                'quantity' => $request->equipment_id ? ($request->quantity ?? 1) : null,
+                'start_time' => $start,
+                'end_time' => $end,
+                'purpose' => $request->purpose,
+                'status' => 'pending',
+            ]);
 
-        // Redirect to My Reservations with success banner
-        return redirect()->route('reservations.index')->with('success', 'Booked successfully!');
+            // Redirect to My Reservations with success banner
+            return redirect()->route('reservations.index')->with('success', 'Booked successfully!');
+        });
     }
 
     public function showApproveForm(Reservation $reservation)
@@ -149,29 +166,68 @@ class ReservationController extends Controller
             'rejection_reason' => 'required_if:status,rejected|nullable|string|max:500',
         ]);
 
-        // Allow users to cancel their own reservations regardless of current status
-        if (!$user->isAdmin()) {
-            if ($request->status === 'cancelled' && $reservation->user_id === $user->id) {
-                $reservation->update(['status' => 'cancelled']);
-                return back()->with('success', 'Reservation cancelled successfully!');
+        return DB::transaction(function () use ($request, $reservation, $user) {
+            // Allow users to cancel their own reservations regardless of current status
+            if (!$user->isAdmin()) {
+                if ($request->status === 'cancelled' && $reservation->user_id === $user->id) {
+                    $reservation->update(['status' => 'cancelled']);
+                    
+                    // If it was an equipment reservation, return the stock back upon user cancellation
+                    if ($reservation->equipment_id) {
+                        $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
+                        if ($equipment) {
+                            $equipment->increment('total_stock', $reservation->quantity ?? 1);
+                        }
+                    }
+
+                    return back()->with('success', 'Reservation cancelled successfully!');
+                }
+                abort(403);
             }
-            abort(403);
-        }
 
-        // Admin updates status directly along with the rejection reason if applicable
-        $reservation->update([
-            'status' => $request->status,
-            'rejection_reason' => $request->status === 'rejected' ? $request->rejection_reason : null,
-        ]);
+            // Admin updates status directly along with the rejection reason if applicable
+            $oldStatus = $reservation->status;
+            $reservation->update([
+                'status' => $request->status,
+                'rejection_reason' => $request->status === 'rejected' ? $request->rejection_reason : null,
+            ]);
 
-        // Send real-time database notification to the student
-        try {
-            $reservation->user->notify(new ReservationStatusChanged($reservation));
-        } catch (\Exception $e) {
-            // Fail silently if notification dispatch encounters an issue
-        }
+            // If admin rejects or cancels an active reservation, return equipment stock back
+            if (in_array($request->status, ['rejected', 'cancelled']) && $oldStatus !== 'rejected' && $oldStatus !== 'cancelled') {
+                if ($reservation->equipment_id) {
+                    $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
+                    if ($equipment) {
+                        $equipment->increment('total_stock', $reservation->quantity ?? 1);
+                    }
+                }
+            }
 
-        return redirect()->route('admin.reservations.index')->with('success', 'Reservation status updated successfully!');
+            // Send real-time database notification to the student
+            try {
+                $reservation->user->notify(new ReservationStatusChanged($reservation));
+            } catch (\Exception $e) {
+                // Fail silently if notification dispatch encounters an issue
+            }
+
+            return redirect()->route('admin.reservations.index')->with('success', 'Reservation status updated successfully!');
+        });
+    }
+
+    public function destroy(Reservation $reservation)
+    {
+        return DB::transaction(function () use ($reservation) {
+            // If it was an equipment reservation, return the stock back when deleted
+            if ($reservation->equipment_id && in_array($reservation->status, ['pending', 'approved'])) {
+                $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
+                if ($equipment) {
+                    $equipment->increment('total_stock', $reservation->quantity ?? 1);
+                }
+            }
+
+            $reservation->delete();
+
+            return back()->with('success', 'Reservation cancelled and stock restored.');
+        });
     }
 
     public function availability(Request $request)
@@ -182,14 +238,22 @@ class ReservationController extends Controller
                 $query->where('status', 'approved')
                       ->where('end_time', '>=', now())
                       ->orderBy('start_time', 'asc');
-            }])->get();
+            }})->get();
 
         $equipment = Equipment::whereIn('status', ['available', 'Available'])
             ->with(['reservations' => function ($query) {
                 $query->where('status', 'approved')
                       ->where('end_time', '>=', now())
                       ->orderBy('start_time', 'asc');
-            }])->get();
+            }})->get()->map(function($item) {
+                $bookedCount = $item->reservations()
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->where('end_time', '>=', now())
+                    ->sum('quantity');
+                    
+                $item->live_available_stock = max(0, $item->total_stock - $bookedCount);
+                return $item;
+            });
 
         return view('reservations.availability', compact('facilities', 'equipment'));
     } 
@@ -206,7 +270,7 @@ class ReservationController extends Controller
         $myReservations = $user->reservations()->with(['facility', 'equipment'])->latest()->get();
         $facilities = Facility::whereIn('status', ['available', 'Available'])->get();
         
-        // Calculate live available stock for each equipment item
+        // Calculate live available stock for each equipment item across user dashboards
         $equipment = Equipment::whereIn('status', ['available', 'Available'])->get()->map(function($item) {
             $bookedCount = $item->reservations()
                 ->whereIn('status', ['pending', 'approved'])
