@@ -18,12 +18,10 @@ class ReservationController extends Controller
         $user = auth()->user();
 
         if ($user->isAdmin()) {
-            // Admins see all reservations across the system
             $reservations = Reservation::with(['user', 'facility', 'equipment'])->latest()->get();
             return view('admin.reservations.index', compact('reservations'));
         }
 
-        // Students only see their own reservations
         $reservations = $user->reservations()->with(['facility', 'equipment'])->latest()->get();
         return view('reservations.index', compact('reservations'));
     }
@@ -32,7 +30,6 @@ class ReservationController extends Controller
     {
         $facilities = Facility::whereIn('status', ['available', 'Available'])->get();
         
-        // Map equipment with real-time dynamic available stock calculation for creation form view
         $equipment = Equipment::whereIn('status', ['available', 'Available'])->get()->map(function($item) {
             $bookedCount = $item->reservations()
                 ->whereIn('status', ['pending', 'approved'])
@@ -61,7 +58,6 @@ class ReservationController extends Controller
         $end = Carbon::parse($request->end_time)->toDateTimeString();
         $userId = Auth::id();
 
-        // 0. DUPLICATE SUBMISSION CHECK
         $duplicateCheck = Reservation::where('user_id', $userId)
             ->where('start_time', $start)
             ->where('end_time', $end)
@@ -80,7 +76,6 @@ class ReservationController extends Controller
             ]);
         }
 
-        // 1. FACILITY CONFLICT DETECTION
         if ($request->facility_id) {
             $facilityConflict = Reservation::where('facility_id', $request->facility_id)
                 ->whereIn('status', ['pending', 'approved'])
@@ -96,7 +91,6 @@ class ReservationController extends Controller
             }
         }
 
-        // 2. EQUIPMENT QUANTITY & OVERLAP DETECTION
         if ($request->equipment_id) {
             $equipment = Equipment::findOrFail($request->equipment_id);
             $requestedQty = (int) ($request->quantity ?? 1);
@@ -123,7 +117,6 @@ class ReservationController extends Controller
             }
         }
 
-        // 3. DATABASE TRANSACTION FOR SAFE CREATION
         DB::transaction(function () use ($request, $start, $end, $userId) {
             Reservation::create([
                 'user_id' => $userId,
@@ -176,6 +169,7 @@ class ReservationController extends Controller
                 abort(403);
             }
 
+            // Admin update status
             $oldStatus = $reservation->status;
             $reservation->update([
                 'status' => $request->status,
