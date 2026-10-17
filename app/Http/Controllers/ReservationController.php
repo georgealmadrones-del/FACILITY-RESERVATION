@@ -169,7 +169,6 @@ class ReservationController extends Controller
                 abort(403);
             }
 
-            // Admin update status
             $oldStatus = $reservation->status;
             $reservation->update([
                 'status' => $request->status,
@@ -218,14 +217,14 @@ class ReservationController extends Controller
                 $query->where('status', 'approved')
                       ->where('end_time', '>=', now())
                       ->orderBy('start_time', 'asc');
-            }})->get();
+            }])->get();
 
         $equipment = Equipment::whereIn('status', ['available', 'Available'])
             ->with(['reservations' => function ($query) {
                 $query->where('status', 'approved')
                       ->where('end_time', '>=', now())
                       ->orderBy('start_time', 'asc');
-            }})->get()->map(function($item) {
+            }])->get()->map(function($item) {
                 $bookedCount = $item->reservations()
                     ->whereIn('status', ['pending', 'approved'])
                     ->where('end_time', '>=', now())
