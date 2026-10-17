@@ -46,7 +46,7 @@ class ReservationController extends Controller
         return view('reservations.create', compact('facilities', 'equipment'));
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'facility_id' => 'nullable|required_without:equipment_id|exists:facilities,id',
@@ -125,11 +125,6 @@ class ReservationController extends Controller
 
         // 3. DATABASE TRANSACTION FOR SAFE CREATION
         DB::transaction(function () use ($request, $start, $end, $userId) {
-            if ($request->equipment_id) {
-                $equipment = Equipment::lockForUpdate()->find($request->equipment_id);
-                // Optional: track live decrement if you want physical stock reduced on booking
-            }
-
             Reservation::create([
                 'user_id' => $userId,
                 'facility_id' => $request->facility_id,
@@ -144,6 +139,7 @@ class ReservationController extends Controller
 
         return redirect()->route('reservations.index')->with('success', 'Booked successfully!');
     }
+
     public function showApproveForm(Reservation $reservation)
     {
         return view('admin.reservations.approve', compact('reservation'));
@@ -164,12 +160,10 @@ class ReservationController extends Controller
         ]);
 
         return DB::transaction(function () use ($request, $reservation, $user) {
-            // Allow users to cancel their own reservations regardless of current status
             if (!$user->isAdmin()) {
                 if ($request->status === 'cancelled' && $reservation->user_id === $user->id) {
                     $reservation->update(['status' => 'cancelled']);
                     
-                    // If it was an equipment reservation, return the stock back upon user cancellation
                     if ($reservation->equipment_id) {
                         $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
                         if ($equipment) {
@@ -182,14 +176,12 @@ class ReservationController extends Controller
                 abort(403);
             }
 
-            // Admin updates status directly along with the rejection reason if applicable
             $oldStatus = $reservation->status;
             $reservation->update([
                 'status' => $request->status,
                 'rejection_reason' => $request->status === 'rejected' ? $request->rejection_reason : null,
             ]);
 
-            // If admin rejects or cancels an active reservation, return equipment stock back
             if (in_array($request->status, ['rejected', 'cancelled']) && $oldStatus !== 'rejected' && $oldStatus !== 'cancelled') {
                 if ($reservation->equipment_id) {
                     $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
@@ -199,11 +191,10 @@ class ReservationController extends Controller
                 }
             }
 
-            // Send real-time database notification to the student
             try {
                 $reservation->user->notify(new ReservationStatusChanged($reservation));
             } catch (\Exception $e) {
-                // Fail silently if notification dispatch encounters an issue
+                // Fail silently
             }
 
             return redirect()->route('admin.reservations.index')->with('success', 'Reservation status updated successfully!');
@@ -213,7 +204,6 @@ class ReservationController extends Controller
     public function destroy(Reservation $reservation)
     {
         return DB::transaction(function () use ($reservation) {
-            // If it was an equipment reservation, return the stock back when deleted
             if ($reservation->equipment_id && in_array($reservation->status, ['pending', 'approved'])) {
                 $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
                 if ($equipment) {
@@ -229,7 +219,6 @@ class ReservationController extends Controller
 
     public function availability(Request $request)
     {
-        // Fetch all active facilities and equipment along with their approved upcoming reservations
         $facilities = Facility::whereIn('status', ['available', 'Available'])
             ->with(['reservations' => function ($query) {
                 $query->where('status', 'approved')
@@ -259,7 +248,6 @@ class ReservationController extends Controller
     {
         $user = Auth::user();
 
-        // Redirect admins to the admin command center dashboard
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
@@ -267,7 +255,6 @@ class ReservationController extends Controller
         $myReservations = $user->reservations()->with(['facility', 'equipment'])->latest()->get();
         $facilities = Facility::whereIn('status', ['available', 'Available'])->get();
         
-        // Calculate live available stock for each equipment item across user dashboards
         $equipment = Equipment::whereIn('status', ['available', 'Available'])->get()->map(function($item) {
             $bookedCount = $item->reservations()
                 ->whereIn('status', ['pending', 'approved'])
