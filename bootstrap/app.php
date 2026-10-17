@@ -13,22 +13,17 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Trust Render's proxy load balancer to handle HTTPS properly
         $middleware->trustProxies(at: '*');
-    })
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })->create();
 
-return Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
-    )
-   ->withMiddleware(function (Middleware $middleware) {
-    $middleware->web(append: [
-        \App\Http\Middleware\UpdateUserLastSeen::class,
-    ]);
-})
+        // Append global web middleware
+        $middleware->web(append: [
+            \App\Http\Middleware\UpdateUserLastSeen::class,
+        ]);
+
+        // Register custom route middleware aliases (like 'admin')
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
