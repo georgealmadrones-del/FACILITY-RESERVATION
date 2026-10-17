@@ -16,12 +16,12 @@ class ResourceSeeder extends Seeder
         Equipment::truncate();
         Schema::enableForeignKeyConstraints();
 
-        // 1. Real-World Facilities & Rooms with Exact Local Photos
+        // 1. Facilities & Rooms
         Facility::insert([
             [
                 'name' => 'Lecture Hall 101',
                 'description' => 'Tiered amphitheater equipped with a smart podium, laser projector, and acoustic sound system.',
-                'image' => 'images/Audio-Visual.jpg',
+                'image' => 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -29,7 +29,7 @@ class ResourceSeeder extends Seeder
             [
                 'name' => 'Computer Laboratory 3',
                 'description' => 'Equipped with 40 high-performance workstations, fiber internet, and dual-display developer environments.',
-                'image' => 'images/Computer_Lab3.jpg',
+                'image' => 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -37,7 +37,7 @@ class ResourceSeeder extends Seeder
             [
                 'name' => 'Executive Conference Room',
                 'description' => 'Boardroom setup featuring a 75-inch smart TV, conference speakerphone, and executive seating for meetings.',
-                'image' => 'images/Student_Council_Conference_Room.jpg',
+                'image' => 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -45,20 +45,20 @@ class ResourceSeeder extends Seeder
             [
                 'name' => 'Multimedia Production Lab',
                 'description' => 'Acoustically treated media room featuring a green screen backdrop, studio lighting rigs, and editing bays.',
-                'image' => 'images/Speech_Laboratory.jpg',
+                'image' => 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         ]);
 
-        // 2. Real-World Equipment with Quantities and Exact Local Photos
+        // 2. Equipment & Devices
         Equipment::insert([
             [
                 'name' => 'Epson Short-Throw Classroom Projector',
                 'description' => 'Portable classroom projector with HDMI, wireless casting, and wide-angle projection lens.',
                 'total_stock' => 12,
-                'image' => 'images/Epson_Multimedia.jpg',
+                'image' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -67,7 +67,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Dell Latitude 5530 Student Laptop',
                 'description' => 'Intel Core i7 laptop pre-configured with programming IDEs, office suites, and design software.',
                 'total_stock' => 30,
-                'image' => 'images/High_Speed_Pocket_WiFi_LTE_Modem.jpg',
+                'image' => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -76,7 +76,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Sony 4K Mirrorless Camera',
                 'description' => 'High-resolution digital camera with tripod, zoom lens, and extra battery kit for campus events and media coverage.',
                 'total_stock' => 6,
-                'image' => 'images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg',
+                'image' => 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -85,7 +85,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Shure Wireless Microphone Set',
                 'description' => 'Dual-channel handheld UHF wireless microphone system with crystal-clear audio transmission for seminars.',
                 'total_stock' => 10,
-                'image' => 'images/Wireless_Microphone_Set.jpg',
+                'image' => 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -94,7 +94,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Anker Bluetooth Conference Speakerphone',
                 'description' => 'Omnidirectional speakerphone with 360-degree voice pickup and noise cancellation for hybrid meetings.',
                 'total_stock' => 8,
-                'image' => 'images/Portable_PA_System_with_Wireless_Mic.jpg',
+                'image' => 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -103,7 +103,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Arduino & Raspberry Pi STEM Kit',
                 'description' => 'Complete hardware prototyping toolbox containing sensors, microcontrollers, and breadboards for student projects.',
                 'total_stock' => 15,
-                'image' => 'images/Arduino_Raspberry_Pi_STEM_Kit.jpg',
+                'image' => 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80',
                 'status' => 'Available',
                 'created_at' => now(),
                 'updated_at' => now(),
