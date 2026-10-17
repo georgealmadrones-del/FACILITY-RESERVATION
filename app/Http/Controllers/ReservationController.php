@@ -46,7 +46,7 @@ class ReservationController extends Controller
         return view('reservations.create', compact('facilities', 'equipment'));
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $request->validate([
             'facility_id' => 'nullable|required_without:equipment_id|exists:facilities,id',
@@ -57,80 +57,79 @@ class ReservationController extends Controller
             'purpose' => 'required|string|max:1000',
         ]);
 
-        // Parse dates to prevent datetime-local format mismatch/false conflicts
         $start = Carbon::parse($request->start_time)->toDateTimeString();
         $end = Carbon::parse($request->end_time)->toDateTimeString();
         $userId = Auth::id();
 
-        return DB::transaction(function () use ($request, $start, $end, $userId) {
-            // 0. DUPLICATE SUBMISSION CHECK (Prevent same user booking twice simultaneously)
-            $duplicateCheck = Reservation::where('user_id', $userId)
-                ->where('start_time', $start)
-                ->where('end_time', $end)
-                ->whereIn('status', ['pending', 'approved'])
-                ->when($request->facility_id, function($q) use ($request) {
-                    return $q->where('facility_id', $request->facility_id);
-                })
-                ->when($request->equipment_id, function($q) use ($request) {
-                    return $q->where('equipment_id', $request->equipment_id);
-                })
-                ->exists();
+        // 0. DUPLICATE SUBMISSION CHECK
+        $duplicateCheck = Reservation::where('user_id', $userId)
+            ->where('start_time', $start)
+            ->where('end_time', $end)
+            ->whereIn('status', ['pending', 'approved'])
+            ->when($request->facility_id, function($q) use ($request) {
+                return $q->where('facility_id', $request->facility_id);
+            })
+            ->when($request->equipment_id, function($q) use ($request) {
+                return $q->where('equipment_id', $request->equipment_id);
+            })
+            ->exists();
 
-            if ($duplicateCheck) {
+        if ($duplicateCheck) {
+            return back()->withInput()->withErrors([
+                'start_time' => 'Duplicate Notice: You already have a pending or approved request for this item during this exact time slot.'
+            ]);
+        }
+
+        // 1. FACILITY CONFLICT DETECTION
+        if ($request->facility_id) {
+            $facilityConflict = Reservation::where('facility_id', $request->facility_id)
+                ->whereIn('status', ['pending', 'approved'])
+                ->where(function ($query) use ($start, $end) {
+                    $query->where('start_time', '<', $end)
+                          ->where('end_time', '>', $start);
+                })->exists();
+
+            if ($facilityConflict) {
                 return back()->withInput()->withErrors([
-                    'start_time' => 'Duplicate Notice: You already have a pending or approved request for this item during this exact time slot.'
+                    'start_time' => 'Conflict Error: This facility is already reserved or has a pending request during this time slot.'
+                ]);
+            }
+        }
+
+        // 2. EQUIPMENT QUANTITY & OVERLAP DETECTION
+        if ($request->equipment_id) {
+            $equipment = Equipment::findOrFail($request->equipment_id);
+            $requestedQty = (int) ($request->quantity ?? 1);
+
+            if ($requestedQty < 1) {
+                return back()->withInput()->withErrors([
+                    'quantity' => 'The quantity must be at least 1 when booking equipment.'
                 ]);
             }
 
-            // 1. FACILITY CONFLICT DETECTION (Prevent Double-Booking Rooms)
-            if ($request->facility_id) {
-                $facilityConflict = Reservation::where('facility_id', $request->facility_id)
-                    ->whereIn('status', ['pending', 'approved'])
-                    ->where(function ($query) use ($start, $end) {
-                        $query->where('start_time', '<', $end)
-                              ->where('end_time', '>', $start);
-                    })->exists();
+            $bookedQuantity = Reservation::where('equipment_id', $request->equipment_id)
+                ->whereIn('status', ['pending', 'approved'])
+                ->where(function ($query) use ($start, $end) {
+                    $query->where('start_time', '<', $end)
+                          ->where('end_time', '>', $start);
+                })->sum('quantity');
 
-                if ($facilityConflict) {
-                    return back()->withInput()->withErrors([
-                        'start_time' => 'Conflict Error: This facility is already reserved or has a pending request during this time slot.'
-                    ]);
-                }
+            $availableStock = max(0, $equipment->total_stock - $bookedQuantity);
+
+            if (($bookedQuantity + $requestedQty) > $equipment->total_stock) {
+                return back()->withInput()->withErrors([
+                    'quantity' => "Conflict Error: Only {$availableStock} units of this equipment are available for the selected time window."
+                ]);
             }
+        }
 
-            // 2. EQUIPMENT QUANTITY & OVERLAP DETECTION (Dynamic stock calculation)
+        // 3. DATABASE TRANSACTION FOR SAFE CREATION
+        DB::transaction(function () use ($request, $start, $end, $userId) {
             if ($request->equipment_id) {
-                $equipment = Equipment::lockForUpdate()->findOrFail($request->equipment_id);
-                $requestedQty = (int) ($request->quantity ?? 1);
-
-                if ($requestedQty < 1) {
-                    return back()->withInput()->withErrors([
-                        'quantity' => 'The quantity must be at least 1 when booking equipment.'
-                    ]);
-                }
-
-                // Sum up units already booked in this time window
-                $bookedQuantity = Reservation::where('equipment_id', $request->equipment_id)
-                    ->whereIn('status', ['pending', 'approved'])
-                    ->where(function ($query) use ($start, $end) {
-                        $query->where('start_time', '<', $end)
-                              ->where('end_time', '>', $start);
-                    })->sum('quantity');
-
-                $availableStock = max(0, $equipment->total_stock - $bookedQuantity);
-
-                // Check if remaining stock is sufficient
-                if (($bookedQuantity + $requestedQty) > $equipment->total_stock) {
-                    return back()->withInput()->withErrors([
-                        'quantity' => "Conflict Error: Only {$availableStock} units of this equipment are available for the selected time window."
-                    ]);
-                }
-
-                // Decrement the physical stock count when booked
-                $equipment->decrement('total_stock', $requestedQty);
+                $equipment = Equipment::lockForUpdate()->find($request->equipment_id);
+                // Optional: track live decrement if you want physical stock reduced on booking
             }
 
-            // 3. CREATE THE RESERVATION (Passed all checks!)
             Reservation::create([
                 'user_id' => $userId,
                 'facility_id' => $request->facility_id,
@@ -141,12 +140,10 @@ class ReservationController extends Controller
                 'purpose' => $request->purpose,
                 'status' => 'pending',
             ]);
-
-            // Redirect to My Reservations with success banner
-            return redirect()->route('reservations.index')->with('success', 'Booked successfully!');
         });
-    }
 
+        return redirect()->route('reservations.index')->with('success', 'Booked successfully!');
+    }
     public function showApproveForm(Reservation $reservation)
     {
         return view('admin.reservations.approve', compact('reservation'));
