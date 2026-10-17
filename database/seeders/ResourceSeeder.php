@@ -16,7 +16,7 @@ class ResourceSeeder extends Seeder
         Equipment::truncate();
         Schema::enableForeignKeyConstraints();
 
-        // 1. Facilities & Rooms (Matching exact photos)
+        // 1. Facilities & Rooms
         Facility::insert([
             [
                 'name' => 'Outdoor Student Pavilion',
@@ -76,7 +76,7 @@ class ResourceSeeder extends Seeder
             ],
         ]);
 
-        // 2. Equipment & Devices (Matching exact photos)
+        // 2. Equipment & Devices
         Equipment::insert([
             [
                 'name' => 'Epson Multimedia Projector',
