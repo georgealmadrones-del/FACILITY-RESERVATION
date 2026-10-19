@@ -20,8 +20,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     
-    // Cancel Reservation Route
+    // Cancellation Routes (Handles both /cancel and /status forms)
     Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
+    Route::patch('/reservations/{reservation}/status', [ReservationController::class, 'cancel'])->name('reservations.status');
 
     // Notification Read Route
     Route::post('/notifications/read', function () {
