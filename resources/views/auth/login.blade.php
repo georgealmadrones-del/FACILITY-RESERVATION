@@ -1,5 +1,3 @@
-<?php
-
 <x-guest-layout>
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 px-4 sm:px-6">
         <!-- Logo / Brand Header -->
@@ -40,7 +38,7 @@
                         <label for="password" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider">Password</label>
                         @if (Route::has('password.request'))
                             <a class="text-xs text-indigo-600 hover:text-indigo-500 font-medium" href="{{ route('password.request') }}">
-                                {{ __('Forgot password?') }}
+                                Forgot password?
                             </a>
                         @endif
                     </div>
@@ -78,14 +76,14 @@
                 <div class="flex items-center justify-between text-xs pt-1">
                     <label for="remember_me" class="inline-flex items-center cursor-pointer">
                         <input id="remember_me" type="checkbox" name="remember" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4">
-                        <span class="ms-2 text-gray-700 font-medium">{{ __('Remember me') }}</span>
+                        <span class="ms-2 text-gray-700 font-medium">Remember me</span>
                     </label>
                 </div>
 
                 <!-- Submit Button -->
                 <div class="pt-2">
                     <button type="submit" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-100 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        {{ __('Log in to Account') }}
+                        Log in to Account
                     </button>
                 </div>
 
@@ -102,7 +100,6 @@
 
     <!-- Interactive Scripts: Eye Toggle + Auto-fill Password on Email Input -->
     <script>
-        // 1. Password Show / Hide Toggle
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const eyeOpen = document.getElementById('eye-open');
@@ -119,14 +116,12 @@
             }
         }
 
-        // 2. Remember Me Local Storage Auto-fill Logic
         document.addEventListener('DOMContentLoaded', () => {
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
             const rememberCheckbox = document.getElementById('remember_me');
             const loginForm = document.getElementById('login-form');
 
-            // Check if saved credentials exist
             const savedEmail = localStorage.getItem('remembered_email');
             const savedPassword = localStorage.getItem('remembered_password');
 
@@ -138,7 +133,6 @@
                 }
             }
 
-            // Auto-fill password as the user types their email
             emailInput.addEventListener('input', () => {
                 const currentEmail = emailInput.value.trim();
                 if (savedEmail && currentEmail.toLowerCase() === savedEmail.toLowerCase()) {
@@ -146,16 +140,17 @@
                 }
             });
 
-            // Save or clear credentials on form submission
-            loginForm.addEventListener('submit', () => {
-                if (rememberCheckbox.checked) {
-                    localStorage.setItem('remembered_email', emailInput.value.trim());
-                    localStorage.setItem('remembered_password', passwordInput.value);
-                } else {
-                    localStorage.removeItem('remembered_email');
-                    localStorage.removeItem('remembered_password');
-                }
-            });
+            if (loginForm) {
+                loginForm.addEventListener('submit', () => {
+                    if (rememberCheckbox.checked) {
+                        localStorage.setItem('remembered_email', emailInput.value.trim());
+                        localStorage.setItem('remembered_password', passwordInput.value);
+                    } else {
+                        localStorage.removeItem('remembered_email');
+                        localStorage.removeItem('remembered_password');
+                    }
+                });
+            }
         });
     </script>
 </x-guest-layout>
