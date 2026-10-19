@@ -156,33 +156,15 @@ class ReservationController extends Controller
             if (!$user->isAdmin()) {
                 if ($request->status === 'cancelled' && $reservation->user_id === $user->id) {
                     $reservation->update(['status' => 'cancelled']);
-                    
-                    if ($reservation->equipment_id) {
-                        $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
-                        if ($equipment) {
-                            $equipment->increment('total_stock', $reservation->quantity ?? 1);
-                        }
-                    }
-
                     return back()->with('success', 'Reservation cancelled successfully!');
                 }
                 abort(403);
             }
 
-            $oldStatus = $reservation->status;
             $reservation->update([
                 'status' => $request->status,
                 'rejection_reason' => $request->status === 'rejected' ? $request->rejection_reason : null,
             ]);
-
-            if (in_array($request->status, ['rejected', 'cancelled']) && $oldStatus !== 'rejected' && $oldStatus !== 'cancelled') {
-                if ($reservation->equipment_id) {
-                    $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
-                    if ($equipment) {
-                        $equipment->increment('total_stock', $reservation->quantity ?? 1);
-                    }
-                }
-            }
 
             try {
                 $reservation->user->notify(new ReservationStatusChanged($reservation));
@@ -197,16 +179,8 @@ class ReservationController extends Controller
     public function destroy(Reservation $reservation)
     {
         return DB::transaction(function () use ($reservation) {
-            if ($reservation->equipment_id && in_array($reservation->status, ['pending', 'approved'])) {
-                $equipment = Equipment::lockForUpdate()->find($reservation->equipment_id);
-                if ($equipment) {
-                    $equipment->increment('total_stock', $reservation->quantity ?? 1);
-                }
-            }
-
             $reservation->delete();
-
-            return back()->with('success', 'Reservation cancelled and stock restored.');
+            return back()->with('success', 'Reservation deleted successfully.');
         });
     }
 

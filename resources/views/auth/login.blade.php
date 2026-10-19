@@ -98,7 +98,7 @@
         </div>
     </div>
 
-    <!-- Interactive Scripts: Eye Toggle + Auto-fill Password on Email Input -->
+    <!-- Scripts: Password Visibility + Remember Me Auto-fill -->
     <script>
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
@@ -122,6 +122,7 @@
             const rememberCheckbox = document.getElementById('remember_me');
             const loginForm = document.getElementById('login-form');
 
+            // Load remembered credentials if stored
             const savedEmail = localStorage.getItem('remembered_email');
             const savedPassword = localStorage.getItem('remembered_password');
 
@@ -133,6 +134,7 @@
                 }
             }
 
+            // Auto-fill password dynamically when typing the matching email
             emailInput.addEventListener('input', () => {
                 const currentEmail = emailInput.value.trim();
                 if (savedEmail && currentEmail.toLowerCase() === savedEmail.toLowerCase()) {
@@ -140,6 +142,7 @@
                 }
             });
 
+            // Save or clear credentials upon form submission based on checkbox
             if (loginForm) {
                 loginForm.addEventListener('submit', () => {
                     if (rememberCheckbox.checked) {
