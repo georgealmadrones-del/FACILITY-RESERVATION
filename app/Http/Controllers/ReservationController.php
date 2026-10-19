@@ -133,6 +133,23 @@ class ReservationController extends Controller
         return redirect()->route('reservations.index')->with('success', 'Booked successfully!');
     }
 
+    public function cancel(Reservation $reservation)
+    {
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (!in_array($reservation->status, ['pending', 'approved'])) {
+            return back()->with('error', 'This reservation can no longer be cancelled.');
+        }
+
+        DB::transaction(function () use ($reservation) {
+            $reservation->update(['status' => 'cancelled']);
+        });
+
+        return back()->with('success', 'Reservation cancelled successfully!');
+    }
+
     public function showApproveForm(Reservation $reservation)
     {
         return view('admin.reservations.approve', compact('reservation'));
