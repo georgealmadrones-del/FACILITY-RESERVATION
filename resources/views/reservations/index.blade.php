@@ -145,10 +145,9 @@
                     </button>
 
                     <template x-if="selectedRes.rawStatus !== 'cancelled'">
-                        <form :action="'{{ url('reservations') }}/' + selectedRes.id + '/status'" method="POST">
+                        <form :action="'{{ url('reservations') }}/' + selectedRes.id + '/cancel'" method="POST" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
                             @csrf
                             @method('PATCH')
-                            <input type="hidden" name="status" value="cancelled">
                             <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition">
                                 Cancel Reservation
                             </button>
