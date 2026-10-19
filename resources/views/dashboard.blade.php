@@ -33,6 +33,56 @@
                 </div>
             </div>
 
+            <!-- My Reservations Section (With Working Cancellation Form) -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                    <h3 class="text-base font-bold text-gray-900 flex items-center">
+                        <span class="bg-purple-600 text-white w-2 h-5 rounded-full mr-2"></span>
+                        My Recent Reservations
+                    </h3>
+                    <a href="{{ route('reservations.index') }}" class="text-xs font-medium text-blue-600 hover:underline">View All</a>
+                </div>
+
+                <div class="space-y-3">
+                    @isset($myReservations)
+                        @forelse($myReservations as $reservation)
+                            <div class="p-4 rounded-lg border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-gray-50/50">
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <h4 class="font-semibold text-sm text-gray-900">
+                                            {{ $reservation->facility->name ?? $reservation->equipment->name ?? 'Resource' }}
+                                        </h4>
+                                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded-full 
+                                            {{ $reservation->status === 'approved' ? 'bg-green-100 text-green-800' : ($reservation->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                            {{ $reservation->status }}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        🕒 {{ $reservation->start_time }} to {{ $reservation->end_time }}
+                                        @if($reservation->quantity)
+                                            • Qty: {{ $reservation->quantity }}
+                                        @endif
+                                    </p>
+                                </div>
+
+                                <!-- Cancellation Form using the correct route -->
+                                @if(in_array($reservation->status, ['pending', 'approved']))
+                                    <form action="{{ route('reservations.cancel', $reservation->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-semibold transition border border-red-200">
+                                            Cancel Reservation
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-xs text-gray-500 text-center py-4">You have no active reservations yet.</p>
+                        @endforelse
+                    @endisset
+                </div>
+            </div>
+
             <!-- Two Column Catalogs -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
@@ -100,7 +150,6 @@
                                         ? (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) 
                                         : 'https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=600&auto=format&fit=crop&q=80';
                                     
-                                    // Use calculated live available stock (fallback to total_stock if null)
                                     $availableUnits = $item->live_available_stock ?? $item->total_stock;
                                 @endphp
 
