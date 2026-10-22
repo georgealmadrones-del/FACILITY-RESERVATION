@@ -1,183 +1,231 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <div>
-                <h2 class="text-2xl font-extrabold text-pink-950 tracking-tight">
-                    Student Dashboard ✨
-                </h2>
-                <p class="text-xs text-pink-700/80 mt-0.5 font-medium">Welcome to your central resource and reservation portal.</p>
-            </div>
-            <a href="{{ route('reservations.create') }}" class="px-4 py-2.5 bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white rounded-2xl text-xs font-bold transition shadow-md shadow-pink-300/40 flex items-center space-x-1.5">
-                <span>+ Reserve Resource</span>
-            </a>
-        </div>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Dashboard') }}
+        </h2>
     </x-slot>
 
-    <div class="py-10 bg-pink-100/60 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="py-12" x-data="{ openModal: false, selectedItem: {} }">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            <!-- USER WELCOME PROFILE CARD -->
-            <div class="bg-white/90 p-6 rounded-3xl border border-pink-200 shadow-xl shadow-pink-500/5 backdrop-blur-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <!-- User Header Card -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div class="flex items-center space-x-4">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-400 via-rose-400 to-purple-400 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-pink-300/50 ring-4 ring-pink-50">
-                        {{ strtoupper(substr(Auth::user()->name ?? 'G', 0, 2)) }}
+                    <div class="w-12 h-12 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-lg shadow-inner">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
                     </div>
-                    <div class="space-y-0.5">
+                    <div>
                         <div class="flex items-center space-x-2">
-                            <h3 class="text-lg font-bold text-pink-950">{{ Auth::user()->name ?? 'Student User' }}[cite: 4]</h3>
-                            <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-pink-100 text-pink-700 uppercase tracking-wider border border-pink-200">Active Now[cite: 4]</span>
+                            <h3 class="text-lg font-bold text-gray-900">{{ Auth::user()->name }}</h3>
+                            <span class="px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Active Now</span>
                         </div>
-                        <p class="text-xs text-pink-700/80">{{ Auth::user()->email ?? 'student@email.com' }} &bull; <span class="capitalize font-semibold">{{ Auth::user()->role ?? 'Student' }}[cite: 4]</span></p>
+                        <p class="text-xs text-gray-500">{{ Auth::user()->email }} • <span class="capitalize font-medium text-blue-600">{{ Auth::user()->role }}</span></p>
                     </div>
                 </div>
 
-                <div class="flex items-center space-x-3 w-full md:w-auto justify-end border-t md:border-t-0 border-pink-100 pt-4 md:pt-0">
-                    <a href="{{ route('profile.edit') }}" class="px-4 py-2 bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-xl text-xs font-bold border border-pink-200 transition">
-                        Edit Profile[cite: 4]
+                <div class="flex items-center space-x-3">
+                    <a href="{{ route('profile.edit') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+                        Edit Profile
                     </a>
-                    <a href="{{ route('reservations.create') }}" class="px-4 py-2 bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-pink-200">
-                        + Reserve Resource[cite: 4]
+                    <a href="{{ route('reservations.create') }}" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">
+                        + Reserve Resource
                     </a>
                 </div>
             </div>
 
-            <!-- MY RECENT RESERVATIONS -->
-            <div class="bg-white/90 p-6 rounded-3xl border border-pink-200 shadow-xl shadow-pink-500/5 backdrop-blur-xl space-y-4">
-                <div class="flex justify-between items-center pb-3 border-b border-pink-100">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
-                        <h3 class="font-extrabold text-base text-pink-950">My Recent Reservations[cite: 4]</h3>
-                    </div>
-                    <a href="{{ route('reservations.index') }}" class="text-xs font-bold text-pink-600 hover:text-pink-700 hover:underline">
-                        View All &rarr;
-                    </a>
+            <!-- My Reservations Section (With Working Cancellation Form) -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                    <h3 class="text-base font-bold text-gray-900 flex items-center">
+                        <span class="bg-purple-600 text-white w-2 h-5 rounded-full mr-2"></span>
+                        My Recent Reservations
+                    </h3>
+                    <a href="{{ route('reservations.index') }}" class="text-xs font-medium text-blue-600 hover:underline">View All</a>
                 </div>
 
-                @if(isset($myReservations) && $myReservations->count() > 0)
-                    <div class="space-y-3">
-                        @foreach($myReservations->take(3) as $res)
-                            @php
-                                $itemTitle = $res->facility?->name ?? $res->equipment?->name ?? 'Resource';
-                                $scheduleFormatted = \Carbon\Carbon::parse($res->start_time)->format('M d, Y g:i A') . ' → ' . \Carbon\Carbon::parse($res->end_time)->format('g:i A');
-                            @endphp
-                            <div class="p-4 rounded-2xl bg-pink-50/50 border border-pink-100 flex justify-between items-center transition hover:bg-pink-50">
-                                <div class="space-y-1">
+                <div class="space-y-3">
+                    @isset($myReservations)
+                        @forelse($myReservations as $reservation)
+                            <div class="p-4 rounded-lg border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-gray-50/50">
+                                <div>
                                     <div class="flex items-center space-x-2">
-                                        @if($res->facility_id)
-                                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-pink-100 text-pink-700">Facility</span>
-                                        @endif
-                                        @if($res->equipment_id)
-                                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-purple-100 text-purple-700">Equipment</span>
-                                        @endif
+                                        <h4 class="font-semibold text-sm text-gray-900">
+                                            {{ $reservation->facility->name ?? $reservation->equipment->name ?? 'Resource' }}
+                                        </h4>
+                                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded-full 
+                                            {{ $reservation->status === 'approved' ? 'bg-green-100 text-green-800' : ($reservation->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                            {{ $reservation->status }}
+                                        </span>
                                     </div>
-                                    <h4 class="font-bold text-pink-950 text-sm">{{ $itemTitle }}</h4>
-                                    <p class="text-xs text-pink-800/70"><span class="font-semibold">Schedule:</span> {{ $scheduleFormatted }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        🕒 {{ $reservation->start_time }} to {{ $reservation->end_time }}
+                                        @if($reservation->quantity)
+                                            • Qty: {{ $reservation->quantity }}
+                                        @endif
+                                    </p>
                                 </div>
-                                <span class="px-3 py-1 text-xs font-bold rounded-full border uppercase tracking-wider
-                                    {{ $res->status === 'approved' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : '' }}
-                                    {{ $res->status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-200' : '' }}
-                                    {{ $res->status === 'rejected' ? 'bg-rose-100 text-rose-800 border-rose-200' : '' }}
-                                    {{ $res->status === 'cancelled' ? 'bg-stone-100 text-stone-700 border-stone-200' : '' }}">
-                                    {{ ucfirst($res->status) }}
-                                </span>
+
+                                <!-- Cancellation Form using the correct route -->
+                                @if(in_array($reservation->status, ['pending', 'approved']))
+                                    <form action="{{ route('reservations.cancel', $reservation->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-semibold transition border border-red-200">
+                                            Cancel Reservation
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="py-8 text-center">
-                        <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold">🌸</div>
-                        <p class="text-sm font-semibold text-pink-950">You have no active reservations yet[cite: 4].</p>
-                        <p class="text-xs text-pink-700/70 mt-1">Explore available facilities and equipment below to make a booking!</p>
-                    </div>
-                @endif
+                        @empty
+                            <p class="text-xs text-gray-500 text-center py-4">You have no active reservations yet.</p>
+                        @endforelse
+                    @endisset
+                </div>
             </div>
 
-            <!-- FACILITIES AND EQUIPMENT GRIDS -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Available Facilities -->
-                <div class="bg-white/90 p-6 rounded-3xl border border-pink-200 shadow-xl shadow-pink-500/5 backdrop-blur-xl space-y-4">
-                    <div class="flex justify-between items-center pb-3 border-b border-pink-100">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-rose-400"></span>
-                            <h3 class="font-extrabold text-base text-pink-950">Available Facilities & Rooms[cite: 4]</h3>
-                        </div>
-                        <a href="{{ route('reservations.create') }}" class="text-xs font-bold text-pink-600 hover:underline">View All</a>
+            <!-- Two Column Catalogs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- FACILITIES COLUMN -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                        <h3 class="text-base font-bold text-gray-900 flex items-center">
+                            <span class="bg-blue-600 text-white w-2 h-5 rounded-full mr-2"></span>
+                            Available Facilities & Rooms
+                        </h3>
+                        <a href="{{ route('reservations.availability') }}" class="text-xs font-medium text-blue-600 hover:underline">View All</a>
                     </div>
-                    
+
                     <div class="space-y-3">
-                        @if(isset($facilities) && $facilities->count() > 0)
-                            @foreach($facilities->take(3) as $facility)
-                                <div class="p-4 rounded-2xl bg-pink-50/40 border border-pink-100 hover:border-pink-200 transition space-y-2">
+                        @isset($facilities)
+                            @foreach($facilities as $facility)
+                                @php
+                                    $imgUrl = $facility->image 
+                                        ? (str_starts_with($facility->image, 'http') ? $facility->image : asset('storage/' . $facility->image)) 
+                                        : 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&auto=format&fit=crop&q=80';
+                                @endphp
+
+                                <div class="p-4 rounded-lg border border-gray-100 hover:border-blue-300 hover:bg-blue-50/30 transition cursor-pointer group"
+                                     @click="selectedItem = { 
+                                         name: $el.dataset.name, 
+                                         desc: $el.dataset.desc, 
+                                         type: $el.dataset.type, 
+                                         stock: $el.dataset.stock, 
+                                         image: $el.dataset.image 
+                                     } ; openModal = true"
+                                     data-name="{{ $facility->name }}"
+                                     data-desc="{{ $facility->description ?? 'No description provided.' }}"
+                                     data-type="Facility"
+                                     data-stock="N/A (Room)"
+                                     data-image="{{ $imgUrl }}">
+                                    
                                     <div class="flex justify-between items-start">
-                                        <h4 class="font-bold text-pink-950 text-sm">{{ $facility->name }}[cite: 4]</h4>
-                                        <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Available[cite: 4]</span>
+                                        <h4 class="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition">{{ $facility->name }}</h4>
+                                        <span class="px-2 py-0.5 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                                            {{ ucfirst($facility->status) }}
+                                        </span>
                                     </div>
-                                    <p class="text-xs text-pink-800/70 line-clamp-2">{{ $facility->description }}[cite: 4]</p>
+                                    <p class="text-xs text-gray-500 line-clamp-2 mt-1">{{ $facility->description }}</p>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="p-4 rounded-2xl bg-pink-50/40 border border-pink-100 space-y-2">
-                                <div class="flex justify-between items-start">
-                                    <h4 class="font-bold text-pink-950 text-sm">Outdoor Student Pavilion[cite: 4]</h4>
-                                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Available[cite: 4]</span>
-                                </div>
-                                <p class="text-xs text-pink-800/70">Open-air campus pavilion equipped with study benches and natural surroundings for collaborative learning[cite: 4].</p>
-                            </div>
-                            <div class="p-4 rounded-2xl bg-pink-50/40 border border-pink-100 space-y-2">
-                                <div class="flex justify-between items-start">
-                                    <h4 class="font-bold text-pink-950 text-sm">Computer Laboratory 3[cite: 4]</h4>
-                                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Available[cite: 4]</span>
-                                </div>
-                                <p class="text-xs text-pink-800/70">Equipped with 40 high-performance workstations, fiber internet, and dual-display developer environments[cite: 4].</p>
-                            </div>
-                        @endif
+                        @endisset
                     </div>
                 </div>
 
-                <!-- Available Equipment -->
-                <div class="bg-white/90 p-6 rounded-3xl border border-pink-200 shadow-xl shadow-pink-500/5 backdrop-blur-xl space-y-4">
-                    <div class="flex justify-between items-center pb-3 border-b border-pink-100">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                            <h3 class="font-extrabold text-base text-pink-950">Available Equipment[cite: 4]</h3>
-                        </div>
-                        <a href="{{ route('reservations.create') }}" class="text-xs font-bold text-pink-600 hover:underline">View All</a>
+                <!-- EQUIPMENT COLUMN -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                        <h3 class="text-base font-bold text-gray-900 flex items-center">
+                            <span class="bg-indigo-600 text-white w-2 h-5 rounded-full mr-2"></span>
+                            Available Equipment
+                        </h3>
+                        <a href="{{ route('reservations.availability') }}" class="text-xs font-medium text-indigo-600 hover:underline">View All</a>
                     </div>
-                    
+
                     <div class="space-y-3">
-                        @if(isset($equipmentList) && $equipmentList->count() > 0)
-                            @foreach($equipmentList->take(3) as $item)
-                                <div class="p-4 rounded-2xl bg-pink-50/40 border border-pink-100 hover:border-pink-200 transition space-y-1.5">
+                        @isset($equipment)
+                            @foreach($equipment as $item)
+                                @php
+                                    $itemImgUrl = $item->image 
+                                        ? (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) 
+                                        : 'https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=600&auto=format&fit=crop&q=80';
+                                    
+                                    $availableUnits = $item->live_available_stock ?? $item->total_stock;
+                                @endphp
+
+                                <div class="p-4 rounded-lg border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/30 transition cursor-pointer group"
+                                     @click="selectedItem = { 
+                                         name: $el.dataset.name, 
+                                         desc: $el.dataset.desc, 
+                                         type: $el.dataset.type, 
+                                         stock: $el.dataset.stock, 
+                                         image: $el.dataset.image 
+                                     } ; openModal = true"
+                                     data-name="{{ $item->name }}"
+                                     data-desc="{{ $item->description ?? 'No description provided.' }}"
+                                     data-type="Equipment"
+                                     data-stock="{{ $availableUnits }} / {{ $item->total_stock }} available"
+                                     data-image="{{ $itemImgUrl }}">
+                                    
                                     <div class="flex justify-between items-start">
-                                        <h4 class="font-bold text-pink-950 text-sm">{{ $item->name }}[cite: 4]</h4>
-                                        <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Available[cite: 4]</span>
+                                        <h4 class="font-semibold text-sm text-gray-900 group-hover:text-indigo-600 transition">{{ $item->name }}</h4>
+                                        <span class="px-2 py-0.5 text-xs font-semibold {{ $availableUnits > 0 ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }} rounded-full">
+                                            {{ $availableUnits > 0 ? 'Available' : 'Out of Stock' }}
+                                        </span>
                                     </div>
-                                    <p class="text-xs font-semibold text-pink-600">Stock: {{ $item->quantity }} units available[cite: 4]</p>
-                                    <p class="text-xs text-pink-800/70 line-clamp-1">{{ $item->description }}[cite: 4]</p>
+                                    <p class="text-xs text-indigo-600 font-medium mt-1">
+                                        Stock: {{ $availableUnits }} / {{ $item->total_stock }} units available
+                                    </p>
+                                    <p class="text-xs text-gray-500 line-clamp-2 mt-0.5">{{ $item->description }}</p>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="p-4 rounded-2xl bg-pink-50/40 border border-pink-100 space-y-1.5">
-                                <div class="flex justify-between items-start">
-                                    <h4 class="font-bold text-pink-950 text-sm">Epson Multimedia Projector[cite: 4]</h4>
-                                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Available[cite: 4]</span>
-                                </div>
-                                <p class="text-xs font-semibold text-pink-600">Stock: 12 / 12 units available[cite: 4]</p>
-                                <p class="text-xs text-pink-800/70">Portable classroom projector with HDMI, wireless casting, and wide-angle projection lens[cite: 4].</p>
-                            </div>
-                            <div class="p-4 rounded-2xl bg-pink-50/40 border border-pink-100 space-y-1.5">
-                                <div class="flex justify-between items-start">
-                                    <h4 class="font-bold text-pink-950 text-sm">High Speed Pocket WiFi LTE Modem[cite: 4]</h4>
-                                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Available[cite: 4]</span>
-                                </div>
-                                <p class="text-xs font-semibold text-pink-600">Stock: 30 / 30 units available[cite: 4]</p>
-                                <p class="text-xs text-pink-800/70">Portable cellular hotspot router providing high-speed mobile internet connectivity across campus[cite: 4].</p>
-                            </div>
-                        @endif
+                        @endisset
                     </div>
                 </div>
+
             </div>
 
         </div>
+
+        <!-- INTERACTIVE PREVIEW MODAL -->
+        <div x-show="openModal" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-70 flex items-center justify-center p-4" 
+             style="display: none;"
+             @keydown.escape.window="openModal = false">
+            
+            <div @click.away="openModal = false" 
+                 class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl transform transition-all border border-gray-100">
+                
+                <div class="relative h-64 bg-gray-100">
+                    <img :src="selectedItem.image" :alt="selectedItem.name" class="w-full h-full object-cover">
+                    <button @click="openModal = false" class="absolute top-4 right-4 bg-black bg-opacity-60 text-white rounded-full p-2 hover:bg-opacity-80 transition duration-150">
+                        ✕
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full shadow-inner" x-text="selectedItem.type"></span>
+                        <span class="text-sm font-medium text-gray-500" x-text="selectedItem.stock"></span>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-gray-900 leading-tight" x-text="selectedItem.name"></h3>
+                    <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line" x-text="selectedItem.desc"></p>
+                    
+                    <div class="flex justify-end pt-4 border-t border-gray-100">
+                        <button @click="openModal = false" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg text-sm font-semibold transition shadow-inner">
+                            Close Preview
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </x-app-layout>
