@@ -7,10 +7,10 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Google Fonts: Plus Jakarta Sans & Playfair Display for Editorial Library Vibe -->
+        <!-- Google Fonts: Plus Jakarta Sans -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,16 +19,14 @@
             body {
                 font-family: 'Plus Jakarta Sans', sans-serif;
             }
-            .font-serif-title {
-                font-family: 'Playfair Display', serif;
-            }
         </style>
     </head>
-    <body class="antialiased bg-[#FBF8F3] text-[#2C221E] selection:bg-[#8C6D58] selection:text-white">
-        <!-- Ambient Warm Library Glow -->
+    <body class="antialiased bg-pink-100 text-pink-950 selection:bg-pink-400 selection:text-white">
+        <!-- Ambient Glowing Pink Orbs -->
         <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-            <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#EADCC9]/50 rounded-full blur-[140px]"></div>
-            <div class="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-[#D9C3B0]/40 rounded-full blur-[140px]"></div>
+            <div class="absolute -top-32 -left-32 w-[600px] h-[600px] bg-rose-200/70 rounded-full blur-[120px]"></div>
+            <div class="absolute top-1/3 right-0 w-[550px] h-[550px] bg-pink-300/60 rounded-full blur-[130px]"></div>
+            <div class="absolute -bottom-32 left-1/3 w-[600px] h-[600px] bg-fuchsia-200/60 rounded-full blur-[140px]"></div>
         </div>
 
         <div class="relative z-10 min-h-screen">
