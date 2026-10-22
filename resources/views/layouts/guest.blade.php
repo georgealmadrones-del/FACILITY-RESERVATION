@@ -7,7 +7,7 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
+        <!-- Google Fonts: Plus Jakarta Sans -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,12 +21,12 @@
             }
         </style>
     </head>
-    <body class="antialiased bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white">
-        <!-- Ambient Mesh Background Lights -->
+    <body class="antialiased bg-rose-50/50 text-slate-800 selection:bg-pink-300 selection:text-pink-950">
+        <!-- Ambient Girly Pastel Mesh Orbs -->
         <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-            <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px]"></div>
-            <div class="absolute top-1/2 right-0 w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-[140px]"></div>
-            <div class="absolute -bottom-40 left-1/3 w-[600px] h-[600px] bg-sky-600/10 rounded-full blur-[140px]"></div>
+            <div class="absolute -top-32 -left-32 w-[550px] h-[550px] bg-pink-200/60 rounded-full blur-[120px]"></div>
+            <div class="absolute top-1/3 right-0 w-[500px] h-[500px] bg-purple-200/50 rounded-full blur-[130px]"></div>
+            <div class="absolute -bottom-32 left-1/3 w-[600px] h-[600px] bg-rose-200/60 rounded-full blur-[140px]"></div>
         </div>
 
         <div class="relative z-10 min-h-screen">
