@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }} - CATC Resource Hub</title>
+        <title>{{ config('app.name', 'Laravel') }} - RESERVA | CATC</title>
 
         <!-- Google Fonts: Plus Jakarta Sans -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,18 +26,16 @@
             <div class="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex justify-between items-center">
                 <!-- Logo & Name -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-100 text-black flex items-center justify-center font-bold text-lg shadow-sm">
-                        ⚡
-                    </div>
+                    <img src="{{ asset('images/reserva.jpg') }}" alt="RESERVA Logo" class="w-10 h-10 rounded-xl object-cover border border-[#27272A]">
                     <div>
-                        <span class="font-extrabold text-base tracking-tight text-white block leading-tight">CATC Resource Hub</span>
-                        <span class="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase">Computer Arts & Technical College</span>
+                        <span class="font-extrabold text-base tracking-tight text-white block leading-tight">RESERVA</span>
+                        <span class="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase">CATC Facility Hub</span>
                     </div>
                 </div>
 
                 <!-- Nav Links -->
                 <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-zinc-400">
-                    <a href="#facilities" class="hover:text-white transition">Facilities & Equipment</a>
+                    <a href="#facilities" class="hover:text-white transition">What You Can Reserve</a>
                     <a href="#features" class="hover:text-white transition">Core Features</a>
                     <a href="#tutorial" class="hover:text-white transition">User Tutorial</a>
                 </div>
@@ -87,7 +85,7 @@
                         </div>
                     </div>
 
-                    <!-- Right Interactive Resource Preview Card -->
+                    <!-- Right Clickable Resource Preview Card -->
                     <div class="lg:col-span-5" id="facilities">
                         <div class="bg-[#18181B] p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl relative space-y-4">
                             <div class="border-b border-[#27272A] pb-4 flex justify-between items-center">
@@ -100,42 +98,51 @@
 
                             <div class="space-y-3">
                                 <!-- Rooms & Halls -->
-                                <a href="{{ route('login') }}" class="block p-3.5 rounded-2xl bg-[#09090B] border border-[#27272A] hover:border-zinc-500 transition group">
+                                <div class="p-3.5 rounded-2xl bg-[#09090B] border border-[#27272A] hover:border-zinc-500 transition cursor-pointer">
                                     <div class="flex justify-between items-center">
                                         <div>
-                                            <p class="text-xs font-bold text-white group-hover:text-zinc-200">Rooms & Halls</p>
+                                            <p class="text-xs font-bold text-white">Rooms & Halls</p>
                                             <p class="text-[11px] text-zinc-500">Audio-Visual Room, Lecture Halls, Student Lounge</p>
                                         </div>
-                                        <span class="px-2 py-1 text-[10px] font-bold rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">Available &rarr;</span>
+                                        <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/80">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                            <span>Available</span>
+                                        </span>
                                     </div>
-                                </a>
+                                </div>
 
                                 <!-- Laboratories -->
-                                <a href="{{ route('login') }}" class="block p-3.5 rounded-2xl bg-[#09090B] border border-[#27272A] hover:border-zinc-500 transition group">
+                                <div class="p-3.5 rounded-2xl bg-[#09090B] border border-[#27272A] hover:border-zinc-500 transition cursor-pointer">
                                     <div class="flex justify-between items-center">
                                         <div>
-                                            <p class="text-xs font-bold text-white group-hover:text-zinc-200">Computer Laboratories</p>
+                                            <p class="text-xs font-bold text-white">Computer Laboratories</p>
                                             <p class="text-[11px] text-zinc-500">Lab 1, Lab 2, Network & Coding Workstations</p>
                                         </div>
-                                        <span class="px-2 py-1 text-[10px] font-bold rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">Available &rarr;</span>
+                                        <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/80">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                            <span>Available</span>
+                                        </span>
                                     </div>
-                                </a>
+                                </div>
 
                                 <!-- Equipment -->
-                                <a href="{{ route('login') }}" class="block p-3.5 rounded-2xl bg-[#09090B] border border-[#27272A] hover:border-zinc-500 transition group">
+                                <div class="p-3.5 rounded-2xl bg-[#09090B] border border-[#27272A] hover:border-zinc-500 transition cursor-pointer">
                                     <div class="flex justify-between items-center">
                                         <div>
-                                            <p class="text-xs font-bold text-white group-hover:text-zinc-200">Technical Equipment</p>
+                                            <p class="text-xs font-bold text-white">Technical Equipment</p>
                                             <p class="text-[11px] text-zinc-500">Projectors, DSLR Kits, Pocket WiFis</p>
                                         </div>
-                                        <span class="px-2 py-1 text-[10px] font-bold rounded-full bg-amber-950 text-amber-400 border border-amber-800">Check Stock &rarr;</span>
+                                        <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/80">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                            <span>Check Stock</span>
+                                        </span>
                                     </div>
-                                </a>
+                                </div>
                             </div>
 
                             <div class="pt-1">
                                 <a href="{{ route('login') }}" class="block text-center w-full py-3 bg-zinc-100 hover:bg-white text-black text-xs font-bold rounded-xl transition">
-                                    Reserve Now &rarr;
+                                    Sign In to Access Booking &rarr;
                                 </a>
                             </div>
                         </div>
@@ -176,43 +183,55 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <!-- Feature 1 -->
-                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition">
-                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">📅</div>
+                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition cursor-pointer">
+                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
                         <h3 class="font-bold text-lg text-white">Facility & Equipment Booking</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">Browse classrooms, computer laboratories, and technical gear with real-time calendars. Request item bundles alongside your space reservation.</p>
                     </div>
 
                     <!-- Feature 2 -->
-                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition">
-                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">⚡</div>
+                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition cursor-pointer">
+                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
                         <h3 class="font-bold text-lg text-white">Administrative Approvals</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">Streamlined multi-level approval workflows with live status tracking — from submission through department sign-off to final confirmation.</p>
                     </div>
 
                     <!-- Feature 3 -->
-                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition">
-                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">🎓</div>
+                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition cursor-pointer">
+                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        </div>
                         <h3 class="font-bold text-lg text-white">Campus Event Logistics</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">Official tracking and documentation support for student organizations, tech symposiums, faculty lectures, and institutional functions.</p>
                     </div>
 
                     <!-- Feature 4 -->
-                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition">
-                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">🔔</div>
+                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition cursor-pointer">
+                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        </div>
                         <h3 class="font-bold text-lg text-white">Smart Notifications</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">Real-time alerts on approvals, rejections, reminders, and campus announcements delivered directly to your dashboard.</p>
                     </div>
 
                     <!-- Feature 5 -->
-                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition">
-                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">🛡️</div>
+                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition cursor-pointer">
+                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                        </div>
                         <h3 class="font-bold text-lg text-white">QR Verification</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">Every approved reservation generates a secure QR-coded permit for on-site check-in and verification by property custodians.</p>
                     </div>
 
                     <!-- Feature 6 -->
-                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition">
-                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">🔑</div>
+                    <div class="bg-[#18181B] p-8 rounded-3xl border border-[#27272A] space-y-4 shadow-sm hover:border-zinc-500 transition cursor-pointer">
+                        <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                        </div>
                         <h3 class="font-bold text-lg text-white">Institutional SSO Login</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">Sign in securely using your official CATC student credentials via the institutional portal — no separate account creation required.</p>
                     </div>
@@ -220,7 +239,7 @@
             </div>
         </section>
 
-        <!-- TUTORIAL SECTION -->
+        <!-- USER TUTORIAL SECTION -->
         <section id="tutorial" class="py-20 bg-[#18181B]/40 border-t border-[#27272A]">
             <div class="max-w-7xl mx-auto px-6 lg:px-8 space-y-12">
                 <div class="text-center space-y-3 max-w-2xl mx-auto">
@@ -231,35 +250,35 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <!-- Step 1 -->
-                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3">
+                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3 hover:border-zinc-500 transition cursor-pointer">
                         <span class="w-8 h-8 rounded-xl bg-zinc-100 text-black flex items-center justify-center text-xs font-bold">1</span>
                         <h4 class="font-bold text-sm text-white">Log In</h4>
                         <p class="text-xs text-zinc-400">Sign in with your CATC university credentials. No separate sign-up needed.</p>
                     </div>
 
                     <!-- Step 2 -->
-                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3">
+                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3 hover:border-zinc-500 transition cursor-pointer">
                         <span class="w-8 h-8 rounded-xl bg-zinc-100 text-black flex items-center justify-center text-xs font-bold">2</span>
                         <h4 class="font-bold text-sm text-white">Complete Profile</h4>
                         <p class="text-xs text-zinc-400">Fill in your course, organization, and year level — done just once on first login.</p>
                     </div>
 
                     <!-- Step 3 -->
-                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3">
+                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3 hover:border-zinc-500 transition cursor-pointer">
                         <span class="w-8 h-8 rounded-xl bg-zinc-100 text-black flex items-center justify-center text-xs font-bold">3</span>
                         <h4 class="font-bold text-sm text-white">Pick a Facility</h4>
                         <p class="text-xs text-zinc-400">Browse available spaces and equipment by date and time using the real-time calendar.</p>
                     </div>
 
                     <!-- Step 4 -->
-                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3">
+                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3 hover:border-zinc-500 transition cursor-pointer">
                         <span class="w-8 h-8 rounded-xl bg-zinc-100 text-black flex items-center justify-center text-xs font-bold">4</span>
                         <h4 class="font-bold text-sm text-white">Submit Request</h4>
                         <p class="text-xs text-zinc-400">Fill in event details, attach required documents, and submit for multi-level approval.</p>
                     </div>
 
                     <!-- Step 5 -->
-                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3">
+                    <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-3 hover:border-zinc-500 transition cursor-pointer">
                         <span class="w-8 h-8 rounded-xl bg-zinc-100 text-black flex items-center justify-center text-xs font-bold">5</span>
                         <h4 class="font-bold text-sm text-white">Get Confirmed</h4>
                         <p class="text-xs text-zinc-400">Track status at every stage and present your QR-coded permit on the day of use.</p>
@@ -272,14 +291,14 @@
         <footer class="bg-[#09090B] text-zinc-400 py-12 border-t border-[#27272A]">
             <div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded-lg bg-zinc-100 text-black flex items-center justify-center font-bold text-xs">⚡</div>
+                    <img src="{{ asset('images/reserva.jpg') }}" alt="RESERVA Logo" class="w-8 h-8 rounded-lg object-cover border border-[#27272A]">
                     <div>
-                        <span class="font-bold text-sm text-white block">CATC Resource Hub</span>
+                        <span class="font-bold text-sm text-white block">RESERVA Hub</span>
                         <span class="text-[10px] text-zinc-500">Computer Arts & Technical College</span>
                     </div>
                 </div>
                 <div class="text-xs text-zinc-500">
-                    &copy; {{ date('Y') }} Computer Arts and Technical College (CATC). All rights reserved.
+                    &copy; {{ date('Y') }} Computer Arts and Technical College (RESERVA). All rights reserved.
                 </div>
             </div>
         </footer>
