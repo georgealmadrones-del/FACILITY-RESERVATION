@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Facility extends Model
 {
-    protected $fillable = ['name', 'description', 'capacity', 'status'];
+    protected $fillable = ['name', 'description', 'capacity', 'type', 'status'];
 
     public function reservations(): HasMany
     {
