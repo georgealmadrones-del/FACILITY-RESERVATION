@@ -21,12 +21,11 @@
             }
         </style>
     </head>
-    <body class="antialiased bg-slate-950 text-slate-100 selection:bg-blue-600 selection:text-white">
-        <!-- Ambient Glow Orbs -->
+    <body class="antialiased bg-[#09090B] text-zinc-100 selection:bg-zinc-100 selection:text-black">
+        <!-- Subtle Ambient Background Glow -->
         <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-            <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px]"></div>
-            <div class="absolute top-1/2 -right-40 w-[550px] h-[550px] bg-indigo-600/15 rounded-full blur-[140px]"></div>
-            <div class="absolute -bottom-40 left-1/3 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[140px]"></div>
+            <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-zinc-800/20 rounded-full blur-[140px]"></div>
+            <div class="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-zinc-700/10 rounded-full blur-[140px]"></div>
         </div>
 
         <div class="relative z-10 min-h-screen">
