@@ -1,85 +1,96 @@
 <x-guest-layout>
-    <div class="min-h-screen flex flex-col items-center justify-center p-6 sm:p-12">
-        
-        <!-- Brand Header -->
-        <div class="flex items-center space-x-3 mb-8">
-            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-blue-500/25 ring-1 ring-white/20">
-                ⚡
-            </div>
-            <span class="font-extrabold text-2xl tracking-tight text-white">Resource Hub</span>
-        </div>
-
-        <!-- Center Glass Card -->
-        <div class="w-full max-w-md space-y-6 bg-slate-900/80 p-8 sm:p-10 rounded-3xl border border-slate-800/80 shadow-2xl shadow-blue-950/20 backdrop-blur-2xl">
+    <div class="min-h-screen bg-[#09090B] text-zinc-100 flex items-center justify-center p-6 lg:p-12 font-['Plus_Jakarta_Sans',sans-serif]">
+        <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-[#121215] border border-[#27272A] rounded-3xl p-8 lg:p-12 shadow-2xl">
             
-            <!-- Header Text -->
-            <div class="text-center space-y-1">
-                <h2 class="text-3xl font-extrabold tracking-tight text-white">Create Account</h2>
-                <p class="text-xs text-slate-400">Fill in your information below to sign up.</p>
+            <!-- Left Side: Hero Brand Showcase -->
+            <div class="lg:col-span-7 space-y-6 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-[#27272A] pb-8 lg:pb-0">
+                <div class="flex items-center space-x-3">
+                    <img src="{{ asset('reserva.jpg') }}" alt="RESERVA Logo" class="w-10 h-10 rounded-xl object-cover border border-zinc-700 shadow-md" onerror="this.style.display='none';">
+                    <span class="font-extrabold text-white text-lg tracking-tight">RESERVA</span>
+                </div>
+
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-emerald-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>SECURE PORTAL ACCESS</span>
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                    Shared spaces.<br>Smarter access.
+                </h1>
+
+                <p class="text-sm text-zinc-400 max-w-md leading-relaxed">
+                    Create your account to start scheduling facilities and borrowing technical equipment seamlessly.
+                </p>
+
+                <div class="pt-4 flex items-center space-x-4">
+                    <div class="bg-zinc-900/80 px-4 py-3 rounded-2xl border border-zinc-800">
+                        <span class="text-lg font-extrabold text-white block">100%</span>
+                        <span class="text-[10px] text-zinc-500 uppercase tracking-wider block">Verified Access</span>
+                    </div>
+                </div>
             </div>
 
-            <form method="POST" action="{{ route('register') }}" class="space-y-4">
-                @csrf
-
-                <!-- Full Name -->
-                <div class="space-y-1.5">
-                    <label for="name" class="block text-xs font-bold uppercase tracking-wider text-slate-300">Full Name</label>
-                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"
-                        class="w-full px-3.5 py-2.5 bg-slate-950/70 border border-slate-800 rounded-2xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-150"
-                        placeholder="Alex Vance">
-                    <x-input-error :messages="$errors->get('name')" class="mt-1 text-xs text-rose-400" />
+            <!-- Right Side: Register Form Card -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="flex space-x-2 bg-zinc-900 p-1.5 rounded-2xl border border-zinc-800 text-xs font-bold text-center">
+                    <a href="{{ route('login') }}" class="flex-1 py-2 rounded-xl text-zinc-400 hover:text-white transition">Sign in</a>
+                    <a href="{{ route('register') }}" class="flex-1 py-2 rounded-xl bg-zinc-800 text-white shadow-sm transition">Register</a>
                 </div>
 
-                <!-- Email Address -->
-                <div class="space-y-1.5">
-                    <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-300">Email Address</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username"
-                        class="w-full px-3.5 py-2.5 bg-slate-950/70 border border-slate-800 rounded-2xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-150"
-                        placeholder="alex@domain.com">
-                    <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs text-rose-400" />
+                <div>
+                    <h3 class="text-xl font-extrabold text-white">Create your account</h3>
+                    <p class="text-xs text-zinc-400 mt-1">Enter your details to register for RESERVA.</p>
                 </div>
 
-                <!-- Password -->
-                <div class="space-y-1.5" x-data="{ show: false }">
-                    <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label>
-                    <div class="relative">
-                        <input id="password" :type="show ? 'text' : 'password'" name="password" required autocomplete="new-password"
-                            class="w-full pl-3.5 pr-10 py-2.5 bg-slate-950/70 border border-slate-800 rounded-2xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-150"
-                            placeholder="••••••••">
-                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition">
-                            <svg x-show="!show" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            <svg x-show="show" style="display: none;" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
-                        </button>
+                <form method="POST" action="{{ route('register') }}" class="space-y-4">
+                    @csrf
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Full name</label>
+                        <input type="text" name="name" :value="old('name')" required autofocus autocomplete="name" placeholder="John Doe"
+                            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition placeholder-zinc-600">
+                        <x-input-error :messages="$errors->get('name')" class="mt-1 text-xs text-red-400" />
                     </div>
-                    <x-input-error :messages="$errors->get('password')" class="mt-1 text-xs text-rose-400" />
-                </div>
 
-                <!-- Confirm Password -->
-                <div class="space-y-1.5">
-                    <label for="password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-slate-300">Confirm Password</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
-                        class="w-full px-3.5 py-2.5 bg-slate-950/70 border border-slate-800 rounded-2xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-150"
-                        placeholder="••••••••">
-                    <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-xs text-rose-400" />
-                </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Email address</label>
+                        <input type="email" name="email" :value="old('email')" required autocomplete="username" placeholder="name@domain.com"
+                            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition placeholder-zinc-600">
+                        <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs text-red-400" />
+                    </div>
 
-                <!-- Gradient Button -->
-                <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/25 transition-all duration-150 active:scale-[0.99] text-sm mt-2">
-                    Create Account
-                </button>
+                    <!-- Role Selection (Student or Faculty) -->
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Select role</label>
+                        <select name="role" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                            <option value="" disabled selected>Select your role</option>
+                            <option value="Student">Student</option>
+                            <option value="Faculty">Faculty</option>
+                        </select>
+                        <x-input-error :messages="$errors->get('role')" class="mt-1 text-xs text-red-400" />
+                    </div>
 
-                <!-- Login Link -->
-                <p class="text-center text-xs text-slate-400 pt-2 font-medium">
-                    Already registered? 
-                    <a href="{{ route('login') }}" class="font-bold text-blue-400 hover:text-blue-300 hover:underline">Sign in here</a>
-                </p>
-            </form>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Password</label>
+                        <input type="password" name="password" required autocomplete="new-password" placeholder="••••••••"
+                            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition placeholder-zinc-600">
+                        <x-input-error :messages="$errors->get('password')" class="mt-1 text-xs text-red-400" />
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Confirm password</label>
+                        <input type="password" name="password_confirmation" required autocomplete="new-password" placeholder="••••••••"
+                            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition placeholder-zinc-600">
+                        <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-xs text-red-400" />
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded-xl transition shadow-lg flex items-center justify-center space-x-2">
+                        <span>Create account</span>
+                        <span>&rarr;</span>
+                    </button>
+                </form>
+            </div>
 
         </div>
-
-        <p class="text-xs text-slate-600 mt-8 text-center font-medium">
-            &copy; {{ date('Y') }} Facility Reservation System
-        </p>
-
     </div>
 </x-guest-layout>
