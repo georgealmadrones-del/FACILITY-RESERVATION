@@ -39,7 +39,7 @@
 
             <!-- Auth Actions -->
             <div class="flex items-center space-x-3">
-                @Route::has('login')
+                @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="px-5 py-2.5 text-xs font-bold text-white bg-zinc-800 hover:bg-zinc-700 rounded-xl border border-zinc-700 transition shadow-sm">
                             Dashboard &rarr;
