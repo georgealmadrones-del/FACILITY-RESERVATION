@@ -3,6 +3,25 @@
     openModal: false, 
     activeResource: {}, 
     searchQuery: '',
+    // Fast animated counter states
+    countAvailable: 0,
+    countBookings: 0,
+    countApproval: 0,
+    animateCounters() {
+        let duration = 1000;
+        let start = null;
+        let step = (timestamp) => {
+            if (!start) start = timestamp;
+            let progress = Math.min((timestamp - start) / duration, 1);
+            this.countAvailable = Math.floor(progress * 42);
+            this.countBookings = Math.floor(progress * 18);
+            this.countApproval = Math.floor(progress * 94);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    },
     resources: [
         { name: 'Auditorium Hall', type: 'Facility', status: 'Available Today', capacity: '150 persons', desc: 'Spacious presentation hall equipped with surround sound, dual projection screens, and tiered seating for major events.', icon: 'building' },
         { name: 'Mac Laboratory', type: 'Facility', status: 'Available Today', capacity: '40 workstations', desc: 'High-performance workstations configured for media production, coding bootcamps, and digital interface prototyping.', icon: 'cpu' },
@@ -12,7 +31,7 @@
         if (this.searchQuery === '') return this.resources;
         return this.resources.filter(r => r.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || r.type.toLowerCase().includes(this.searchQuery.toLowerCase()));
     }
-}">
+}" x-init="animateCounters()">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,13 +51,9 @@
     <!-- Top Navigation Bar -->
     <header class="w-full border-b border-[#27272A] bg-[#09090B]/80 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <!-- Brand Logo (Using reserva.jpg) -->
+            <!-- Brand Logo (Direct Public asset path check) -->
             <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
-                <img src="{{ asset('storage/reserva.jpg') }}" alt="RESERVA Logo" class="w-10 h-10 rounded-xl object-cover border border-zinc-700 shadow-md group-hover:border-zinc-500 transition" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <!-- Fallback if image path differs -->
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-900 border border-zinc-700 hidden items-center justify-center shadow-md">
-                    <span class="font-extrabold text-white text-sm tracking-tighter">R</span>
-                </div>
+                <img src="{{ asset('reserva.jpg') }}" alt="RESERVA Logo" class="w-10 h-10 rounded-xl object-cover border border-zinc-700 shadow-md group-hover:border-zinc-500 transition" onerror="this.src='{{ asset('images/reserva.jpg') }}';">
                 <div>
                     <span class="font-extrabold text-base tracking-tight text-white block leading-none">RESERVA</span>
                     <span class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest block mt-1">CATC FACILITY HUB</span>
@@ -123,21 +138,21 @@
                         </span>
                     </div>
 
-                    <!-- Stats Grid -->
+                    <!-- Fast Animated Counters -->
                     <div class="grid grid-cols-3 gap-3">
                         <div class="bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800/80">
                             <span class="text-[10px] text-zinc-500 font-medium block">Available now</span>
-                            <span class="text-xl font-extrabold text-white mt-1 block">42</span>
+                            <span class="text-2xl font-extrabold text-white mt-1 block" x-text="countAvailable">0</span>
                             <span class="text-[9px] text-zinc-500 block">resources</span>
                         </div>
                         <div class="bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800/80">
                             <span class="text-[10px] text-zinc-500 font-medium block">Today's bookings</span>
-                            <span class="text-xl font-extrabold text-white mt-1 block">18</span>
+                            <span class="text-2xl font-extrabold text-white mt-1 block" x-text="countBookings">0</span>
                             <span class="text-[9px] text-zinc-500 block">confirmed</span>
                         </div>
                         <div class="bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800/80">
                             <span class="text-[10px] text-zinc-500 font-medium block">Approval rate</span>
-                            <span class="text-xl font-extrabold text-white mt-1 block">94%</span>
+                            <span class="text-2xl font-extrabold text-white mt-1 block"><span x-text="countApproval">0</span>%</span>
                             <span class="text-[9px] text-emerald-400 font-semibold block">on time</span>
                         </div>
                     </div>
@@ -146,7 +161,7 @@
                     <div class="space-y-2 pt-2">
                         <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Today's Activity Feed</span>
                         
-                        <div class="p-3 bg-zinc-900/40 rounded-xl border border-zinc-800/60 flex items-center justify-between text-xs">
+                        <div class="p-3 bg-zinc-900/40 rounded-xl border border-zinc-800/60 flex items-center justify-between text-xs hover:border-zinc-700 transition cursor-pointer">
                             <div class="flex items-center space-x-2.5">
                                 <div class="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
@@ -159,7 +174,7 @@
                             <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-950 text-emerald-400 border border-emerald-900">Open</span>
                         </div>
 
-                        <div class="p-3 bg-zinc-900/40 rounded-xl border border-zinc-800/60 flex items-center justify-between text-xs">
+                        <div class="p-3 bg-zinc-900/40 rounded-xl border border-zinc-800/60 flex items-center justify-between text-xs hover:border-zinc-700 transition cursor-pointer">
                             <div class="flex items-center space-x-2.5">
                                 <div class="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -180,7 +195,7 @@
             </div>
         </section>
 
-        <!-- What You Can Reserve Section (Interactive Filter & Clickable Cards) -->
+        <!-- What You Can Reserve Section -->
         <section id="what-to-reserve" class="max-w-7xl mx-auto px-6 py-20 border-t border-[#27272A]">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
                 <div>
@@ -190,7 +205,7 @@
                 </div>
                 <!-- Interactive Search Filter -->
                 <div class="w-full md:w-72">
-                    <input type="text" x-model="searchQuery" placeholder="Search facilities or equipment..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-600 transition placeholder-zinc-600">
+                    <input type="text" x-model="searchQuery" placeholder="Filter resources..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-600 transition placeholder-zinc-600">
                 </div>
             </div>
 
@@ -199,7 +214,6 @@
                     <div @click="activeResource = item; openModal = true" class="bg-[#18181B] p-6 sm:p-8 rounded-3xl border border-[#27272A] hover:border-zinc-500 transition cursor-pointer group space-y-6 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200 shadow-inner group-hover:scale-105 transition">
-                                <!-- Dynamic Vector Icons -->
                                 <template x-if="item.icon === 'building'">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                                 </template>
@@ -272,27 +286,27 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2">
+                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2 hover:border-zinc-500 transition">
                     <span class="text-xs font-extrabold text-zinc-600 block">01</span>
                     <h4 class="font-bold text-sm text-white">Sign in</h4>
                     <p class="text-xs text-zinc-400 leading-relaxed">Log in with your official CATC student or faculty account.</p>
                 </div>
-                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2">
+                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2 hover:border-zinc-500 transition">
                     <span class="text-xs font-extrabold text-zinc-600 block">02</span>
                     <h4 class="font-bold text-sm text-white">Choose</h4>
                     <p class="text-xs text-zinc-400 leading-relaxed">Select the specific room, lab, or equipment kit you need.</p>
                 </div>
-                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2">
+                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2 hover:border-zinc-500 transition">
                     <span class="text-xs font-extrabold text-zinc-600 block">03</span>
                     <h4 class="font-bold text-sm text-white">Schedule</h4>
                     <p class="text-xs text-zinc-400 leading-relaxed">Pick your exact time slots, purpose, and attendee count.</p>
                 </div>
-                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2">
+                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2 hover:border-zinc-500 transition">
                     <span class="text-xs font-extrabold text-zinc-600 block">04</span>
                     <h4 class="font-bold text-sm text-white">Submit</h4>
                     <p class="text-xs text-zinc-400 leading-relaxed">Send your request straight to the facility manager.</p>
                 </div>
-                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2">
+                <div class="bg-[#18181B] p-6 rounded-2xl border border-[#27272A] space-y-2 hover:border-zinc-500 transition">
                     <span class="text-xs font-extrabold text-zinc-600 block">05</span>
                     <h4 class="font-bold text-sm text-white">Get approved</h4>
                     <p class="text-xs text-zinc-400 leading-relaxed">Receive instant confirmation and pick up your resource.</p>
