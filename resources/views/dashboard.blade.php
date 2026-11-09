@@ -15,11 +15,60 @@
         selectedDate: 'May 27, 2026',
         selectedTimeSlot: '10:00 AM - 12:00 PM',
         purposeReason: '',
+        
+        // Dynamic Calendar State
+        currentMonth: new Date().getMonth(),
+        currentYear: new Date().getFullYear(),
+        selectedDay: 27,
+
+        get monthName() {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[this.currentMonth] + ' ' + this.currentYear;
+        },
+
+        get daysInMonth() {
+            return new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+        },
+
+        get firstDayIndex() {
+            return new Date(this.currentYear, this.currentMonth, 1).getDay();
+        },
+
+        prevMonth() {
+            if (this.currentMonth === 0) {
+                this.currentMonth = 11;
+                this.currentYear--;
+            } else {
+                this.currentMonth--;
+            }
+        },
+
+        nextMonth() {
+            if (this.currentMonth === 11) {
+                this.currentMonth = 0;
+                this.currentYear++;
+            } else {
+                this.currentMonth++;
+            }
+        },
+
+        selectDate(day) {
+            this.selectedDay = day;
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            this.selectedDate = `${months[this.currentMonth]} ${day}, ${this.currentYear}`;
+        },
+        
+        // Modal & Real-Time Data States
+        detailsModalOpen: false,
+        selectedReservation: null,
+        recentReservations: @json($reservations),
+
         notifications: [
-            { id: 1, title: 'Reservation Approved', message: 'Your request for Audio-Visual Room (AVR 2) has been approved by custodian.', time: '10m ago', unread: true },
-            { id: 2, title: 'Booking Reminder', message: 'Upcoming reservation for Sony Cinema Kit A scheduled for May 27.', time: '1h ago', unread: true },
-            { id: 3, title: 'Pending Approval', message: 'Your request for Sony Mirrorless Vlogging Camera Kit is awaiting review.', time: '3h ago', unread: true }
+            { id: 1, title: 'Reservation Approved', message: 'Your request for Audio-Visual Room (AVR 2) has been approved.', time: '10m ago' },
+            { id: 2, title: 'Booking Reminder', message: 'Upcoming reservation scheduled for May 27.', time: '1h ago' },
+            { id: 3, title: 'Pending Review', message: 'Your equipment request is currently under review.', time: '3h ago' }
         ],
+
         resources: [
             { id: 'f1', name: 'Audio-Visual Room (AVR 2) - Main Building', category: 'rooms', type: 'Facility', capacity: 'Air-conditioned room equipped with a wide...', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Audio-Visual.jpg' },
             { id: 'f2', name: 'Computer Laboratory 3 (ComLab)', category: 'labs', type: 'Laboratory', capacity: 'Fully air-conditioned computer hub with 4...', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Open after 03:00 PM', image: '/images/Computer_lab3.jpg' },
@@ -40,11 +89,7 @@
             { id: 'e8', name: 'High-Speed Pocket Wi-Fi / LTE Modem', category: 'equipment', type: 'Equipment', capacity: '10 units stock · Portable wireless router', availableSlots: 6, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/High_Speed_Pocket_WiFi_LTE_Modem.jpg' },
             { id: 'e9', name: 'Whiteboard Marker & Eraser Bulk Set', category: 'equipment', type: 'Equipment', capacity: '25 units stock · Set of assorted color dry', availableSlots: 20, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Whiteboard_Marker_Eraser_Bulk_Set.jpg' }
         ],
-        recentReservations: [
-            { id: 'RES-8921', resource: 'Audio-Visual Room (AVR 2)', type: 'Facility · Main Bldg', datetime: 'May 24, 2026 | 10:00 AM - 12:00 PM', status: 'APPROVED', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800' },
-            { id: 'RES-8922', resource: 'Sony Mirrorless Vlogging Camera Kit', type: 'Equipment · 1 kit', datetime: 'May 27, 2026 | 08:30 AM - 05:00 PM', status: 'PENDING', statusClass: 'bg-amber-950 text-amber-400 border-amber-800' },
-            { id: 'RES-8919', resource: 'Computer Laboratory 3', type: 'Laboratory · ComLab', datetime: 'May 18, 2026 | 01:00 PM - 03:00 PM', status: 'CANCELLED', statusClass: 'bg-rose-950 text-rose-400 border-rose-800' }
-        ],
+
         get filteredResources() {
             return this.resources.filter(item => {
                 let matchesCategory = (this.activeTab === 'all' || item.category === this.activeTab);
@@ -113,7 +158,7 @@
                 </div>
             </div>
 
-            <!-- Profile Sidebar Footer Widget -->
+            <!-- Sidebar Footer -->
             <div class="pt-6 border-t border-[#27272A] flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-xs text-emerald-400">
@@ -136,7 +181,7 @@
         <!-- Main Dashboard Viewport -->
         <div class="flex-grow flex flex-col min-h-screen">
             
-            <!-- Top App Bar Search, Notifications & Indicators -->
+            <!-- Top App Bar -->
             <header class="h-20 border-b border-[#27272A] bg-[#09090B]/80 backdrop-blur-md px-6 lg:px-10 flex items-center justify-between sticky top-0 z-30">
                 <div class="w-full max-w-md relative">
                     <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -152,7 +197,7 @@
                         <span class="text-emerald-400 font-bold">12 active slots</span>
                     </div>
 
-                    <!-- Notification Bell & Dropdown Widget -->
+                    <!-- Notification Bell & Dropdown -->
                     <div class="relative" @click.away="notificationsOpen = false">
                         <button @click="notificationsOpen = !notificationsOpen" class="w-10 h-10 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 flex items-center justify-center transition relative">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -161,13 +206,11 @@
                             </template>
                         </button>
 
-                        <!-- Notification Dropdown Panel -->
-                        <div x-show="notificationsOpen" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" class="absolute right-0 mt-3 w-80 bg-[#121215] border border-[#27272A] rounded-2xl shadow-2xl p-4 space-y-3 z-50" style="display: none;">
+                        <div x-show="notificationsOpen" class="absolute right-0 mt-3 w-80 bg-[#121215] border border-[#27272A] rounded-2xl shadow-2xl p-4 space-y-3 z-50" style="display: none;">
                             <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
                                 <span class="text-xs font-bold text-white">Notifications</span>
                                 <button @click="unreadNotifications = 0" class="text-[10px] text-emerald-400 hover:underline">Mark all read</button>
                             </div>
-
                             <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
                                 <template x-for="n in notifications" :key="n.id">
                                     <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 hover:border-zinc-700 transition space-y-1">
@@ -219,17 +262,16 @@
                                     <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-950 text-emerald-400 border border-emerald-900 uppercase">ACTIVE</span>
                                 </div>
                                 <p class="text-xs text-zinc-400 mt-0.5">{{ Auth::user()->role ?? 'Student' }} Account</p>
-                                <span class="text-[10px] text-zinc-500 mt-1 block font-mono">ID: {{ Auth::user()->id ?? '1001' }}</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="bg-[#121215]/90 backdrop-blur-xl p-5 rounded-3xl border border-[#27272A] shadow-xl flex flex-col justify-between">
-                            <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">ACTIVE BOOKINGS</span>
+                            <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">TOTAL REQUESTS</span>
                             <div class="mt-2">
-                                <span class="text-3xl font-extrabold text-white">02</span>
-                                <span class="text-[10px] text-zinc-400 block mt-0.5">1 upcoming today</span>
+                                <span class="text-3xl font-extrabold text-white" x-text="recentReservations.length">0</span>
+                                <span class="text-[10px] text-zinc-400 block mt-0.5">Database active records</span>
                             </div>
                         </div>
 
@@ -255,12 +297,12 @@
                     </div>
                 </div>
 
-                <!-- Recent Reservations Table Section -->
+                <!-- Real-Time Recent Reservations Table -->
                 <section class="space-y-4">
                     <div class="flex justify-between items-center">
                         <div>
                             <h3 class="text-lg font-extrabold text-white">My recent reservations</h3>
-                            <p class="text-xs text-zinc-400">Track current requests and recent activity.</p>
+                            <p class="text-xs text-zinc-400">Click any reservation to view full details, cancel, or return items.</p>
                         </div>
                         <button @click="currentView = 'profile'; profileTab = 'history';" class="text-xs font-bold text-zinc-400 hover:text-white transition flex items-center space-x-1">
                             <span>View all history</span>
@@ -280,22 +322,31 @@
                                 </thead>
                                 <tbody class="divide-y divide-[#27272A] text-xs">
                                     <template x-for="item in recentReservations" :key="item.id">
-                                        <tr class="hover:bg-zinc-900/40 transition cursor-pointer">
+                                        <tr @click="selectedReservation = item; detailsModalOpen = true;" class="hover:bg-zinc-900/40 transition cursor-pointer">
                                             <td class="py-4 px-6">
                                                 <div class="flex items-center space-x-3">
                                                     <div class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                                                     </div>
                                                     <div>
-                                                        <span class="font-bold text-white block" x-text="item.resource"></span>
-                                                        <span class="text-[10px] text-zinc-500" x-text="item.type"></span>
+                                                        <span class="font-bold text-white block" x-text="item.resource_name"></span>
+                                                        <span class="text-[10px] text-zinc-500 capitalize" x-text="item.resource_type"></span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="py-4 px-6 text-zinc-300 font-medium" x-text="item.datetime"></td>
+                                            <td class="py-4 px-6 text-zinc-300 font-medium" x-text="item.start_time + ' - ' + item.end_time"></td>
                                             <td class="py-4 px-6 text-right">
-                                                <span class="px-3 py-1 text-[10px] font-bold rounded-full border shadow-sm" :class="item.statusClass" x-text="item.status"></span>
+                                                <span class="px-3 py-1 text-[10px] font-bold rounded-full border shadow-sm" :class="{
+                                                    'bg-emerald-950 text-emerald-400 border-emerald-800': item.status === 'APPROVED' || item.status === 'RETURNED',
+                                                    'bg-amber-950 text-amber-400 border-amber-800': item.status === 'PENDING',
+                                                    'bg-rose-950 text-rose-400 border-rose-800': item.status === 'CANCELLED'
+                                                }" x-text="item.status"></span>
                                             </td>
+                                        </tr>
+                                    </template>
+                                    <template x-if="recentReservations.length === 0">
+                                        <tr>
+                                            <td colspan="3" class="py-8 text-center text-zinc-500 text-xs">No reservations found. Create your first request!</td>
                                         </tr>
                                     </template>
                                 </tbody>
@@ -309,317 +360,147 @@
             <!-- ==================== VIEW 2: NEW RESERVATION WORKSPACE ==================== -->
             <main x-show="currentView === 'new-reservation'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 
-                <div class="flex items-center justify-between border-b border-[#27272A] pb-6">
-                    <div class="space-y-1">
-                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">NEW REQUEST</span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Make a reservation</h2>
-                        <p class="text-xs text-zinc-400">Choose a resource and find a time that works for you.</p>
+                <form action="{{ route('reservations.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="resource_type" x-model="resourceType">
+                    <input type="hidden" name="resource_name" x-model="resourceType === 'facility' ? selectedFacility : selectedEquipment">
+                    <input type="hidden" name="category" x-model="resourceType === 'facility' ? 'rooms' : 'equipment'">
+                    <input type="hidden" name="start_time" x-model="selectedDate + ' 10:00:00'">
+                    <input type="hidden" name="end_time" x-model="selectedDate + ' 12:00:00'">
+                    <input type="hidden" name="quantity" x-model="resourceType === 'facility' ? expectedAttendees : equipmentQuantity">
+
+                    <div class="flex items-center justify-between border-b border-[#27272A] pb-6">
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">NEW REQUEST</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Make a reservation</h2>
+                            <p class="text-xs text-zinc-400">Choose a resource and submit directly to your database.</p>
+                        </div>
                     </div>
 
-                    <!-- Step Indicator Pills -->
-                    <div class="flex items-center space-x-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shadow-md transition" :class="bookingStep >= 1 ? 'bg-emerald-500 text-zinc-950 shadow-emerald-950/50' : 'bg-zinc-800 text-zinc-400'">1</span>
-                            <span class="text-xs font-semibold text-zinc-400 hidden sm:inline">What</span>
-                        </div>
-                        <div class="w-8 h-0.5 bg-zinc-800"></div>
-                        <div class="flex items-center space-x-2">
-                            <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shadow-md transition" :class="bookingStep >= 2 ? 'bg-emerald-500 text-zinc-950 shadow-emerald-950/50' : 'bg-zinc-800 text-zinc-400'">2</span>
-                            <span class="text-xs font-semibold text-zinc-400 hidden sm:inline">When</span>
-                        </div>
-                        <div class="w-8 h-0.5 bg-zinc-800"></div>
-                        <div class="flex items-center space-x-2">
-                            <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shadow-md transition" :class="bookingStep >= 3 ? 'bg-emerald-500 text-zinc-950 shadow-emerald-950/50' : 'bg-zinc-800 text-zinc-400'">3</span>
-                            <span class="text-xs font-semibold text-zinc-400 hidden sm:inline">Review</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    
-                    <!-- Left Form Section -->
-                    <div class="lg:col-span-8 bg-[#121215]/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl space-y-8">
-                        
-                        <!-- STEP 1: What do you need? -->
-                        <div x-show="bookingStep === 1" class="space-y-6">
-                            <div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-6">
+                        <div class="lg:col-span-8 bg-[#121215]/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl space-y-8">
+                            
+                            <!-- Step 1: Resource Picker -->
+                            <div class="space-y-6">
                                 <h3 class="text-base font-extrabold text-white">What do you need?</h3>
-                                <p class="text-xs text-zinc-400 mt-0.5">Select resource type and specific item.</p>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <button type="button" @click="resourceType = 'facility'" :class="resourceType === 'facility' ? 'border-emerald-500 bg-zinc-900 shadow-lg shadow-emerald-950/30 ring-1 ring-emerald-500/50' : 'border-zinc-800 bg-zinc-900/40'" class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                        </div>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <button type="button" @click="resourceType = 'facility'" :class="resourceType === 'facility' ? 'border-emerald-500 bg-zinc-900 ring-1 ring-emerald-500/50' : 'border-zinc-800 bg-zinc-900/40'" class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
                                         <span class="text-xs font-bold text-white">Facility</span>
-                                    </div>
-                                    <span class="w-4 h-4 rounded-full border border-zinc-600 flex items-center justify-center" :class="resourceType === 'facility' ? 'border-emerald-500 bg-emerald-500' : ''">
-                                        <span x-show="resourceType === 'facility'" class="w-1.5 h-1.5 rounded-full bg-zinc-950"></span>
-                                    </span>
-                                </button>
-
-                                <button type="button" @click="resourceType = 'equipment'" :class="resourceType === 'equipment' ? 'border-emerald-500 bg-zinc-900 shadow-lg shadow-emerald-950/30 ring-1 ring-emerald-500/50' : 'border-zinc-800 bg-zinc-900/40'" class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                        </div>
+                                    </button>
+                                    <button type="button" @click="resourceType = 'equipment'" :class="resourceType === 'equipment' ? 'border-emerald-500 bg-zinc-900 ring-1 ring-emerald-500/50' : 'border-zinc-800 bg-zinc-900/40'" class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
                                         <span class="text-xs font-bold text-white">Equipment</span>
-                                    </div>
-                                    <span class="w-4 h-4 rounded-full border border-zinc-600 flex items-center justify-center" :class="resourceType === 'equipment' ? 'border-emerald-500 bg-emerald-500' : ''">
-                                        <span x-show="resourceType === 'equipment'" class="w-1.5 h-1.5 rounded-full bg-zinc-950"></span>
-                                    </span>
-                                </button>
-                            </div>
+                                    </button>
+                                </div>
 
-                            <div class="space-y-4">
                                 <template x-if="resourceType === 'facility'">
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Select facility</label>
-                                            <select x-model="selectedFacility" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
-                                                <option value="Audio-Visual Room (AVR 2) - Main Building">Audio-Visual Room (AVR 2) - Main Building</option>
-                                                <option value="Computer Laboratory 3 (ComLab)">Computer Laboratory 3 (ComLab)</option>
-                                                <option value="University Covered Court">University Covered Court</option>
-                                                <option value="Student Council Conference Room">Student Council Conference Room</option>
-                                                <option value="Speech Laboratory">Speech Laboratory</option>
-                                                <option value="Engineering Physics Laboratory">Engineering Physics Laboratory</option>
-                                                <option value="HRM / Culinary Kitchen Studio">HRM / Culinary Kitchen Studio</option>
-                                                <option value="Outdoor Student Pavilion / Gazebo">Outdoor Student Pavilion / Gazebo</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Expected attendees</label>
-                                            <div class="flex items-center space-x-3 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5">
-                                                <input type="number" x-model="expectedAttendees" min="1" max="180" class="w-full bg-transparent text-xs text-white focus:outline-none">
-                                                <div class="flex items-center space-x-1">
-                                                    <button type="button" @click="if(expectedAttendees > 1) expectedAttendees--" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold flex items-center justify-center">-</button>
-                                                    <button type="button" @click="expectedAttendees++" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold flex items-center justify-center">+</button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Select facility</label>
+                                        <select x-model="selectedFacility" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500">
+                                            <option value="Audio-Visual Room (AVR 2)">Audio-Visual Room (AVR 2)</option>
+                                            <option value="Computer Laboratory 3 (ComLab)">Computer Laboratory 3 (ComLab)</option>
+                                            <option value="University Covered Court">University Covered Court</option>
+                                        </select>
                                     </div>
                                 </template>
 
                                 <template x-if="resourceType === 'equipment'">
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Select equipment</label>
-                                            <select x-model="selectedEquipment" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
-                                                <option value="Epson Multimedia Classroom Projector">Epson Multimedia Classroom Projector (10 stock)</option>
-                                                <option value="Sony Mirrorless Vlogging Camera Kit">Sony Mirrorless Vlogging Camera Kit (5 stock)</option>
-                                                <option value="Wireless Microphone Set (Dual Handheld)">Wireless Microphone Set (Dual Handheld) (8 stock)</option>
-                                                <option value="Heavy-Duty Extension Cord (5-Meter)">Heavy-Duty Extension Cord (5-Meter) (15 stock)</option>
-                                                <option value="Arduino & Raspberry Pi STEM Kit">Arduino & Raspberry Pi STEM Kit (12 stock)</option>
-                                                <option value="Portable PA System with Wireless Mic">Portable PA System with Wireless Mic (6 stock)</option>
-                                                <option value="Compound Monocular Microscope Set">Compound Monocular Microscope Set (20 stock)</option>
-                                                <option value="High-Speed Pocket Wi-Fi / LTE Modem">High-Speed Pocket Wi-Fi / LTE Modem (10 stock)</option>
-                                                <option value="Whiteboard Marker & Eraser Bulk Set">Whiteboard Marker & Eraser Bulk Set (25 stock)</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Quantity needed</label>
-                                            <div class="flex items-center space-x-3 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5">
-                                                <input type="number" x-model="equipmentQuantity" min="1" max="10" class="w-full bg-transparent text-xs text-white focus:outline-none">
-                                                <div class="flex items-center space-x-1">
-                                                    <button type="button" @click="if(equipmentQuantity > 1) equipmentQuantity--" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold flex items-center justify-center">-</button>
-                                                    <button type="button" @click="equipmentQuantity++" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold flex items-center justify-center">+</button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Select equipment</label>
+                                        <select x-model="selectedEquipment" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500">
+                                            <option value="Epson Multimedia Classroom Projector">Epson Multimedia Classroom Projector</option>
+                                            <option value="Sony Mirrorless Vlogging Camera Kit">Sony Mirrorless Vlogging Camera Kit</option>
+                                            <option value="Wireless Microphone Set">Wireless Microphone Set</option>
+                                        </select>
                                     </div>
                                 </template>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Purpose / Reason for reservation</label>
-                                <textarea x-model="purposeReason" rows="3" placeholder="e.g., Thesis defense presentation, faculty meeting, video project..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition placeholder-zinc-600" required></textarea>
-                            </div>
-                        </div>
-
-                        <!-- STEP 2: When do you need it? -->
-                        <div x-show="bookingStep === 2" class="space-y-6" style="display: none;">
-                            <div>
+                            <!-- Step 2: Dynamic Calendar Picker -->
+                            <div class="space-y-6 pt-6 border-t border-[#27272A]">
                                 <h3 class="text-base font-extrabold text-white">When do you need it?</h3>
-                                <p class="text-xs text-zinc-400 mt-0.5">Choose an available date and start time.</p>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                                <!-- Visual Calendar Box -->
-                                <div class="md:col-span-7 bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 space-y-4">
-                                    <div class="flex justify-between items-center">
-                                        <button type="button" class="text-zinc-400 hover:text-white">&larr;</button>
-                                        <span class="text-xs font-extrabold text-white">May 2026</span>
-                                        <button type="button" class="text-zinc-400 hover:text-white">&rarr;</button>
+                                
+                                <div class="bg-zinc-900/50 p-5 rounded-2xl border border-zinc-800 max-w-md">
+                                    <!-- Month Header with Arrows -->
+                                    <div class="flex items-center justify-between mb-4">
+                                        <button type="button" @click="prevMonth()" class="text-zinc-400 hover:text-white px-2.5 py-1 bg-zinc-800 rounded-lg">&larr;</button>
+                                        <span class="text-xs font-extrabold text-white" x-text="monthName"></span>
+                                        <button type="button" @click="nextMonth()" class="text-zinc-400 hover:text-white px-2.5 py-1 bg-zinc-800 rounded-lg">&rarr;</button>
                                     </div>
 
-                                    <div class="grid grid-cols-7 text-center text-[10px] font-bold text-zinc-500">
+                                    <!-- Days Grid -->
+                                    <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-zinc-400 font-semibold mb-2">
                                         <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
                                     </div>
-
-                                    <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold">
-                                        <template x-for="day in 31">
-                                            <button type="button" 
-                                                @click="selectedDate = 'May ' + day + ', 2026'"
-                                                class="py-2 rounded-xl transition flex flex-col items-center justify-center"
-                                                :class="selectedDate === ('May ' + day + ', 2026') ? 'bg-emerald-500 text-zinc-950 font-extrabold shadow-lg shadow-emerald-950/50' : 'text-zinc-300 hover:bg-zinc-800'">
-                                                <span x-text="day"></span>
-                                                <span class="w-1 h-1 rounded-full mt-1" :class="day === 27 ? 'bg-emerald-400' : (day % 3 === 0 ? 'bg-amber-400' : 'bg-zinc-600')"></span>
-                                            </button>
+                                    <div class="grid grid-cols-7 gap-1 text-center text-xs">
+                                        <template x-for="i in firstDayIndex">
+                                            <div></div>
                                         </template>
-                                    </div>
-
-                                    <div class="flex items-center justify-center space-x-6 pt-3 border-t border-zinc-800 text-[10px] text-zinc-400">
-                                        <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Available</span></div>
-                                        <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span><span>Limited</span></div>
-                                        <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-zinc-600"></span><span>Unavailable</span></div>
-                                    </div>
-                                </div>
-
-                                <!-- Time Slots Picker Box -->
-                                <div class="md:col-span-5 bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 space-y-3">
-                                    <div class="flex items-center space-x-2 text-xs font-bold text-zinc-400 pb-2 border-b border-zinc-800">
-                                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        <span x-text="selectedDate"></span>
-                                    </div>
-
-                                    <div class="space-y-2">
-                                        <template x-for="slot in ['08:00 AM - 10:00 AM', '10:00 AM - 12:00 PM', '01:00 PM - 03:00 PM', '03:00 PM - 05:00 PM']">
+                                        <template x-for="day in daysInMonth" :key="day">
                                             <button type="button" 
-                                                @click="selectedTimeSlot = slot"
-                                                class="w-full p-3 rounded-xl border text-left transition flex items-center justify-between text-xs font-semibold"
-                                                :class="selectedTimeSlot === slot ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-zinc-800 bg-zinc-950/50 text-zinc-400 hover:border-zinc-700'">
-                                                <span x-text="slot"></span>
-                                                <span class="text-[10px] font-bold" :class="selectedTimeSlot === slot ? 'text-emerald-400' : 'text-zinc-500'" x-text="selectedTimeSlot === slot ? 'Selected' : 'Available'"></span>
+                                                @click="selectDate(day)"
+                                                :class="selectedDay === day ? 'bg-emerald-500 text-zinc-950 font-extrabold shadow-md' : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800'"
+                                                class="h-8 rounded-lg flex items-center justify-center transition"
+                                                x-text="day">
                                             </button>
                                         </template>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- STEP 3: Review & Submit -->
-                        <div x-show="bookingStep === 3" class="space-y-6 text-center py-8" style="display: none;">
-                            <div class="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                <div>
+                                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Purpose / Reason for reservation</label>
+                                    <textarea name="purpose" x-model="purposeReason" rows="3" placeholder="e.g., Thesis defense presentation, faculty meeting..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500" required></textarea>
+                                </div>
                             </div>
-                            <div class="space-y-2 max-w-md mx-auto">
-                                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">REQUEST READY</span>
-                                <h3 class="text-xl font-extrabold text-white">Everything looks good.</h3>
-                                <p class="text-xs text-zinc-400 leading-relaxed">Your reservation request is ready to submit. You will receive an update after custodian review.</p>
-                            </div>
-                        </div>
 
-                        <!-- Navigation Buttons -->
-                        <div class="pt-6 border-t border-[#27272A] flex justify-between items-center">
-                            <button type="button" @click="if(bookingStep > 1) bookingStep--; else currentView = 'overview';" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-5 py-2.5 rounded-xl text-xs font-bold transition">
-                                <span x-text="bookingStep === 1 ? 'Cancel' : 'Back'"></span>
-                            </button>
-                            
-                            <template x-if="bookingStep < 3">
-                                <button type="button" @click="bookingStep++" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-6 py-2.5 rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-950/40">
-                                    Next step &rarr;
+                            <div class="pt-6 border-t border-[#27272A] flex justify-end">
+                                <button type="submit" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-6 py-3 rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-950/40">
+                                    Submit Request &rarr;
                                 </button>
-                            </template>
-                            <template x-if="bookingStep === 3">
-                                <button type="button" @click="alert('Reservation submitted successfully!'); currentView = 'overview'; bookingStep = 1;" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-6 py-2.5 rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-950/40">
-                                    Submit request &rarr;
-                                </button>
-                            </template>
-                        </div>
-
-                    </div>
-
-                    <!-- Right Sidebar Reservation Summary -->
-                    <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl space-y-6">
-                        <div class="space-y-6">
-                            <div>
-                                <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">RESERVATION SUMMARY</span>
-                                <h4 class="text-base font-extrabold text-white mt-1" x-text="resourceType === 'facility' ? selectedFacility : selectedEquipment"></h4>
-                            </div>
-
-                            <div class="space-y-4 text-xs pt-4 border-t border-zinc-800/80">
-                                <div class="flex justify-between">
-                                    <span class="text-zinc-500">Type</span>
-                                    <span class="font-bold text-zinc-200 capitalize" x-text="resourceType"></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-zinc-500">Date</span>
-                                    <span class="font-bold text-zinc-200" x-text="selectedDate"></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-zinc-500">Time</span>
-                                    <span class="font-bold text-emerald-400" x-text="selectedTimeSlot"></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-zinc-500" x-text="resourceType === 'facility' ? 'Attendees' : 'Quantity'"></span>
-                                    <span class="font-bold text-zinc-200" x-text="resourceType === 'facility' ? expectedAttendees + ' persons' : equipmentQuantity + ' units'"></span>
-                                </div>
                             </div>
                         </div>
 
-                        <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-2">
-                            <div class="flex items-center space-x-2 text-[11px] font-bold text-emerald-400">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                <span>SLOT AVAILABLE</span>
+                        <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl space-y-6">
+                            <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">SUMMARY</span>
+                            <h4 class="text-base font-extrabold text-white" x-text="resourceType === 'facility' ? selectedFacility : selectedEquipment"></h4>
+                            <div class="space-y-2 text-xs text-zinc-300 pt-2 border-t border-zinc-800">
+                                <p><strong>Date:</strong> <span x-text="selectedDate"></span></p>
+                                <p><strong>Time:</strong> 10:00 AM - 12:00 PM</p>
                             </div>
-                            <p class="text-[10px] text-zinc-400 leading-relaxed">This resource is available for your selected date and time.</p>
+                            <p class="text-[11px] text-zinc-400">Your reservation will be saved immediately to the database for custodian approval.</p>
                         </div>
                     </div>
-
-                </div>
-
+                </form>
             </main>
 
 
-            <!-- ==================== VIEW 3: AVAILABILITY CALENDAR & CATALOG DIRECTORY ==================== -->
+            <!-- ==================== VIEW 3: AVAILABILITY CALENDAR & CATALOG ==================== -->
             <main x-show="currentView === 'availability-calendar'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
-                
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#27272A] pb-6">
                     <div class="space-y-1">
                         <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">MASTER DIRECTORY</span>
                         <h2 class="text-3xl font-extrabold text-white tracking-tight">Campus Availability Calendar</h2>
-                        <p class="text-xs text-zinc-400">Real-time scheduling and status overview across all rooms, labs, and equipment.</p>
-                    </div>
-
-                    <div class="bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-xl text-xs font-bold text-zinc-300 flex items-center space-x-2">
-                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span>May 2026</span>
+                        <p class="text-xs text-zinc-400">Real-time inventory stock overview across all rooms and equipment.</p>
                     </div>
                 </div>
 
                 <!-- Category Filtering Tabs -->
                 <div class="flex space-x-2 border-b border-[#27272A] pb-3 overflow-x-auto text-xs font-bold">
-                    <button @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition">
-                        All Resources
-                    </button>
-                    <button @click="activeTab = 'rooms'" :class="activeTab === 'rooms' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition">
-                        Rooms & Halls
-                    </button>
-                    <button @click="activeTab = 'labs'" :class="activeTab === 'labs' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition">
-                        Computer Laboratories
-                    </button>
-                    <button @click="activeTab = 'equipment'" :class="activeTab === 'equipment' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition">
-                        Technical Equipment
-                    </button>
+                    <button @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-zinc-800 text-white' : 'text-zinc-400'" class="px-4 py-2 rounded-xl transition">All Resources</button>
+                    <button @click="activeTab = 'rooms'" :class="activeTab === 'rooms' ? 'bg-zinc-800 text-white' : 'text-zinc-400'" class="px-4 py-2 rounded-xl transition">Rooms & Halls</button>
+                    <button @click="activeTab = 'labs'" :class="activeTab === 'labs' ? 'bg-zinc-800 text-white' : 'text-zinc-400'" class="px-4 py-2 rounded-xl transition">Laboratories</button>
+                    <button @click="activeTab = 'equipment'" :class="activeTab === 'equipment' ? 'bg-zinc-800 text-white' : 'text-zinc-400'" class="px-4 py-2 rounded-xl transition">Technical Equipment</button>
                 </div>
 
-                <!-- Availability Catalog Grid with Database Photos -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <template x-for="item in filteredResources" :key="item.id">
                         <div class="bg-[#121215]/90 backdrop-blur-xl rounded-3xl border border-[#27272A] hover:border-emerald-500/50 transition overflow-hidden shadow-xl flex flex-col justify-between group">
-                            
-                            <!-- Image Header Preview -->
                             <div class="relative h-44 w-full overflow-hidden bg-zinc-900 border-b border-[#27272A]">
-                                <img :src="item.image" :alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-85">
-                                <div class="absolute inset-0 bg-gradient-to-t from-[#121215] via-transparent to-transparent"></div>
+                                <img :src="item.image" :alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-85" onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80'">
                                 <div class="absolute top-3 right-3">
                                     <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border shadow-sm backdrop-blur-md" :class="item.statusClass" x-text="item.status"></span>
                                 </div>
                             </div>
-
-                            <!-- Content Details -->
                             <div class="p-6 space-y-4">
                                 <div>
                                     <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block" x-text="item.type"></span>
@@ -627,194 +508,68 @@
                                     <p class="text-xs text-zinc-400 mt-1" x-text="item.capacity"></p>
                                 </div>
                             </div>
-
-                            <!-- Footer Schedule & Action -->
                             <div class="p-6 pt-0 space-y-4">
-                                <div class="flex items-center space-x-2 text-xs bg-zinc-900/80 px-3 py-2 rounded-xl border border-zinc-800/80">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                    <span class="text-zinc-300 font-medium truncate" x-text="item.schedule"></span>
-                                </div>
-                                <button @click="currentView = 'new-reservation'; bookingStep = 1;" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-bold rounded-xl transition block text-center shadow-lg shadow-emerald-950/40">
+                                <button @click="currentView = 'new-reservation'; bookingStep = 1;" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-bold rounded-xl transition block text-center shadow-lg">
                                     Book This Resource &rarr;
                                 </button>
                             </div>
-
                         </div>
                     </template>
                 </div>
-
             </main>
 
 
-            <!-- ==================== VIEW 4: MY PROFILE & SETTINGS (FIGMA MATCH) ==================== -->
+            <!-- ==================== VIEW 4: MY PROFILE & HISTORY ==================== -->
             <main x-show="currentView === 'profile'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 
-                <!-- Profile Header Card -->
-                <div class="bg-[#121215]/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                    
-                    <div class="flex items-center space-x-5 relative z-10">
-                        <div class="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center font-extrabold text-xl text-emerald-400 shadow-inner">
+                <div class="bg-[#121215]/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div class="flex items-center space-x-5">
+                        <div class="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center font-extrabold text-xl text-emerald-400">
                             {{ strtoupper(substr(Auth::user()->name ?? 'JD', 0, 2)) }}
                         </div>
                         <div class="space-y-1">
-                            <div class="flex items-center space-x-3">
-                                <h1 class="text-2xl font-extrabold text-white tracking-tight">{{ Auth::user()->name ?? 'Juan Dela Cruz' }}</h1>
-                                <span class="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 uppercase">ACTIVE ACCOUNT</span>
-                            </div>
+                            <h1 class="text-2xl font-extrabold text-white tracking-tight">{{ Auth::user()->name ?? 'Juan Dela Cruz' }}</h1>
                             <p class="text-xs text-zinc-400">{{ Auth::user()->email ?? 'jdelacruz@csu.edu.ph' }}</p>
-                            <p class="text-[10px] text-zinc-500 font-mono">Member ID: {{ Auth::user()->id ?? '2022-0382' }}</p>
                         </div>
                     </div>
-
-                    <a href="{{ route('profile.edit') }}" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl border border-zinc-800 transition shadow-sm flex items-center space-x-2">
-                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        <span>Edit profile</span>
-                    </a>
                 </div>
 
-                <!-- Profile Sub-Navigation Tabs -->
                 <div class="flex space-x-6 border-b border-[#27272A] text-xs font-bold">
-                    <button @click="profileTab = 'overview'" :class="profileTab === 'overview' ? 'text-emerald-400 border-b-2 border-emerald-400 pb-3 -mb-px' : 'text-zinc-400 hover:text-white pb-3'" class="transition">
-                        Overview
-                    </button>
-                    <button @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-emerald-400 border-b-2 border-emerald-400 pb-3 -mb-px' : 'text-zinc-400 hover:text-white pb-3'" class="transition">
-                        Reservation history
-                    </button>
-                    <button @click="profileTab = 'settings'" :class="profileTab === 'settings' ? 'text-emerald-400 border-b-2 border-emerald-400 pb-3 -mb-px' : 'text-zinc-400 hover:text-white pb-3'" class="transition">
-                        Account settings
-                    </button>
+                    <button @click="profileTab = 'overview'" :class="profileTab === 'overview' ? 'text-emerald-400 border-b-2 border-emerald-400 pb-3 -mb-px' : 'text-zinc-400 hover:text-white pb-3'" class="transition">Overview</button>
+                    <button @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-emerald-400 border-b-2 border-emerald-400 pb-3 -mb-px' : 'text-zinc-400 hover:text-white pb-3'" class="transition">Reservation history</button>
                 </div>
 
-                <!-- TAB 1: OVERVIEW -->
+                <!-- Profile Overview Tab -->
                 <div x-show="profileTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] shadow-xl space-y-6">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-extrabold text-white">Academic information</h3>
-                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        </div>
-
-                        <div class="space-y-4 text-xs">
-                            <div>
-                                <span class="text-[10px] font-bold text-zinc-500 uppercase">FULL NAME</span>
-                                <p class="text-zinc-200 font-semibold mt-0.5">{{ Auth::user()->name ?? 'Juan Miguel Dela Cruz' }}</p>
-                            </div>
-                            <div>
-                                <span class="text-[10px] font-bold text-zinc-500 uppercase">EMAIL ADDRESS</span>
-                                <p class="text-zinc-200 font-semibold mt-0.5">{{ Auth::user()->email ?? 'jdelacruz@csu.edu.ph' }}</p>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <span class="text-[10px] font-bold text-zinc-500 uppercase">COURSE</span>
-                                    <p class="text-zinc-200 font-semibold mt-0.5">Computer Arts</p>
-                                </div>
-                                <div>
-                                    <span class="text-[10px] font-bold text-zinc-500 uppercase">YEAR LEVEL</span>
-                                    <p class="text-zinc-200 font-semibold mt-0.5">Third Year</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-4 border-t border-zinc-800/80 flex items-center space-x-2 text-[11px] text-emerald-400 font-bold">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                            <span>VERIFIED & ACTIVE</span>
-                        </div>
+                    <div class="lg:col-span-6 bg-[#121215] p-6 rounded-3xl border border-[#27272A] space-y-4">
+                        <h3 class="text-sm font-extrabold text-white">Academic Information</h3>
+                        <p class="text-xs text-zinc-300">Name: {{ Auth::user()->name }}</p>
+                        <p class="text-xs text-zinc-300">Email: {{ Auth::user()->email }}</p>
                     </div>
-
-                    <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] shadow-xl space-y-6">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-extrabold text-white">Reservation activity</h3>
-                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-zinc-900/80 p-4 rounded-2xl border border-zinc-800">
-                                <span class="text-[10px] font-bold text-zinc-500 uppercase block">TOTAL REQUESTS</span>
-                                <span class="text-2xl font-extrabold text-white mt-1 block">24</span>
-                                <span class="text-[10px] text-zinc-400 mt-1 block">Your usage this academic year</span>
-                            </div>
-                            <div class="bg-zinc-900/80 p-4 rounded-2xl border border-zinc-800">
-                                <span class="text-[10px] font-bold text-zinc-500 uppercase block">APPROVED</span>
-                                <span class="text-2xl font-extrabold text-emerald-400 mt-1 block">21</span>
-                                <span class="text-[10px] text-emerald-500 mt-1 block">96% success rate</span>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3 pt-2">
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs"><span class="text-zinc-400">Rooms & Halls</span><span class="text-white font-bold">12</span></div>
-                                <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden"><div class="w-3/5 h-full bg-emerald-500 rounded-full"></div></div>
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs"><span class="text-zinc-400">Media Equipment</span><span class="text-white font-bold">9</span></div>
-                                <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden"><div class="w-2/5 h-full bg-emerald-400 rounded-full"></div></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] shadow-xl space-y-6">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-extrabold text-white">Quick actions</h3>
-                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        </div>
-
-                        <div class="space-y-3">
-                            <button @click="currentView = 'new-reservation'" class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 text-xs font-bold rounded-2xl border border-zinc-800 transition flex items-center justify-between group">
-                                <div class="flex items-center space-x-3">
-                                    <span class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-extrabold">+</span>
-                                    <span>New reservation</span>
-                                </div>
-                                <span class="text-zinc-500 group-hover:text-white">&rarr;</span>
-                            </button>
-
-                            <button @click="profileTab = 'history'" class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 text-xs font-bold rounded-2xl border border-zinc-800 transition flex items-center justify-between group">
-                                <div class="flex items-center space-x-3">
-                                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                    <span>Download history</span>
-                                </div>
-                                <span class="text-zinc-500 group-hover:text-white">&rarr;</span>
-                            </button>
-
-                            <button class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 text-xs font-bold rounded-2xl border border-zinc-800 transition flex items-center justify-between group">
-                                <div class="flex items-center space-x-3">
-                                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <span>Get support</span>
-                                </div>
-                                <span class="text-zinc-500 group-hover:text-white">&rarr;</span>
-                            </button>
-                        </div>
+                    <div class="lg:col-span-6 bg-[#121215] p-6 rounded-3xl border border-[#27272A] space-y-4">
+                        <h3 class="text-sm font-extrabold text-white">Total Requests</h3>
+                        <p class="text-3xl font-extrabold text-emerald-400" x-text="recentReservations.length"></p>
                     </div>
                 </div>
 
-                <!-- TAB 2: HISTORY -->
+                <!-- Reservation History Tab -->
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-extrabold text-white">Reservation history</h3>
-                            <p class="text-xs text-zinc-400">All your resource requests in one place.</p>
-                        </div>
-                        <button class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl border border-zinc-800 transition">
-                            Export history
-                        </button>
-                    </div>
-
-                    <div class="bg-[#121215]/90 backdrop-blur-xl rounded-3xl border border-[#27272A] overflow-hidden shadow-xl">
+                    <h3 class="text-lg font-extrabold text-white">Full Reservation History</h3>
+                    <div class="bg-[#121215] rounded-3xl border border-[#27272A] overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#27272A]">
                             <template x-for="item in recentReservations" :key="item.id">
-                                <div class="p-5 flex items-center justify-between hover:bg-zinc-900/40 transition">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
-                                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-sm font-bold text-white" x-text="item.resource"></h4>
-                                            <p class="text-xs text-zinc-400 mt-0.5" x-text="item.type"></p>
-                                        </div>
+                                <div @click="selectedReservation = item; detailsModalOpen = true;" class="p-5 flex items-center justify-between hover:bg-zinc-900/40 transition cursor-pointer">
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white" x-text="item.resource_name"></h4>
+                                        <p class="text-xs text-zinc-400 mt-0.5" x-text="item.resource_type + ' · ' + item.purpose"></p>
                                     </div>
-
                                     <div class="flex items-center space-x-6">
-                                        <span class="text-xs text-zinc-300 font-medium hidden sm:inline" x-text="item.datetime"></span>
-                                        <span class="px-3 py-1 text-[10px] font-bold rounded-full border shadow-sm" :class="item.statusClass" x-text="item.status"></span>
+                                        <span class="text-xs text-zinc-300 font-medium" x-text="item.start_time"></span>
+                                        <span class="px-3 py-1 text-[10px] font-bold rounded-full border" :class="{
+                                            'bg-emerald-950 text-emerald-400 border-emerald-800': item.status === 'APPROVED' || item.status === 'RETURNED',
+                                            'bg-amber-950 text-amber-400 border-amber-800': item.status === 'PENDING',
+                                            'bg-rose-950 text-rose-400 border-rose-800': item.status === 'CANCELLED'
+                                        }" x-text="item.status"></span>
                                     </div>
                                 </div>
                             </template>
@@ -822,46 +577,71 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: SETTINGS -->
-                <div x-show="profileTab === 'settings'" class="space-y-6 max-w-2xl" style="display: none;">
+            </main>
+
+        </div>
+
+        <!-- ==================== RESERVATION DETAILS & ACTIONS MODAL ==================== -->
+        <div x-show="detailsModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" style="display: none;">
+            <div @click.away="detailsModalOpen = false" class="bg-[#121215] border border-[#27272A] w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
                     <div>
-                        <h3 class="text-lg font-extrabold text-white">Account preferences</h3>
-                        <p class="text-xs text-zinc-400">Control how RESERVA works for you.</p>
+                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">REQUEST DETAILS</span>
+                        <h3 class="text-lg font-extrabold text-white mt-0.5" x-text="selectedReservation?.resource_name"></h3>
+                    </div>
+                    <button @click="detailsModalOpen = false" class="text-zinc-400 hover:text-white font-bold">&times;</button>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <div class="grid grid-cols-2 gap-4 bg-zinc-900/60 p-4 rounded-2xl border border-zinc-800">
+                        <div>
+                            <span class="text-[10px] font-bold text-zinc-500 uppercase">STATUS</span>
+                            <p class="font-bold mt-0.5" :class="{
+                                'text-emerald-400': selectedReservation?.status === 'APPROVED' || selectedReservation?.status === 'RETURNED',
+                                'text-amber-400': selectedReservation?.status === 'PENDING',
+                                'text-rose-400': selectedReservation?.status === 'CANCELLED'
+                            }" x-text="selectedReservation?.status"></p>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold text-zinc-500 uppercase">TYPE</span>
+                            <p class="text-zinc-200 font-semibold mt-0.5 capitalize" x-text="selectedReservation?.resource_type"></p>
+                        </div>
                     </div>
 
-                    <div class="bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] space-y-6 shadow-xl">
-                        <div class="flex items-center justify-between py-3 border-b border-zinc-800">
-                            <div>
-                                <h4 class="text-xs font-bold text-white">Email notifications</h4>
-                                <p class="text-[11px] text-zinc-400">Receive status and reminder updates by email.</p>
-                            </div>
-                            <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 rounded bg-zinc-900 border-zinc-700">
-                        </div>
-
-                        <div class="space-y-2 py-3 border-b border-zinc-800">
-                            <h4 class="text-xs font-bold text-white">Default reservation duration</h4>
-                            <p class="text-[11px] text-zinc-400">Used when creating a new request.</p>
-                            <select class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500">
-                                <option>2 hours</option>
-                                <option>4 hours</option>
-                                <option>Full day</option>
-                            </select>
-                        </div>
-
-                        <div class="flex items-center justify-between py-3">
-                            <div>
-                                <h4 class="text-xs font-bold text-white">Password & security</h4>
-                                <p class="text-[11px] text-zinc-400">Update your account password.</p>
-                            </div>
-                            <a href="{{ route('profile.edit') }}" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl border border-zinc-800 transition">
-                                Change password
-                            </a>
-                        </div>
+                    <div>
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase">PURPOSE</span>
+                        <p class="text-zinc-300 bg-zinc-900/90 p-3 rounded-xl border border-zinc-800 mt-0.5" x-text="selectedReservation?.purpose"></p>
                     </div>
                 </div>
 
-            </main>
+                <div class="pt-4 border-t border-zinc-800 flex items-center justify-between">
+                    <button @click="detailsModalOpen = false" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold rounded-xl transition">
+                        Close
+                    </button>
 
+                    <div class="flex items-center space-x-3">
+                        <!-- Return Unit Button -->
+                        <template x-if="selectedReservation?.status === 'APPROVED' && selectedReservation?.resource_type === 'equipment'">
+                            <form :action="'/reservations/' + selectedReservation?.id + '/return'" method="POST">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-bold rounded-xl transition shadow-lg">
+                                    Return Unit
+                                </button>
+                            </form>
+                        </template>
+
+                        <!-- Cancel Request Button -->
+                        <template x-if="selectedReservation?.status === 'PENDING' || selectedReservation?.status === 'APPROVED'">
+                            <form :action="'/reservations/' + selectedReservation?.id + '/cancel'" method="POST">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 bg-rose-950 text-rose-400 border border-rose-800 hover:bg-rose-900 text-xs font-bold rounded-xl transition">
+                                    Cancel Request
+                                </button>
+                            </form>
+                        </template>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
