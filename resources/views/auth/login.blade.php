@@ -13,9 +13,16 @@
                 <div class="absolute top-0 left-0 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div class="relative z-10 space-y-6">
-                    <div class="flex items-center space-x-3">
-                        <img src="{{ asset('images/reserva.jpg') }}" alt="RESERVA Logo" class="w-10 h-10 rounded-xl object-cover border border-emerald-500/30 shadow-lg shadow-emerald-950/50" onerror="this.src='{{ asset('reserva.jpg') }}';">
-                        <span class="font-extrabold text-white text-lg tracking-tight">RESERVA</span>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-3">
+                            <img src="{{ asset('images/reserva.jpg') }}" alt="RESERVA Logo" class="w-10 h-10 rounded-xl object-cover border border-emerald-500/30 shadow-lg shadow-emerald-950/50" onerror="this.src='{{ asset('reserva.jpg') }}';">
+                            <span class="font-extrabold text-white text-lg tracking-tight">RESERVA</span>
+                        </div>
+                        <!-- Back to Home Link -->
+                        <a href="{{ url('/') }}" class="text-xs font-semibold text-zinc-400 hover:text-white transition flex items-center space-x-1.5 bg-zinc-900/80 px-3 py-1.5 rounded-xl border border-zinc-800">
+                            <span>&larr;</span>
+                            <span>Back to home</span>
+                        </a>
                     </div>
 
                     <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-[11px] font-semibold text-emerald-400">
