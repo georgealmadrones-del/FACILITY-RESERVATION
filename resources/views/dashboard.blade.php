@@ -2,7 +2,7 @@
     <div x-data="{
         activeTab: 'rooms',
         searchQuery: '',
-        currentView: 'overview', // 'overview' or 'new-reservation'
+        currentView: 'overview',
         bookingStep: 1,
         resourceType: 'facility',
         selectedFacility: 'Auditorium Hall',
@@ -10,8 +10,7 @@
         expectedAttendees: 12,
         equipmentQuantity: 2,
         selectedDate: 'May 27, 2026',
-        startTime: '10:00 AM',
-        endTime: '12:00 PM',
+        selectedTimeSlot: '10:00 AM - 12:00 PM',
         purposeReason: '',
         resources: [
             { id: 1, name: 'Multimedia Room 201', category: 'rooms', type: 'Facility', capacity: '30 people · 2nd Floor', availableSlots: 4, status: 'AVAILABLE', icon: 'building' },
@@ -144,8 +143,6 @@
 
             <!-- ==================== VIEW 1: OVERVIEW DASHBOARD ==================== -->
             <main x-show="currentView === 'overview'" class="flex-grow p-6 lg:p-10 space-y-10">
-                
-                <!-- Welcome & Summary Header Block -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div class="space-y-1">
                         <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest block">{{ strtoupper(date('l, F j')) }}</span>
@@ -161,7 +158,6 @@
                     </button>
                 </div>
 
-                <!-- User Profile & Quick Metrics Row -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <div class="lg:col-span-5 bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] shadow-xl flex items-center justify-between relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
@@ -273,7 +269,6 @@
                         </span>
                     </div>
 
-                    <!-- Category Tab Controls -->
                     <div class="flex space-x-2 border-b border-[#27272A] pb-3 overflow-x-auto text-xs font-bold">
                         <button @click="activeTab = 'rooms'" :class="activeTab === 'rooms' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition flex items-center space-x-2">
                             <span>Rooms & Halls</span>
@@ -289,7 +284,6 @@
                         </button>
                     </div>
 
-                    <!-- Grid Cards Container -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <template x-for="item in filteredResources" :key="item.id">
                             <div class="bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] hover:border-emerald-500/50 transition space-y-5 flex flex-col justify-between shadow-xl group">
@@ -328,10 +322,9 @@
             </main>
 
 
-            <!-- ==================== VIEW 2: NEW RESERVATION WORKSPACE (FIGMA STYLE) ==================== -->
+            <!-- ==================== VIEW 2: NEW RESERVATION WORKSPACE (EXACT FIGMA CALENDAR STYLE) ==================== -->
             <main x-show="currentView === 'new-reservation'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 
-                <!-- Breadcrumb & Title Header -->
                 <div class="flex items-center justify-between border-b border-[#27272A] pb-6">
                     <div class="space-y-1">
                         <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">NEW REQUEST</span>
@@ -339,7 +332,7 @@
                         <p class="text-xs text-zinc-400">Choose a resource and find a time that works for you.</p>
                     </div>
 
-                    <!-- Step Indicator Pills (Green when active) -->
+                    <!-- Step Indicator Pills (Glowing Green) -->
                     <div class="flex items-center space-x-3">
                         <div class="flex items-center space-x-2">
                             <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shadow-md transition" :class="bookingStep >= 1 ? 'bg-emerald-500 text-zinc-950 shadow-emerald-950/50' : 'bg-zinc-800 text-zinc-400'">1</span>
@@ -358,7 +351,6 @@
                     </div>
                 </div>
 
-                <!-- 2-Column Workspace Grid (Form Left, Summary Right) -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
                     <!-- Left Form Section -->
@@ -371,7 +363,6 @@
                                 <p class="text-xs text-zinc-400 mt-0.5">Select resource type and specific item.</p>
                             </div>
 
-                            <!-- Facility / Equipment toggle buttons -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <button type="button" @click="resourceType = 'facility'" :class="resourceType === 'facility' ? 'border-emerald-500 bg-zinc-900 shadow-lg shadow-emerald-950/30 ring-1 ring-emerald-500/50' : 'border-zinc-800 bg-zinc-900/40'" class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
                                     <div class="flex items-center space-x-3">
@@ -398,7 +389,6 @@
                                 </button>
                             </div>
 
-                            <!-- Specific Selectors -->
                             <div class="space-y-4">
                                 <template x-if="resourceType === 'facility'">
                                     <div class="space-y-4">
@@ -448,51 +438,74 @@
                                 </template>
                             </div>
 
-                            <!-- Reason / Purpose Bar -->
                             <div>
                                 <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Purpose / Reason for reservation</label>
                                 <textarea x-model="purposeReason" rows="3" placeholder="e.g., Thesis defense presentation, faculty meeting, video project..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition placeholder-zinc-600" required></textarea>
                             </div>
                         </div>
 
-                        <!-- STEP 2: When do you need it? (Custom Start & End Time) -->
+                        <!-- STEP 2: When do you need it? (EXACT FIGMA VISUAL CALENDAR & TIME SLOTS) -->
                         <div x-show="bookingStep === 2" class="space-y-6" style="display: none;">
                             <div>
                                 <h3 class="text-base font-extrabold text-white">When do you need it?</h3>
-                                <p class="text-xs text-zinc-400 mt-0.5">Choose your date and exact start/end times.</p>
+                                <p class="text-xs text-zinc-400 mt-0.5">Choose an available date and start time.</p>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Reservation date</label>
-                                    <input type="date" x-model="selectedDate" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Start time</label>
-                                    <select x-model="startTime" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
-                                        <option value="08:00 AM">08:00 AM</option>
-                                        <option value="10:00 AM">10:00 AM</option>
-                                        <option value="01:00 PM">01:00 PM</option>
-                                        <option value="03:00 PM">03:00 PM</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Finish time</label>
-                                    <select x-model="endTime" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
-                                        <option value="10:00 AM">10:00 AM</option>
-                                        <option value="12:00 PM">12:00 PM</option>
-                                        <option value="03:00 PM">03:00 PM</option>
-                                        <option value="05:00 PM">05:00 PM</option>
-                                    </select>
-                                </div>
-                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                                <!-- Visual Calendar Box -->
+                                <div class="md:col-span-7 bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <button type="button" class="text-zinc-400 hover:text-white">&larr;</button>
+                                        <span class="text-xs font-extrabold text-white">May 2026</span>
+                                        <button type="button" class="text-zinc-400 hover:text-white">&rarr;</button>
+                                    </div>
 
-                            <div class="p-4 bg-zinc-900/60 rounded-2xl border border-zinc-800 flex items-center justify-between">
-                                <div class="flex items-center space-x-2 text-xs text-emerald-400">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                    <span class="font-bold">Slot is fully available for selected time</span>
+                                    <!-- Days Header -->
+                                    <div class="grid grid-cols-7 text-center text-[10px] font-bold text-zinc-500">
+                                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                                    </div>
+
+                                    <!-- Days Grid -->
+                                    <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold">
+                                        <template x-for="day in 31">
+                                            <button type="button" 
+                                                @click="selectedDate = 'May ' + day + ', 2026'"
+                                                class="py-2 rounded-xl transition flex flex-col items-center justify-center"
+                                                :class="selectedDate === ('May ' + day + ', 2026') ? 'bg-emerald-500 text-zinc-950 font-extrabold shadow-lg shadow-emerald-950/50' : 'text-zinc-300 hover:bg-zinc-800'">
+                                                <span x-text="day"></span>
+                                                <!-- Tiny Availability Dot -->
+                                                <span class="w-1 h-1 rounded-full mt-1" :class="day === 27 ? 'bg-emerald-400' : (day % 3 === 0 ? 'bg-amber-400' : 'bg-zinc-600')"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+
+                                    <!-- Calendar Legend -->
+                                    <div class="flex items-center justify-center space-x-6 pt-3 border-t border-zinc-800 text-[10px] text-zinc-400">
+                                        <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Available</span></div>
+                                        <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span><span>Limited</span></div>
+                                        <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-zinc-600"></span><span>Unavailable</span></div>
+                                    </div>
                                 </div>
-                                <span class="text-[10px] text-zinc-500 font-mono">Instant approval</span>
+
+                                <!-- Time Slots Picker Box -->
+                                <div class="md:col-span-5 bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 space-y-3">
+                                    <div class="flex items-center space-x-2 text-xs font-bold text-zinc-400 pb-2 border-b border-zinc-800">
+                                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span x-text="selectedDate"></span>
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <template x-for="slot in ['08:00 AM - 10:00 AM', '10:00 AM - 12:00 PM', '01:00 PM - 03:00 PM', '03:00 PM - 05:00 PM']">
+                                            <button type="button" 
+                                                @click="selectedTimeSlot = slot"
+                                                class="w-full p-3 rounded-xl border text-left transition flex items-center justify-between text-xs font-semibold"
+                                                :class="selectedTimeSlot === slot ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-zinc-800 bg-zinc-950/50 text-zinc-400 hover:border-zinc-700'">
+                                                <span x-text="slot"></span>
+                                                <span class="text-[10px] font-bold" :class="selectedTimeSlot === slot ? 'text-emerald-400' : 'text-zinc-500'" x-text="selectedTimeSlot === slot ? 'Selected' : 'Available'"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -528,7 +541,7 @@
 
                     </div>
 
-                    <!-- Right Sidebar Reservation Summary (Figma Style) -->
+                    <!-- Right Sidebar Reservation Summary -->
                     <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl space-y-6">
                         <div class="space-y-6">
                             <div>
@@ -547,7 +560,7 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-zinc-500">Time</span>
-                                    <span class="font-bold text-emerald-400" x-text="startTime + ' - ' + endTime"></span>
+                                    <span class="font-bold text-emerald-400" x-text="selectedTimeSlot"></span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-zinc-500" x-text="resourceType === 'facility' ? 'Attendees' : 'Quantity'"></span>
