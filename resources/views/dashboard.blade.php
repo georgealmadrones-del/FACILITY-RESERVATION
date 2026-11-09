@@ -5,26 +5,39 @@
         currentView: 'overview',
         bookingStep: 1,
         resourceType: 'facility',
-        selectedFacility: 'Auditorium Hall',
-        selectedEquipment: 'Lighting Kit Pro',
-        expectedAttendees: 12,
-        equipmentQuantity: 2,
+        selectedFacility: 'Audio-Visual Room (AVR 2) - Main Building',
+        selectedEquipment: 'Epson Multimedia Classroom Projector',
+        expectedAttendees: 30,
+        equipmentQuantity: 1,
         selectedDate: 'May 27, 2026',
         selectedTimeSlot: '10:00 AM - 12:00 PM',
         purposeReason: '',
         resources: [
-            { id: 1, name: 'Multimedia Room 201', category: 'rooms', type: 'Facility', capacity: '30 people · 2nd Floor', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', icon: 'building', image: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=600&q=80' },
-            { id: 2, name: 'Auditorium Hall', category: 'rooms', type: 'Facility', capacity: '180 people · Main Bldg.', availableSlots: 2, status: 'LIMITED', statusClass: 'bg-amber-950 text-amber-400 border-amber-800', schedule: 'Reserved: 01:00 PM - 03:00 PM', icon: 'building', image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&q=80' },
-            { id: 3, name: 'Conference Room A', category: 'rooms', type: 'Facility', capacity: '12 people · Admin Wing', availableSlots: 0, status: 'UNAVAILABLE', statusClass: 'bg-rose-950 text-rose-400 border-rose-800', schedule: 'Fully booked today', icon: 'building', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80' },
-            { id: 4, name: 'Mac Workstation Lab', category: 'labs', type: 'Laboratory', capacity: '40 seats · 3rd Floor', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Open after 03:00 PM', icon: 'cpu', image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80' },
-            { id: 5, name: 'CAD Engineering Lab', category: 'labs', type: 'Laboratory', capacity: '24 seats · 3rd Floor', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', icon: 'cpu', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80' },
-            { id: 6, name: 'Lighting Kit Pro', category: 'equipment', type: 'Equipment', capacity: '2 units stock · Tech Locker', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: '1 unit available', icon: 'camera', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80' },
-            { id: 7, name: 'Sony Cinema Kit A', category: 'equipment', type: 'Equipment', capacity: '1 kit · Media Locker', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', icon: 'camera', image: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=600&q=80' }
+            // Facilities from database
+            { id: 'f1', name: 'Audio-Visual Room (AVR 2) - Main Building', category: 'rooms', type: 'Facility', capacity: 'Air-conditioned room equipped with a wide...', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '{{ asset(\'images/Audio-Visual.jpg\') }}' },
+            { id: 'f2', name: 'Computer Laboratory 3 (ComLab)', category: 'labs', type: 'Laboratory', capacity: 'Fully air-conditioned computer hub with 4...', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Open after 03:00 PM', image: '{{ asset(\'images/Computer_lab3.jpg\') }}' },
+            { id: 'f3', name: 'University Covered Court', category: 'rooms', type: 'Facility', capacity: 'Semi-open multipurpose coliseum style co...', availableSlots: 2, status: 'LIMITED', statusClass: 'bg-amber-950 text-amber-400 border-amber-800', schedule: 'Reserved: 01:00 PM - 03:00 PM', image: '{{ asset(\'images/Covered_court.jpg\') }}' },
+            { id: 'f4', name: 'Student Council Conference Room', category: 'rooms', type: 'Facility', capacity: 'Collaborative discussion space furnished ...', availableSlots: 0, status: 'UNAVAILABLE', statusClass: 'bg-rose-950 text-rose-400 border-rose-800', schedule: 'Fully booked today', image: '{{ asset(\'images/Student_Council_Conference_Room.jpg\') }}' },
+            { id: 'f5', name: 'Speech Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Air-conditioned language and audio trainin...', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '{{ asset(\'images/Speech_Laboratory.jpg\') }}' },
+            { id: 'f6', name: 'Engineering Physics Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Equipped with heavy-duty workbenches, ...', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '{{ asset(\'images/Engineering_Physics_Laboratory.jpg\') }}' },
+            { id: 'f7', name: 'HRM / Culinary Kitchen Studio', category: 'rooms', type: 'Facility', capacity: 'Commercial-grade kitchen facility featurin...', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: '1 unit available', image: '{{ asset(\'images/Culinary_Kitchen_Studio.jpg\') }}' },
+            { id: 'f8', name: 'Outdoor Student Pavilion / Gazebo', category: 'rooms', type: 'Facility', capacity: 'Shaded open-air study hub with concrete...', availableSlots: 12, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '{{ asset(\'images/Outdoor_Student_Pavilion.jpg\') }}' },
+            
+            // Equipment from database
+            { id: 'e1', name: 'Epson Multimedia Classroom Projector', category: 'equipment', type: 'Equipment', capacity: '10 units stock · High-lumen portable LCD', availableSlots: 5, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/Epson_Multimedia.jpg\') }}' },
+            { id: 'e2', name: 'Sony Mirrorless Vlogging Camera Kit', category: 'equipment', type: 'Equipment', capacity: '5 units stock · Digital camera kit', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg\') }}' },
+            { id: 'e3', name: 'Wireless Microphone Set (Dual Handheld)', category: 'equipment', type: 'Equipment', capacity: '8 units stock · VHF/UHF dual wireless', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/Wireless_Microphone_Set.jpg\') }}' },
+            { id: 'e4', name: 'Heavy-Duty Extension Cord (5-Meter)', category: 'equipment', type: 'Equipment', capacity: '15 units stock · Thick-insulated 5-way', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/Heavy_Duty_Extension_Cord.jpg\') }}' },
+            { id: 'e5', name: 'Arduino & Raspberry Pi STEM Kit', category: 'equipment', type: 'Equipment', capacity: '12 units stock · Complete hardware', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/Arduino_Raspberry_Pi_STEM_Kit.jpg\') }}' },
+            { id: 'e6', name: 'Portable PA System with Wireless Mic', category: 'equipment', type: 'Equipment', capacity: '6 units stock · Rechargeable mobile sound', availableSlots: 2, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/Portable_PA_System_with_Wireless_Mic.jpg\') }}' },
+            { id: 'e7', name: 'Compound Monocular Microscope Set', category: 'equipment', type: 'Equipment', capacity: '20 units stock · High-magnification', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/Compound_Monocular_Microscope_Set.jpg\') }}' },
+            { id: 'e8', name: 'High-Speed Pocket Wi-Fi / LTE Modem', category: 'equipment', type: 'Equipment', capacity: '10 units stock · Portable wireless router', availableSlots: 6, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/High_Speed_Pocket_WiFi_LTE_Modem.jpg\') }}' },
+            { id: 'e9', name: 'Whiteboard Marker & Eraser Bulk Set', category: 'equipment', type: 'Equipment', capacity: '25 units stock · Set of assorted color dry', availableSlots: 20, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '{{ asset(\'images/Whiteboard_Marker_Eraser_Bulk_Set.jpg\') }}' }
         ],
         recentReservations: [
-            { id: 'RES-8921', resource: 'Multimedia Room 201', type: 'Room · 30 capacity', datetime: 'May 24, 2026 | 10:00 AM - 12:00 PM', status: 'APPROVED', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800' },
-            { id: 'RES-8922', resource: 'Lighting Kit Pro', type: 'Equipment · 2 units', datetime: 'May 27, 2026 | 08:30 AM - 05:00 PM', status: 'PENDING', statusClass: 'bg-amber-950 text-amber-400 border-amber-800' },
-            { id: 'RES-8919', resource: 'CAD Laboratory', type: 'Laboratory · 24 seats', datetime: 'May 18, 2026 | 01:00 PM - 03:00 PM', status: 'CANCELLED', statusClass: 'bg-rose-950 text-rose-400 border-rose-800' }
+            { id: 'RES-8921', resource: 'Audio-Visual Room (AVR 2)', type: 'Facility · Main Bldg', datetime: 'May 24, 2026 | 10:00 AM - 12:00 PM', status: 'APPROVED', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800' },
+            { id: 'RES-8922', resource: 'Sony Mirrorless Vlogging Camera Kit', type: 'Equipment · 1 kit', datetime: 'May 27, 2026 | 08:30 AM - 05:00 PM', status: 'PENDING', statusClass: 'bg-amber-950 text-amber-400 border-amber-800' },
+            { id: 'RES-8919', resource: 'Computer Laboratory 3', type: 'Laboratory · ComLab', datetime: 'May 18, 2026 | 01:00 PM - 03:00 PM', status: 'CANCELLED', statusClass: 'bg-rose-950 text-rose-400 border-rose-800' }
         ],
         get filteredResources() {
             return this.resources.filter(item => {
@@ -35,7 +48,7 @@
         }
     }" class="min-h-screen bg-[#09090B] text-zinc-100 font-['Plus_Jakarta_Sans',sans-serif] flex relative overflow-x-hidden">
 
-        <!-- Ambient Emerald Background Glows -->
+        <!-- Ambient Background Glows -->
         <div class="absolute -top-32 -left-32 w-[35rem] h-[35rem] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none"></div>
         <div class="absolute top-[40%] -right-32 w-[30rem] h-[30rem] bg-emerald-900/10 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -121,7 +134,7 @@
             <header class="h-20 border-b border-[#27272A] bg-[#09090B]/80 backdrop-blur-md px-6 lg:px-10 flex items-center justify-between sticky top-0 z-30">
                 <div class="w-full max-w-md relative">
                     <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" x-model="searchQuery" placeholder="Search resources, rooms, equipment..." class="w-full bg-zinc-900/90 border border-zinc-800 rounded-xl pl-10 pr-12 py-2.5 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition placeholder-zinc-500">
+                    <input type="text" x-model="searchQuery" placeholder="Search rooms, labs, or equipment..." class="w-full bg-zinc-900/90 border border-zinc-800 rounded-xl pl-10 pr-12 py-2.5 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition placeholder-zinc-500">
                     <span class="absolute right-3 top-3 text-[10px] font-mono text-zinc-500 bg-zinc-800/80 px-1.5 py-0.5 rounded border border-zinc-700/50">⌘K</span>
                 </div>
 
@@ -267,7 +280,7 @@
                         <p class="text-xs text-zinc-400">Choose a resource and find a time that works for you.</p>
                     </div>
 
-                    <!-- Step Indicator Pills (Glowing Green) -->
+                    <!-- Step Indicator Pills -->
                     <div class="flex items-center space-x-3">
                         <div class="flex items-center space-x-2">
                             <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shadow-md transition" :class="bookingStep >= 1 ? 'bg-emerald-500 text-zinc-950 shadow-emerald-950/50' : 'bg-zinc-800 text-zinc-400'">1</span>
@@ -330,10 +343,14 @@
                                         <div>
                                             <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Select facility</label>
                                             <select x-model="selectedFacility" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
-                                                <option value="Auditorium Hall">Auditorium Hall (180 people · Main Bldg.)</option>
-                                                <option value="Multimedia Room 201">Multimedia Room 201 (30 people · 2nd Floor)</option>
-                                                <option value="Conference Room A">Conference Room A (12 people · Admin Wing)</option>
-                                                <option value="Mac Workstation Lab">Mac Workstation Lab (40 seats · 3rd Floor)</option>
+                                                <option value="Audio-Visual Room (AVR 2) - Main Building">Audio-Visual Room (AVR 2) - Main Building</option>
+                                                <option value="Computer Laboratory 3 (ComLab)">Computer Laboratory 3 (ComLab)</option>
+                                                <option value="University Covered Court">University Covered Court</option>
+                                                <option value="Student Council Conference Room">Student Council Conference Room</option>
+                                                <option value="Speech Laboratory">Speech Laboratory</option>
+                                                <option value="Engineering Physics Laboratory">Engineering Physics Laboratory</option>
+                                                <option value="HRM / Culinary Kitchen Studio">HRM / Culinary Kitchen Studio</option>
+                                                <option value="Outdoor Student Pavilion / Gazebo">Outdoor Student Pavilion / Gazebo</option>
                                             </select>
                                         </div>
                                         <div>
@@ -354,15 +371,21 @@
                                         <div>
                                             <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Select equipment</label>
                                             <select x-model="selectedEquipment" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
-                                                <option value="Lighting Kit Pro">Lighting Kit Pro (2 units stock)</option>
-                                                <option value="Sony Cinema Kit A">Sony Cinema Kit A (1 kit)</option>
-                                                <option value="Epson Multimedia Projector">Epson Multimedia Projector (5 units stock)</option>
+                                                <option value="Epson Multimedia Classroom Projector">Epson Multimedia Classroom Projector (10 stock)</option>
+                                                <option value="Sony Mirrorless Vlogging Camera Kit">Sony Mirrorless Vlogging Camera Kit (5 stock)</option>
+                                                <option value="Wireless Microphone Set (Dual Handheld)">Wireless Microphone Set (Dual Handheld) (8 stock)</option>
+                                                <option value="Heavy-Duty Extension Cord (5-Meter)">Heavy-Duty Extension Cord (5-Meter) (15 stock)</option>
+                                                <option value="Arduino & Raspberry Pi STEM Kit">Arduino & Raspberry Pi STEM Kit (12 stock)</option>
+                                                <option value="Portable PA System with Wireless Mic">Portable PA System with Wireless Mic (6 stock)</option>
+                                                <option value="Compound Monocular Microscope Set">Compound Monocular Microscope Set (20 stock)</option>
+                                                <option value="High-Speed Pocket Wi-Fi / LTE Modem">High-Speed Pocket Wi-Fi / LTE Modem (10 stock)</option>
+                                                <option value="Whiteboard Marker & Eraser Bulk Set">Whiteboard Marker & Eraser Bulk Set (25 stock)</option>
                                             </select>
                                         </div>
                                         <div>
                                             <label class="block text-xs font-semibold text-zinc-400 mb-1.5">Quantity needed</label>
                                             <div class="flex items-center space-x-3 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5">
-                                                <input type="number" x-model="equipmentQuantity" min="1" max="5" class="w-full bg-transparent text-xs text-white focus:outline-none">
+                                                <input type="number" x-model="equipmentQuantity" min="1" max="10" class="w-full bg-transparent text-xs text-white focus:outline-none">
                                                 <div class="flex items-center space-x-1">
                                                     <button type="button" @click="if(equipmentQuantity > 1) equipmentQuantity--" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold flex items-center justify-center">-</button>
                                                     <button type="button" @click="equipmentQuantity++" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold flex items-center justify-center">+</button>
@@ -379,7 +402,7 @@
                             </div>
                         </div>
 
-                        <!-- STEP 2: When do you need it? (EXACT FIGMA VISUAL CALENDAR & TIME SLOTS) -->
+                        <!-- STEP 2: When do you need it? (Visual Calendar & Time Slots) -->
                         <div x-show="bookingStep === 2" class="space-y-6" style="display: none;">
                             <div>
                                 <h3 class="text-base font-extrabold text-white">When do you need it?</h3>
@@ -546,7 +569,7 @@
                     </button>
                 </div>
 
-                <!-- Availability Catalog Grid with Photos -->
+                <!-- Availability Catalog Grid with Database Photos -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <template x-for="item in filteredResources" :key="item.id">
                         <div class="bg-[#121215]/90 backdrop-blur-xl rounded-3xl border border-[#27272A] hover:border-emerald-500/50 transition overflow-hidden shadow-xl flex flex-col justify-between group">
