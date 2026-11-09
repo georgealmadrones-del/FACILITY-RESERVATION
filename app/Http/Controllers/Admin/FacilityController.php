@@ -21,14 +21,14 @@ class FacilityController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'capacity' => 'required|integer|min:1',
             'status' => 'required|in:available,maintenance',
         ]);
 
-        Facility::create($request->all());
+        Facility::create($validated);
 
         return redirect()->route('admin.facilities.index')
             ->with('success', 'Facility created successfully.');
@@ -41,14 +41,14 @@ class FacilityController extends Controller
 
     public function update(Request $request, Facility $facility)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'capacity' => 'required|integer|min:1',
             'status' => 'required|in:available,maintenance',
         ]);
 
-        $facility->update($request->all());
+        $facility->update($validated);
 
         return redirect()->route('admin.facilities.index')
             ->with('success', 'Facility updated successfully.');

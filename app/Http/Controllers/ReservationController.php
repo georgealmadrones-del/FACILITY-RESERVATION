@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -7,42 +8,34 @@ use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
-    // Load Dashboard with real user data & reservations
-    public function index()
-    {
-        $user = Auth::user();
-        $reservations = Reservation::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+    // Your index or other methods...
 
-        return view('dashboard', compact('reservations'));
-    }
-
-    // Store a new reservation request
     public function store(Request $request)
     {
-        $request->validate([
-            'resource_name' => 'required|string',
+        $validated = $request->validate([
             'resource_type' => 'required|string',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
+            'resource_name' => 'required|string',
+            'category' => 'required|string',
             'purpose' => 'required|string',
+            'start_time' => 'required|string',
+            'end_time' => 'required|string',
+            'quantity' => 'required|integer',
         ]);
 
-        Reservation::create([
-            'user_id' => Auth::id(),
-            'resource_name' => $request->resource_name,
-            'resource_type' => $request->resource_type,
-            'category' => $request->category ?? 'rooms',
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'quantity_or_attendees' => $request->quantity ?? 1,
-            'purpose' => $request->purpose,
-            'status' => 'PENDING',
+        auth()->user()->reservations()->create([
+            'resource_type' => $validated['resource_type'],
+            'resource_name' => $validated['resource_name'],
+            'category' => $validated['category'],
+            'purpose' => $validated['purpose'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+            'quantity' => $validated['quantity'],
+            'status' => 'PENDING', // Default state for custodian approval
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Reservation request submitted successfully!');
+        return redirect()->route('dashboard')->with('success', 'Reservation submitted successfully!');
     }
+}
 
     // Cancel a reservation
     public function cancel($id)
