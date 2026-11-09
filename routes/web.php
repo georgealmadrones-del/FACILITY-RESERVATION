@@ -10,37 +10,40 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Authenticated Routes (For all logged-in users)
-Route::middleware('auth')->group(function () {
-    // Student Dashboard Route
-    Route::get('/dashboard', [ReservationController::class, 'studentDashboard'])->name('dashboard');
+// --- Public Availability Calendar Route ---
+Route::get('/availability', function () {
+    return view('availability');
+})->name('availability');
 
-    // Reservation List & Management
+// Authenticated User Routes
+Route::middleware('auth')->group(function () {
+    // Dashboard & Reservations
+    Route::get('/dashboard', [ReservationController::class, 'studentDashboard'])->name('dashboard');
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     
-    // Cancellation Routes (Handles both /cancel and /status forms)
+    // Cancellation & Status Updates
     Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     Route::patch('/reservations/{reservation}/status', [ReservationController::class, 'cancel'])->name('reservations.status');
 
-    // Notification Read Route
+    // Notifications
     Route::post('/notifications/read', function () {
         auth()->user()->unreadNotifications->markAsRead();
         return back();
     })->name('notifications.read');
 
-    // Profile Routes
+    // Profile Management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Unified Admin Routes (Protected by auth and admin middleware)
+// Unified Admin Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     
-    // Reservations Management & Status Update
+    // Reservations Management
     Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');
     Route::get('/reservations/{reservation}', [AdminController::class, 'showReservation'])->name('reservations.show');
     Route::patch('/reservations/{reservation}', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
@@ -67,8 +70,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/users/{user}/status', [UserController::class, 'toggleStatus'])->name('users.status');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
-
-// --- Availability Checking Route ---
-Route::get('/availability', [ReservationController::class, 'availability'])->name('reservations.availability');
 
 require __DIR__.'/auth.php';
