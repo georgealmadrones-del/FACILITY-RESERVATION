@@ -36,7 +36,7 @@ class ReservationController extends Controller
             'start_time' => $validated['start_time'],
             'end_time' => $validated['end_time'],
             'quantity' => $validated['quantity'],
-            'status' => 'PENDING',
+            'status' => 'pending', // Lowercase to match DB check constraint
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Reservation submitted successfully!');
@@ -47,8 +47,8 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         
-        if ($reservation->status === 'PENDING' || $reservation->status === 'APPROVED') {
-            $reservation->update(['status' => 'CANCELLED']);
+        if ($reservation->status === 'pending' || $reservation->status === 'approved') {
+            $reservation->update(['status' => 'cancelled']);
             return back()->with('success', 'Reservation has been cancelled.');
         }
 
@@ -60,8 +60,8 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        if ($reservation->status === 'APPROVED' && $reservation->resource_type === 'equipment') {
-            $reservation->update(['status' => 'RETURNED']);
+        if ($reservation->status === 'approved' && $reservation->resource_type === 'equipment') {
+            $reservation->update(['status' => 'returned']);
             return back()->with('success', 'Equipment successfully returned.');
         }
 
