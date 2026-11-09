@@ -3,6 +3,7 @@
         activeTab: 'all',
         searchQuery: '',
         currentView: 'overview',
+        profileTab: 'overview',
         bookingStep: 1,
         resourceType: 'facility',
         selectedFacility: 'Audio-Visual Room (AVR 2) - Main Building',
@@ -82,20 +83,20 @@
                                 <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 <span>Availability Calendar</span>
                             </button>
-                            <a href="#" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/60 transition text-xs font-semibold">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <button @click="currentView = 'profile'; profileTab = 'overview';" :class="currentView === 'profile' ? 'bg-zinc-900 text-white border-zinc-800' : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60 border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                 <span>My profile</span>
-                            </a>
+                            </button>
                         </nav>
                     </div>
 
                     <div>
                         <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block mb-3">MANAGE</span>
                         <nav class="space-y-1">
-                            <a href="#" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/60 transition text-xs font-semibold">
+                            <button @click="currentView = 'profile'; profileTab = 'history';" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/60 border border-transparent transition text-xs font-semibold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>Reservation history</span>
-                            </a>
+                            </button>
                             <a href="#" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/60 transition text-xs font-semibold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>Help & policies</span>
@@ -206,9 +207,9 @@
                         <div class="bg-[#121215]/90 backdrop-blur-xl p-5 rounded-3xl border border-[#27272A] shadow-xl flex flex-col justify-between space-y-2">
                             <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">QUICK ACTIONS</span>
                             <div class="space-y-1.5">
-                                <a href="#" class="w-full py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-[11px] font-semibold rounded-xl border border-zinc-800 transition block text-center">
+                                <button @click="currentView = 'profile'; profileTab = 'overview';" class="w-full py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-[11px] font-semibold rounded-xl border border-zinc-800 transition block text-center">
                                     View profile
-                                </a>
+                                </button>
                                 <button @click="currentView = 'availability-calendar'" class="w-full py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-[11px] font-semibold rounded-xl border border-zinc-800 transition block text-center">
                                     Check availability
                                 </button>
@@ -224,10 +225,10 @@
                             <h3 class="text-lg font-extrabold text-white">My recent reservations</h3>
                             <p class="text-xs text-zinc-400">Track current requests and recent activity.</p>
                         </div>
-                        <a href="#" class="text-xs font-bold text-zinc-400 hover:text-white transition flex items-center space-x-1">
+                        <button @click="currentView = 'profile'; profileTab = 'history';" class="text-xs font-bold text-zinc-400 hover:text-white transition flex items-center space-x-1">
                             <span>View all history</span>
                             <span>&rarr;</span>
-                        </a>
+                        </button>
                     </div>
 
                     <div class="bg-[#121215]/90 backdrop-blur-xl rounded-3xl border border-[#27272A] overflow-hidden shadow-xl">
@@ -400,7 +401,7 @@
                             </div>
                         </div>
 
-                        <!-- STEP 2: When do you need it? (Visual Calendar & Time Slots) -->
+                        <!-- STEP 2: When do you need it? -->
                         <div x-show="bookingStep === 2" class="space-y-6" style="display: none;">
                             <div>
                                 <h3 class="text-base font-extrabold text-white">When do you need it?</h3>
@@ -603,6 +604,223 @@
 
                         </div>
                     </template>
+                </div>
+
+            </main>
+
+
+            <!-- ==================== VIEW 4: MY PROFILE & SETTINGS (FIGMA MATCH) ==================== -->
+            <main x-show="currentView === 'profile'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
+                
+                <!-- Profile Header Card -->
+                <div class="bg-[#121215]/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#27272A] shadow-2xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <div class="flex items-center space-x-5 relative z-10">
+                        <div class="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center font-extrabold text-xl text-emerald-400 shadow-inner">
+                            {{ strtoupper(substr(Auth::user()->name ?? 'JD', 0, 2)) }}
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-3">
+                                <h1 class="text-2xl font-extrabold text-white tracking-tight">{{ Auth::user()->name ?? 'Juan Dela Cruz' }}</h1>
+                                <span class="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 uppercase">ACTIVE ACCOUNT</span>
+                            </div>
+                            <p class="text-xs text-zinc-400">{{ Auth::user()->email ?? 'jdelacruz@csu.edu.ph' }}</p>
+                            <p class="text-[10px] text-zinc-500 font-mono">Member ID: {{ Auth::user()->id ?? '2022-0382' }}</p>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('profile.edit') }}" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl border border-zinc-800 transition shadow-sm flex items-center space-x-2">
+                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        <span>Edit profile</span>
+                    </a>
+                </div>
+
+                <!-- Profile Sub-Navigation Tabs -->
+                <div class="flex space-x-6 border-b border-[#27272A] text-xs font-bold">
+                    <button @click="profileTab = 'overview'" :class="profileTab === 'overview' ? 'text-emerald-400 border-b-2 border-emerald-400 pb-3 -mb-px' : 'text-zinc-400 hover:text-white pb-3'" class="transition">
+                        Overview
+                    </button>
+                    <button @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-emerald-400 border-b-2 border-emerald-400 pb-3 -mb-px' : 'text-zinc-400 hover:text-white pb-3'" class="transition">
+                        Reservation history
+                    </button>
+                    <button @click="profileTab = 'settings'" :class="profileTab === 'settings' ? 'text-emerald-400 border-b-2 border-emerald-400 pb-3 -mb-px' : 'text-zinc-400 hover:text-white pb-3'" class="transition">
+                        Account settings
+                    </button>
+                </div>
+
+                <!-- TAB 1: OVERVIEW -->
+                <div x-show="profileTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] shadow-xl space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-extrabold text-white">Academic information</h3>
+                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </div>
+
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <span class="text-[10px] font-bold text-zinc-500 uppercase">FULL NAME</span>
+                                <p class="text-zinc-200 font-semibold mt-0.5">{{ Auth::user()->name ?? 'Juan Miguel Dela Cruz' }}</p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-zinc-500 uppercase">EMAIL ADDRESS</span>
+                                <p class="text-zinc-200 font-semibold mt-0.5">{{ Auth::user()->email ?? 'jdelacruz@csu.edu.ph' }}</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-[10px] font-bold text-zinc-500 uppercase">COURSE</span>
+                                    <p class="text-zinc-200 font-semibold mt-0.5">Computer Arts</p>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-zinc-500 uppercase">YEAR LEVEL</span>
+                                    <p class="text-zinc-200 font-semibold mt-0.5">Third Year</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-zinc-800/80 flex items-center space-x-2 text-[11px] text-emerald-400 font-bold">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span>VERIFIED & ACTIVE</span>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] shadow-xl space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-extrabold text-white">Reservation activity</h3>
+                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-zinc-900/80 p-4 rounded-2xl border border-zinc-800">
+                                <span class="text-[10px] font-bold text-zinc-500 uppercase block">TOTAL REQUESTS</span>
+                                <span class="text-2xl font-extrabold text-white mt-1 block">24</span>
+                                <span class="text-[10px] text-zinc-400 mt-1 block">Your usage this academic year</span>
+                            </div>
+                            <div class="bg-zinc-900/80 p-4 rounded-2xl border border-zinc-800">
+                                <span class="text-[10px] font-bold text-zinc-500 uppercase block">APPROVED</span>
+                                <span class="text-2xl font-extrabold text-emerald-400 mt-1 block">21</span>
+                                <span class="text-[10px] text-emerald-500 mt-1 block">96% success rate</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 pt-2">
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs"><span class="text-zinc-400">Rooms & Halls</span><span class="text-white font-bold">12</span></div>
+                                <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden"><div class="w-3/5 h-full bg-emerald-500 rounded-full"></div></div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs"><span class="text-zinc-400">Media Equipment</span><span class="text-white font-bold">9</span></div>
+                                <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden"><div class="w-2/5 h-full bg-emerald-400 rounded-full"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-4 bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] shadow-xl space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-extrabold text-white">Quick actions</h3>
+                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+
+                        <div class="space-y-3">
+                            <button @click="currentView = 'new-reservation'" class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 text-xs font-bold rounded-2xl border border-zinc-800 transition flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-extrabold">+</span>
+                                    <span>New reservation</span>
+                                </div>
+                                <span class="text-zinc-500 group-hover:text-white">&rarr;</span>
+                            </button>
+
+                            <button @click="profileTab = 'history'" class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 text-xs font-bold rounded-2xl border border-zinc-800 transition flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <span>Download history</span>
+                                </div>
+                                <span class="text-zinc-500 group-hover:text-white">&rarr;</span>
+                            </button>
+
+                            <button class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 text-xs font-bold rounded-2xl border border-zinc-800 transition flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636l3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Get support</span>
+                                </div>
+                                <span class="text-zinc-500 group-hover:text-white">&rarr;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: HISTORY -->
+                <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-extrabold text-white">Reservation history</h3>
+                            <p class="text-xs text-zinc-400">All your resource requests in one place.</p>
+                        </div>
+                        <button class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl border border-zinc-800 transition">
+                            Export history
+                        </button>
+                    </div>
+
+                    <div class="bg-[#121215]/90 backdrop-blur-xl rounded-3xl border border-[#27272A] overflow-hidden shadow-xl">
+                        <div class="divide-y divide-[#27272A]">
+                            <template x-for="item in recentReservations" :key="item.id">
+                                <div class="p-5 flex items-center justify-between hover:bg-zinc-900/40 transition">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+                                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-white" x-text="item.resource"></h4>
+                                            <p class="text-xs text-zinc-400 mt-0.5" x-text="item.type"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center space-x-6">
+                                        <span class="text-xs text-zinc-300 font-medium hidden sm:inline" x-text="item.datetime"></span>
+                                        <span class="px-3 py-1 text-[10px] font-bold rounded-full border shadow-sm" :class="item.statusClass" x-text="item.status"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: SETTINGS -->
+                <div x-show="profileTab === 'settings'" class="space-y-6 max-w-2xl" style="display: none;">
+                    <div>
+                        <h3 class="text-lg font-extrabold text-white">Account preferences</h3>
+                        <p class="text-xs text-zinc-400">Control how RESERVA works for you.</p>
+                    </div>
+
+                    <div class="bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] space-y-6 shadow-xl">
+                        <div class="flex items-center justify-between py-3 border-b border-zinc-800">
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Email notifications</h4>
+                                <p class="text-[11px] text-zinc-400">Receive status and reminder updates by email.</p>
+                            </div>
+                            <input type="checkbox" checked class="w-4 h-4 accent-emerald-500 rounded bg-zinc-900 border-zinc-700">
+                        </div>
+
+                        <div class="space-y-2 py-3 border-b border-zinc-800">
+                            <h4 class="text-xs font-bold text-white">Default reservation duration</h4>
+                            <p class="text-[11px] text-zinc-400">Used when creating a new request.</p>
+                            <select class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500">
+                                <option>2 hours</option>
+                                <option>4 hours</option>
+                                <option>Full day</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center justify-between py-3">
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Password & security</h4>
+                                <p class="text-[11px] text-zinc-400">Update your account password.</p>
+                            </div>
+                            <a href="{{ route('profile.edit') }}" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl border border-zinc-800 transition">
+                                Change password
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
             </main>
