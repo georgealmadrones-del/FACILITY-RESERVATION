@@ -4,6 +4,8 @@
         searchQuery: '',
         currentView: 'overview',
         profileTab: 'overview',
+        notificationsOpen: false,
+        unreadNotifications: 3,
         bookingStep: 1,
         resourceType: 'facility',
         selectedFacility: 'Audio-Visual Room (AVR 2) - Main Building',
@@ -13,6 +15,11 @@
         selectedDate: 'May 27, 2026',
         selectedTimeSlot: '10:00 AM - 12:00 PM',
         purposeReason: '',
+        notifications: [
+            { id: 1, title: 'Reservation Approved', message: 'Your request for Audio-Visual Room (AVR 2) has been approved by custodian.', time: '10m ago', unread: true },
+            { id: 2, title: 'Booking Reminder', message: 'Upcoming reservation for Sony Cinema Kit A scheduled for May 27.', time: '1h ago', unread: true },
+            { id: 3, title: 'Pending Approval', message: 'Your request for Sony Mirrorless Vlogging Camera Kit is awaiting review.', time: '3h ago', unread: true }
+        ],
         resources: [
             { id: 'f1', name: 'Audio-Visual Room (AVR 2) - Main Building', category: 'rooms', type: 'Facility', capacity: 'Air-conditioned room equipped with a wide...', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Audio-Visual.jpg' },
             { id: 'f2', name: 'Computer Laboratory 3 (ComLab)', category: 'labs', type: 'Laboratory', capacity: 'Fully air-conditioned computer hub with 4...', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Open after 03:00 PM', image: '/images/Computer_lab3.jpg' },
@@ -129,7 +136,7 @@
         <!-- Main Dashboard Viewport -->
         <div class="flex-grow flex flex-col min-h-screen">
             
-            <!-- Top App Bar Search & Global Indicators -->
+            <!-- Top App Bar Search, Notifications & Indicators -->
             <header class="h-20 border-b border-[#27272A] bg-[#09090B]/80 backdrop-blur-md px-6 lg:px-10 flex items-center justify-between sticky top-0 z-30">
                 <div class="w-full max-w-md relative">
                     <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -143,6 +150,36 @@
                         <span class="font-medium">System operational</span>
                         <span class="text-zinc-600">|</span>
                         <span class="text-emerald-400 font-bold">12 active slots</span>
+                    </div>
+
+                    <!-- Notification Bell & Dropdown Widget -->
+                    <div class="relative" @click.away="notificationsOpen = false">
+                        <button @click="notificationsOpen = !notificationsOpen" class="w-10 h-10 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 flex items-center justify-center transition relative">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            <template x-if="unreadNotifications > 0">
+                                <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            </template>
+                        </button>
+
+                        <!-- Notification Dropdown Panel -->
+                        <div x-show="notificationsOpen" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" class="absolute right-0 mt-3 w-80 bg-[#121215] border border-[#27272A] rounded-2xl shadow-2xl p-4 space-y-3 z-50" style="display: none;">
+                            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                                <span class="text-xs font-bold text-white">Notifications</span>
+                                <button @click="unreadNotifications = 0" class="text-[10px] text-emerald-400 hover:underline">Mark all read</button>
+                            </div>
+
+                            <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
+                                <template x-for="n in notifications" :key="n.id">
+                                    <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 hover:border-zinc-700 transition space-y-1">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-white" x-text="n.title"></span>
+                                            <span class="text-[9px] text-zinc-500" x-text="n.time"></span>
+                                        </div>
+                                        <p class="text-[11px] text-zinc-400 leading-tight" x-text="n.message"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
                     </div>
 
                     <a href="{{ url('/') }}" target="_blank" class="text-xs text-zinc-300 hover:text-white transition bg-zinc-900 hover:bg-zinc-800 px-3.5 py-2 rounded-xl border border-zinc-800 flex items-center space-x-1.5 shadow-sm">
@@ -740,7 +777,7 @@
 
                             <button class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 text-xs font-bold rounded-2xl border border-zinc-800 transition flex items-center justify-between group">
                                 <div class="flex items-center space-x-3">
-                                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636l3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span>Get support</span>
                                 </div>
                                 <span class="text-zinc-500 group-hover:text-white">&rarr;</span>
