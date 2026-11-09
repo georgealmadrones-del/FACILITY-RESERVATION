@@ -1,6 +1,6 @@
 <x-app-layout>
     <div x-data="{
-        activeTab: 'rooms',
+        activeTab: 'all',
         searchQuery: '',
         currentView: 'overview',
         bookingStep: 1,
@@ -13,13 +13,13 @@
         selectedTimeSlot: '10:00 AM - 12:00 PM',
         purposeReason: '',
         resources: [
-            { id: 1, name: 'Multimedia Room 201', category: 'rooms', type: 'Facility', capacity: '30 people · 2nd Floor', availableSlots: 4, status: 'AVAILABLE', icon: 'building' },
-            { id: 2, name: 'Auditorium Hall', category: 'rooms', type: 'Facility', capacity: '180 people · Main Bldg.', availableSlots: 2, status: 'AVAILABLE', icon: 'building' },
-            { id: 3, name: 'Conference Room A', category: 'rooms', type: 'Facility', capacity: '12 people · Admin Wing', availableSlots: 0, status: 'LIMITED', icon: 'building' },
-            { id: 4, name: 'Mac Workstation Lab', category: 'labs', type: 'Laboratory', capacity: '40 seats · 3rd Floor', availableSlots: 15, status: 'AVAILABLE', icon: 'cpu' },
-            { id: 5, name: 'CAD Engineering Lab', category: 'labs', type: 'Laboratory', capacity: '24 seats · 3rd Floor', availableSlots: 8, status: 'AVAILABLE', icon: 'cpu' },
-            { id: 6, name: 'Lighting Kit Pro', category: 'equipment', type: 'Equipment', capacity: '2 units stock', availableSlots: 3, status: 'AVAILABLE', icon: 'camera' },
-            { id: 7, name: 'Sony Cinema Kit A', category: 'equipment', type: 'Equipment', capacity: '1 kit · Tech Locker', availableSlots: 3, status: 'AVAILABLE', icon: 'camera' }
+            { id: 1, name: 'Multimedia Room 201', category: 'rooms', type: 'Facility', capacity: '30 people · 2nd Floor', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', icon: 'building', image: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=600&q=80' },
+            { id: 2, name: 'Auditorium Hall', category: 'rooms', type: 'Facility', capacity: '180 people · Main Bldg.', availableSlots: 2, status: 'LIMITED', statusClass: 'bg-amber-950 text-amber-400 border-amber-800', schedule: 'Reserved: 01:00 PM - 03:00 PM', icon: 'building', image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&q=80' },
+            { id: 3, name: 'Conference Room A', category: 'rooms', type: 'Facility', capacity: '12 people · Admin Wing', availableSlots: 0, status: 'UNAVAILABLE', statusClass: 'bg-rose-950 text-rose-400 border-rose-800', schedule: 'Fully booked today', icon: 'building', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80' },
+            { id: 4, name: 'Mac Workstation Lab', category: 'labs', type: 'Laboratory', capacity: '40 seats · 3rd Floor', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Open after 03:00 PM', icon: 'cpu', image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80' },
+            { id: 5, name: 'CAD Engineering Lab', category: 'labs', type: 'Laboratory', capacity: '24 seats · 3rd Floor', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', icon: 'cpu', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80' },
+            { id: 6, name: 'Lighting Kit Pro', category: 'equipment', type: 'Equipment', capacity: '2 units stock · Tech Locker', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: '1 unit available', icon: 'camera', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80' },
+            { id: 7, name: 'Sony Cinema Kit A', category: 'equipment', type: 'Equipment', capacity: '1 kit · Media Locker', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', icon: 'camera', image: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=600&q=80' }
         ],
         recentReservations: [
             { id: 'RES-8921', resource: 'Multimedia Room 201', type: 'Room · 30 capacity', datetime: 'May 24, 2026 | 10:00 AM - 12:00 PM', status: 'APPROVED', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800' },
@@ -67,10 +67,10 @@
                                 </div>
                                 <span class="text-[10px] bg-zinc-800 text-emerald-400 px-1.5 py-0.5 rounded font-mono">+</span>
                             </button>
-                            <a href="#" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/60 transition text-xs font-semibold">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <button @click="currentView = 'availability-calendar'" :class="currentView === 'availability-calendar' ? 'bg-zinc-900 text-white border-zinc-800' : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60 border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border transition text-xs font-semibold">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 <span>Availability Calendar</span>
-                            </a>
+                            </button>
                             <a href="#" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/60 transition text-xs font-semibold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                 <span>My profile</span>
@@ -126,7 +126,6 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <!-- Notification Bar -->
                     <div class="hidden md:flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 shadow-sm">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span class="font-medium">System operational</span>
@@ -199,7 +198,7 @@
                                 <a href="#" class="w-full py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-[11px] font-semibold rounded-xl border border-zinc-800 transition block text-center">
                                     View profile
                                 </a>
-                                <button @click="currentView = 'new-reservation'; bookingStep = 1;" class="w-full py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-[11px] font-semibold rounded-xl border border-zinc-800 transition block text-center">
+                                <button @click="currentView = 'availability-calendar'" class="w-full py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-[11px] font-semibold rounded-xl border border-zinc-800 transition block text-center">
                                     Check availability
                                 </button>
                             </div>
@@ -255,74 +254,10 @@
                         </div>
                     </div>
                 </section>
-
-                <!-- Explore Resource Availability Grid Section -->
-                <section class="space-y-6 pt-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-                        <div>
-                            <h3 class="text-lg font-extrabold text-white">Explore availability</h3>
-                            <p class="text-xs text-zinc-400 mt-0.5">Live status across campus resources.</p>
-                        </div>
-                        <span class="text-[10px] font-semibold text-emerald-400 flex items-center space-x-1.5 bg-zinc-900 px-3 py-1.5 rounded-full border border-zinc-800">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span>Updated just now</span>
-                        </span>
-                    </div>
-
-                    <div class="flex space-x-2 border-b border-[#27272A] pb-3 overflow-x-auto text-xs font-bold">
-                        <button @click="activeTab = 'rooms'" :class="activeTab === 'rooms' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition flex items-center space-x-2">
-                            <span>Rooms & Halls</span>
-                            <span class="px-1.5 py-0.5 text-[9px] rounded bg-zinc-900 text-zinc-400">3</span>
-                        </button>
-                        <button @click="activeTab = 'labs'" :class="activeTab === 'labs' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition flex items-center space-x-2">
-                            <span>Computer Laboratories</span>
-                            <span class="px-1.5 py-0.5 text-[9px] rounded bg-zinc-900 text-zinc-400">2</span>
-                        </button>
-                        <button @click="activeTab = 'equipment'" :class="activeTab === 'equipment' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition flex items-center space-x-2">
-                            <span>Technical Equipment</span>
-                            <span class="px-1.5 py-0.5 text-[9px] rounded bg-zinc-900 text-zinc-400">2</span>
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <template x-for="item in filteredResources" :key="item.id">
-                            <div class="bg-[#121215]/90 backdrop-blur-xl p-6 rounded-3xl border border-[#27272A] hover:border-emerald-500/50 transition space-y-5 flex flex-col justify-between shadow-xl group">
-                                <div class="space-y-4">
-                                    <div class="flex justify-between items-start">
-                                        <div class="w-11 h-11 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 group-hover:border-emerald-500/40 transition">
-                                            <template x-if="item.icon === 'building'">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                            </template>
-                                            <template x-if="item.icon === 'cpu'">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                            </template>
-                                            <template x-if="item.icon === 'camera'">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                            </template>
-                                        </div>
-                                        <span class="px-2.5 py-1 text-[9px] font-bold rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800" x-text="item.status"></span>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-base font-bold text-white group-hover:text-emerald-400 transition" x-text="item.name"></h4>
-                                        <p class="text-xs text-zinc-400 mt-1" x-text="item.capacity"></p>
-                                    </div>
-                                </div>
-
-                                <div class="pt-4 border-t border-[#27272A] flex justify-between items-center text-xs">
-                                    <span class="text-zinc-500 font-medium" x-text="item.availableSlots + ' slots available today'"></span>
-                                    <button @click="currentView = 'new-reservation'; bookingStep = 1;" class="font-bold text-emerald-400 hover:text-emerald-300 transition flex items-center space-x-1">
-                                        <span>Reserve</span>
-                                        <span class="group-hover:translate-x-1 transition">&rarr;</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </section>
             </main>
 
 
-            <!-- ==================== VIEW 2: NEW RESERVATION WORKSPACE (EXACT FIGMA CALENDAR STYLE) ==================== -->
+            <!-- ==================== VIEW 2: NEW RESERVATION WORKSPACE ==================== -->
             <main x-show="currentView === 'new-reservation'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 
                 <div class="flex items-center justify-between border-b border-[#27272A] pb-6">
@@ -460,12 +395,10 @@
                                         <button type="button" class="text-zinc-400 hover:text-white">&rarr;</button>
                                     </div>
 
-                                    <!-- Days Header -->
                                     <div class="grid grid-cols-7 text-center text-[10px] font-bold text-zinc-500">
                                         <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
                                     </div>
 
-                                    <!-- Days Grid -->
                                     <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold">
                                         <template x-for="day in 31">
                                             <button type="button" 
@@ -473,13 +406,11 @@
                                                 class="py-2 rounded-xl transition flex flex-col items-center justify-center"
                                                 :class="selectedDate === ('May ' + day + ', 2026') ? 'bg-emerald-500 text-zinc-950 font-extrabold shadow-lg shadow-emerald-950/50' : 'text-zinc-300 hover:bg-zinc-800'">
                                                 <span x-text="day"></span>
-                                                <!-- Tiny Availability Dot -->
                                                 <span class="w-1 h-1 rounded-full mt-1" :class="day === 27 ? 'bg-emerald-400' : (day % 3 === 0 ? 'bg-amber-400' : 'bg-zinc-600')"></span>
                                             </button>
                                         </template>
                                     </div>
 
-                                    <!-- Calendar Legend -->
                                     <div class="flex items-center justify-center space-x-6 pt-3 border-t border-zinc-800 text-[10px] text-zinc-400">
                                         <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Available</span></div>
                                         <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span><span>Limited</span></div>
@@ -578,6 +509,79 @@
                         </div>
                     </div>
 
+                </div>
+
+            </main>
+
+
+            <!-- ==================== VIEW 3: AVAILABILITY CALENDAR & CATALOG DIRECTORY ==================== -->
+            <main x-show="currentView === 'availability-calendar'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#27272A] pb-6">
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">MASTER DIRECTORY</span>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight">Campus Availability Calendar</h2>
+                        <p class="text-xs text-zinc-400">Real-time scheduling and status overview across all rooms, labs, and equipment.</p>
+                    </div>
+
+                    <div class="bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-xl text-xs font-bold text-zinc-300 flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>May 2026</span>
+                    </div>
+                </div>
+
+                <!-- Category Filtering Tabs -->
+                <div class="flex space-x-2 border-b border-[#27272A] pb-3 overflow-x-auto text-xs font-bold">
+                    <button @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition">
+                        All Resources
+                    </button>
+                    <button @click="activeTab = 'rooms'" :class="activeTab === 'rooms' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition">
+                        Rooms & Halls
+                    </button>
+                    <button @click="activeTab = 'labs'" :class="activeTab === 'labs' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition">
+                        Computer Laboratories
+                    </button>
+                    <button @click="activeTab = 'equipment'" :class="activeTab === 'equipment' ? 'bg-zinc-800 text-white border-zinc-700' : 'text-zinc-400 hover:text-white'" class="px-4 py-2 rounded-xl border border-transparent transition">
+                        Technical Equipment
+                    </button>
+                </div>
+
+                <!-- Availability Catalog Grid with Photos -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template x-for="item in filteredResources" :key="item.id">
+                        <div class="bg-[#121215]/90 backdrop-blur-xl rounded-3xl border border-[#27272A] hover:border-emerald-500/50 transition overflow-hidden shadow-xl flex flex-col justify-between group">
+                            
+                            <!-- Image Header Preview -->
+                            <div class="relative h-44 w-full overflow-hidden bg-zinc-900 border-b border-[#27272A]">
+                                <img :src="item.image" :alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-85">
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#121215] via-transparent to-transparent"></div>
+                                <div class="absolute top-3 right-3">
+                                    <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border shadow-sm backdrop-blur-md" :class="item.statusClass" x-text="item.status"></span>
+                                </div>
+                            </div>
+
+                            <!-- Content Details -->
+                            <div class="p-6 space-y-4">
+                                <div>
+                                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block" x-text="item.type"></span>
+                                    <h3 class="text-base font-bold text-white mt-0.5 group-hover:text-emerald-400 transition" x-text="item.name"></h3>
+                                    <p class="text-xs text-zinc-400 mt-1" x-text="item.capacity"></p>
+                                </div>
+                            </div>
+
+                            <!-- Footer Schedule & Action -->
+                            <div class="p-6 pt-0 space-y-4">
+                                <div class="flex items-center space-x-2 text-xs bg-zinc-900/80 px-3 py-2 rounded-xl border border-zinc-800/80">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    <span class="text-zinc-300 font-medium truncate" x-text="item.schedule"></span>
+                                </div>
+                                <button @click="currentView = 'new-reservation'; bookingStep = 1;" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-bold rounded-xl transition block text-center shadow-lg shadow-emerald-950/40">
+                                    Book This Resource &rarr;
+                                </button>
+                            </div>
+
+                        </div>
+                    </template>
                 </div>
 
             </main>
