@@ -1,74 +1,42 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReservationController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// --- Public Availability Calendar Route ---
-Route::get('/availability', function () {
-    return view('availability');
-})->name('availability');
-
 // Authenticated User Routes
-Route::middleware('auth')->group(function () {
-    // Dashboard & Reservations
-    Route::get('/dashboard', [ReservationController::class, 'studentDashboard'])->name('dashboard');
-    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
-    Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // Main Dashboard & Real-Time Reservations
+    Route::get('/dashboard', [ReservationController::class, 'index'])->name('dashboard');
+    
+    // Store New Reservation Request
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     
-    // Cancellation & Status Updates
-    Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
-    Route::patch('/reservations/{reservation}/status', [ReservationController::class, 'cancel'])->name('reservations.status');
-
-    // Notifications
-    Route::post('/notifications/read', function () {
-        auth()->user()->unreadNotifications->markAsRead();
-        return back();
-    })->name('notifications.read');
-
-    // Profile Management
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-// Unified Admin Routes
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    // Cancel a Reservation
+    Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     
-    // Reservations Management
-    Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations.index');
-    Route::get('/reservations/{reservation}', [AdminController::class, 'showReservation'])->name('reservations.show');
-    Route::patch('/reservations/{reservation}', [AdminController::class, 'updateStatus'])->name('reservations.update-status');
+    // Return Borrowed Unit/Equipment
+    Route::post('/reservations/{id}/return', [ReservationController::class, 'returnUnit'])->name('reservations.return');
 
-    // Reports & PDF Export
-    Route::get('/reports', [AdminController::class, 'reports'])->name('reports.index');
-    Route::get('/reports/pdf', [AdminController::class, 'exportPdf'])->name('reports.pdf');
+    // Availability Calendar Page View (or switchable in dashboard)
+    Route::get('/availability', function () {
+        return view('dashboard'); // Routed to dashboard workspace
+    })->name('availability');
 
-    // Resource Management (Facilities)
-    Route::get('/resources', [AdminController::class, 'resources'])->name('resources.index');
-    Route::post('/facilities', [AdminController::class, 'storeFacility'])->name('facilities.store');
-    Route::put('/facilities/{facility}', [AdminController::class, 'updateFacility'])->name('facilities.update');
-    Route::delete('/facilities/{facility}', [AdminController::class, 'destroyFacility'])->name('facilities.destroy');
-
-    // Resource Management (Equipment)
-    Route::post('/equipment', [AdminController::class, 'storeEquipment'])->name('equipment.store');
-    Route::put('/equipment/{equipment}', [AdminController::class, 'updateEquipment'])->name('equipment.update');
-    Route::delete('/equipment/{equipment}', [AdminController::class, 'destroyEquipment'])->name('equipment.destroy');
-
-    // User Management
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::patch('/users/{user}/status', [UserController::class, 'toggleStatus'])->name('users.status');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    // Profile Edit Page (Breeze default)
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

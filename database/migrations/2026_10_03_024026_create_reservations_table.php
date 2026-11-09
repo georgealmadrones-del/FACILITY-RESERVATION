@@ -12,21 +12,19 @@ return new class extends Migration
     public function up(): void
 {
     Schema::create('reservations', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        
-        // A reservation can be for a facility OR equipment
-        $table->foreignId('facility_id')->nullable()->constrained()->onDelete('cascade');
-        $table->foreignId('equipment_id')->nullable()->constrained()->onDelete('cascade');
-        
-        $table->dateTime('start_time');
-        $table->dateTime('end_time');
-        
-        $table->text('purpose');
-        $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
-        
-        $table->timestamps();
-    });
+    id();
+    foreignId('user_id')->constrained()->onDelete('cascade');
+    string('resource_name');
+    string('resource_type'); // 'facility' or 'equipment'
+    string('category'); // 'rooms', 'labs', 'equipment'
+    dateTime('start_time');
+    dateTime('end_time');
+    integer('quantity_or_attendees')->default(1);
+    text('purpose');
+    string('status')->default('PENDING'); // PENDING, APPROVED, ACTIVE, RETURNED, CANCELLED
+    timestamp('returned_at')->nullable();
+    timestamps();
+});
 }
 
     /**
