@@ -1,103 +1,5 @@
 <x-app-layout>
-    <div x-data="{
-        activeTab: 'all',
-        searchQuery: '',
-        currentView: 'overview',
-        profileTab: 'overview',
-        notificationsOpen: false,
-        unreadNotifications: 3,
-        bookingStep: 1,
-        resourceType: 'facility',
-        selectedFacility: 'Audio-Visual Room (AVR 2) - Main Building',
-        selectedEquipment: 'Epson Multimedia Classroom Projector',
-        expectedAttendees: 30,
-        equipmentQuantity: 1,
-        selectedDate: 'May 27, 2026',
-        selectedTimeSlot: '10:00 AM - 12:00 PM',
-        purposeReason: '',
-        
-        // Dynamic Calendar State
-        currentMonth: new Date().getMonth(),
-        currentYear: new Date().getFullYear(),
-        selectedDay: 27,
-
-        get monthName() {
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            return months[this.currentMonth] + ' ' + this.currentYear;
-        },
-
-        get daysInMonth() {
-            return new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
-        },
-
-        get firstDayIndex() {
-            return new Date(this.currentYear, this.currentMonth, 1).getDay();
-        },
-
-        prevMonth() {
-            if (this.currentMonth === 0) {
-                this.currentMonth = 11;
-                this.currentYear--;
-            } else {
-                this.currentMonth--;
-            }
-        },
-
-        nextMonth() {
-            if (this.currentMonth === 11) {
-                this.currentMonth = 0;
-                this.currentYear++;
-            } else {
-                this.currentMonth++;
-            }
-        },
-
-        selectDate(day) {
-            this.selectedDay = day;
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            this.selectedDate = `${months[this.currentMonth]} ${day}, ${this.currentYear}`;
-        },
-        
-        // Modal & Real-Time Data States
-        detailsModalOpen: false,
-        selectedReservation: null,
-        recentReservations: @json($reservations),
-
-        notifications: [
-            { id: 1, title: 'Reservation Approved', message: 'Your request for Audio-Visual Room (AVR 2) has been approved.', time: '10m ago' },
-            { id: 2, title: 'Booking Reminder', message: 'Upcoming reservation scheduled for May 27.', time: '1h ago' },
-            { id: 3, title: 'Pending Review', message: 'Your equipment request is currently under review.', time: '3h ago' }
-        ],
-
-        resources: [
-            { id: 'f1', name: 'Audio-Visual Room (AVR 2) - Main Building', category: 'rooms', type: 'Facility', capacity: 'Air-conditioned room equipped with a wide...', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Audio-Visual.jpg' },
-            { id: 'f2', name: 'Computer Laboratory 3 (ComLab)', category: 'labs', type: 'Laboratory', capacity: 'Fully air-conditioned computer hub with 4...', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Open after 03:00 PM', image: '/images/Computer_lab3.jpg' },
-            { id: 'f3', name: 'University Covered Court', category: 'rooms', type: 'Facility', capacity: 'Semi-open multipurpose coliseum style co...', availableSlots: 2, status: 'LIMITED', statusClass: 'bg-amber-950 text-amber-400 border-amber-800', schedule: 'Reserved: 01:00 PM - 03:00 PM', image: '/images/Covered_court.jpg' },
-            { id: 'f4', name: 'Student Council Conference Room', category: 'rooms', type: 'Facility', capacity: 'Collaborative discussion space furnished ...', availableSlots: 0, status: 'UNAVAILABLE', statusClass: 'bg-rose-950 text-rose-400 border-rose-800', schedule: 'Fully booked today', image: '/images/Student_Council_Conference_Room.jpg' },
-            { id: 'f5', name: 'Speech Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Air-conditioned language and audio trainin...', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Speech_Laboratory.jpg' },
-            { id: 'f6', name: 'Engineering Physics Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Equipped with heavy-duty workbenches, ...', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Engineering_Physics_Laboratory.jpg' },
-            { id: 'f7', name: 'HRM / Culinary Kitchen Studio', category: 'rooms', type: 'Facility', capacity: 'Commercial-grade kitchen facility featurin...', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: '1 unit available', image: '/images/Culinary_Kitchen_Studio.jpg' },
-            { id: 'f8', name: 'Outdoor Student Pavilion / Gazebo', category: 'rooms', type: 'Facility', capacity: 'Shaded open-air study hub with concrete...', availableSlots: 12, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Outdoor_Student_Pavilion.jpg' },
-            
-            { id: 'e1', name: 'Epson Multimedia Classroom Projector', category: 'equipment', type: 'Equipment', capacity: '10 units stock · High-lumen portable LCD', availableSlots: 5, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Epson_Multimedia.jpg' },
-            { id: 'e2', name: 'Sony Mirrorless Vlogging Camera Kit', category: 'equipment', type: 'Equipment', capacity: '5 units stock · Digital camera kit', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg' },
-            { id: 'e3', name: 'Wireless Microphone Set (Dual Handheld)', category: 'equipment', type: 'Equipment', capacity: '8 units stock · VHF/UHF dual wireless', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Wireless_Microphone_Set.jpg' },
-            { id: 'e4', name: 'Heavy-Duty Extension Cord (5-Meter)', category: 'equipment', type: 'Equipment', capacity: '15 units stock · Thick-insulated 5-way', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Heavy_Duty_Extension_Cord.jpg' },
-            { id: 'e5', name: 'Arduino & Raspberry Pi STEM Kit', category: 'equipment', type: 'Equipment', capacity: '12 units stock · Complete hardware', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Arduino_Raspberry_Pi_STEM_Kit.jpg' },
-            { id: 'e6', name: 'Portable PA System with Wireless Mic', category: 'equipment', type: 'Equipment', capacity: '6 units stock · Rechargeable mobile sound', availableSlots: 2, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Portable_PA_System_with_Wireless_Mic.jpg' },
-            { id: 'e7', name: 'Compound Monocular Microscope Set', category: 'equipment', type: 'Equipment', capacity: '20 units stock · High-magnification', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Compound_Monocular_Microscope_Set.jpg' },
-            { id: 'e8', name: 'High-Speed Pocket Wi-Fi / LTE Modem', category: 'equipment', type: 'Equipment', capacity: '10 units stock · Portable wireless router', availableSlots: 6, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/High_Speed_Pocket_WiFi_LTE_Modem.jpg' },
-            { id: 'e9', name: 'Whiteboard Marker & Eraser Bulk Set', category: 'equipment', type: 'Equipment', capacity: '25 units stock · Set of assorted color dry', availableSlots: 20, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Whiteboard_Marker_Eraser_Bulk_Set.jpg' }
-        ],
-
-        get filteredResources() {
-            return this.resources.filter(item => {
-                let matchesCategory = (this.activeTab === 'all' || item.category === this.activeTab);
-                let matchesSearch = this.searchQuery === '' || item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || item.capacity.toLowerCase().includes(this.searchQuery.toLowerCase());
-                return matchesCategory && matchesSearch;
-            });
-        }
-    }" class="min-h-screen bg-[#09090B] text-zinc-100 font-['Plus_Jakarta_Sans',sans-serif] flex relative overflow-x-hidden">
+    <div x-data="reservationDashboard()" class="min-h-screen bg-[#09090B] text-zinc-100 font-['Plus_Jakarta_Sans',sans-serif] flex relative overflow-x-hidden">
 
         <!-- Ambient Background Glows -->
         <div class="absolute -top-32 -left-32 w-[35rem] h-[35rem] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none"></div>
@@ -337,10 +239,10 @@
                                             <td class="py-4 px-6 text-zinc-300 font-medium" x-text="item.start_time + ' - ' + item.end_time"></td>
                                             <td class="py-4 px-6 text-right">
                                                 <span class="px-3 py-1 text-[10px] font-bold rounded-full border shadow-sm" :class="{
-                                                    'bg-emerald-950 text-emerald-400 border-emerald-800': item.status === 'APPROVED' || item.status === 'RETURNED',
-                                                    'bg-amber-950 text-amber-400 border-amber-800': item.status === 'PENDING',
-                                                    'bg-rose-950 text-rose-400 border-rose-800': item.status === 'CANCELLED'
-                                                }" x-text="item.status"></span>
+                                                    'bg-emerald-950 text-emerald-400 border-emerald-800': item.status === 'approved' || item.status === 'returned',
+                                                    'bg-amber-950 text-amber-400 border-amber-800': item.status === 'pending',
+                                                    'bg-rose-950 text-rose-400 border-rose-800': item.status === 'cancelled'
+                                                }" x-text="item.status.toUpperCase()"></span>
                                             </td>
                                         </tr>
                                     </template>
@@ -566,10 +468,10 @@
                                     <div class="flex items-center space-x-6">
                                         <span class="text-xs text-zinc-300 font-medium" x-text="item.start_time"></span>
                                         <span class="px-3 py-1 text-[10px] font-bold rounded-full border" :class="{
-                                            'bg-emerald-950 text-emerald-400 border-emerald-800': item.status === 'APPROVED' || item.status === 'RETURNED',
-                                            'bg-amber-950 text-amber-400 border-amber-800': item.status === 'PENDING',
-                                            'bg-rose-950 text-rose-400 border-rose-800': item.status === 'CANCELLED'
-                                        }" x-text="item.status"></span>
+                                            'bg-emerald-950 text-emerald-400 border-emerald-800': item.status === 'approved' || item.status === 'returned',
+                                            'bg-amber-950 text-amber-400 border-amber-800': item.status === 'pending',
+                                            'bg-rose-950 text-rose-400 border-rose-800': item.status === 'cancelled'
+                                        }" x-text="item.status.toUpperCase()"></span>
                                     </div>
                                 </div>
                             </template>
@@ -596,10 +498,10 @@
                     <div class="grid grid-cols-2 gap-4 bg-zinc-900/60 p-4 rounded-2xl border border-zinc-800">
                         <div>
                             <span class="text-[10px] font-bold text-zinc-500 uppercase">STATUS</span>
-                            <p class="font-bold mt-0.5" :class="{
-                                'text-emerald-400': selectedReservation?.status === 'APPROVED' || selectedReservation?.status === 'RETURNED',
-                                'text-amber-400': selectedReservation?.status === 'PENDING',
-                                'text-rose-400': selectedReservation?.status === 'CANCELLED'
+                            <p class="font-bold mt-0.5 uppercase" :class="{
+                                'text-emerald-400': selectedReservation?.status === 'approved' || selectedReservation?.status === 'returned',
+                                'text-amber-400': selectedReservation?.status === 'pending',
+                                'text-rose-400': selectedReservation?.status === 'cancelled'
                             }" x-text="selectedReservation?.status"></p>
                         </div>
                         <div>
@@ -621,7 +523,7 @@
 
                     <div class="flex items-center space-x-3">
                         <!-- Return Unit Button -->
-                        <template x-if="selectedReservation?.status === 'APPROVED' && selectedReservation?.resource_type === 'equipment'">
+                        <template x-if="selectedReservation?.status === 'approved' && selectedReservation?.resource_type === 'equipment'">
                             <form :action="'/reservations/' + selectedReservation?.id + '/return'" method="POST">
                                 @csrf
                                 <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-bold rounded-xl transition shadow-lg">
@@ -631,7 +533,7 @@
                         </template>
 
                         <!-- Cancel Request Button -->
-                        <template x-if="selectedReservation?.status === 'PENDING' || selectedReservation?.status === 'APPROVED'">
+                        <template x-if="selectedReservation?.status === 'pending' || selectedReservation?.status === 'approved'">
                             <form :action="'/reservations/' + selectedReservation?.id + '/cancel'" method="POST">
                                 @csrf
                                 <button type="submit" class="px-4 py-2 bg-rose-950 text-rose-400 border border-rose-800 hover:bg-rose-900 text-xs font-bold rounded-xl transition">
@@ -645,4 +547,108 @@
         </div>
 
     </div>
+
+    <!-- Alpine.js Component Script Definition -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('reservationDashboard', () => ({
+                activeTab: 'all',
+                searchQuery: '',
+                currentView: 'overview',
+                profileTab: 'overview',
+                notificationsOpen: false,
+                unreadNotifications: 3,
+                bookingStep: 1,
+                resourceType: 'facility',
+                selectedFacility: 'Audio-Visual Room (AVR 2) - Main Building',
+                selectedEquipment: 'Epson Multimedia Classroom Projector',
+                expectedAttendees: 30,
+                equipmentQuantity: 1,
+                selectedDate: 'May 27, 2026',
+                selectedTimeSlot: '10:00 AM - 12:00 PM',
+                purposeReason: '',
+                
+                // Dynamic Calendar State
+                currentMonth: new Date().getMonth(),
+                currentYear: new Date().getFullYear(),
+                selectedDay: 27,
+
+                get monthName() {
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    return months[this.currentMonth] + ' ' + this.currentYear;
+                },
+
+                get daysInMonth() {
+                    return new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+                },
+
+                get firstDayIndex() {
+                    return new Date(this.currentYear, this.currentMonth, 1).getDay();
+                },
+
+                prevMonth() {
+                    if (this.currentMonth === 0) {
+                        this.currentMonth = 11;
+                        this.currentYear--;
+                    } else {
+                        this.currentMonth--;
+                    }
+                },
+
+                nextMonth() {
+                    if (this.currentMonth === 11) {
+                        this.currentMonth = 0;
+                        this.currentYear++;
+                    } else {
+                        this.currentMonth++;
+                    }
+                },
+
+                selectDate(day) {
+                    this.selectedDay = day;
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    this.selectedDate = `${months[this.currentMonth]} ${day}, ${this.currentYear}`;
+                },
+                
+                detailsModalOpen: false,
+                selectedReservation: null,
+                recentReservations: @json($reservations),
+
+                notifications: [
+                    { id: 1, title: 'Reservation Approved', message: 'Your request for Audio-Visual Room (AVR 2) has been approved.', time: '10m ago' },
+                    { id: 2, title: 'Booking Reminder', message: 'Upcoming reservation scheduled for May 27.', time: '1h ago' },
+                    { id: 3, title: 'Pending Review', message: 'Your equipment request is currently under review.', time: '3h ago' }
+                ],
+
+                resources: [
+                    { id: 'f1', name: 'Audio-Visual Room (AVR 2) - Main Building', category: 'rooms', type: 'Facility', capacity: 'Air-conditioned room equipped with a wide...', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Audio-Visual.jpg' },
+                    { id: 'f2', name: 'Computer Laboratory 3 (ComLab)', category: 'labs', type: 'Laboratory', capacity: 'Fully air-conditioned computer hub with 4...', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Open after 03:00 PM', image: '/images/Computer_lab3.jpg' },
+                    { id: 'f3', name: 'University Covered Court', category: 'rooms', type: 'Facility', capacity: 'Semi-open multipurpose coliseum style co...', availableSlots: 2, status: 'LIMITED', statusClass: 'bg-amber-950 text-amber-400 border-amber-800', schedule: 'Reserved: 01:00 PM - 03:00 PM', image: '/images/Covered_court.jpg' },
+                    { id: 'f4', name: 'Student Council Conference Room', category: 'rooms', type: 'Facility', capacity: 'Collaborative discussion space furnished ...', availableSlots: 0, status: 'UNAVAILABLE', statusClass: 'bg-rose-950 text-rose-400 border-rose-800', schedule: 'Fully booked today', image: '/images/Student_Council_Conference_Room.jpg' },
+                    { id: 'f5', name: 'Speech Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Air-conditioned language and audio trainin...', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Speech_Laboratory.jpg' },
+                    { id: 'f6', name: 'Engineering Physics Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Equipped with heavy-duty workbenches, ...', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Engineering_Physics_Laboratory.jpg' },
+                    { id: 'f7', name: 'HRM / Culinary Kitchen Studio', category: 'rooms', type: 'Facility', capacity: 'Commercial-grade kitchen facility featurin...', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: '1 unit available', image: '/images/Culinary_Kitchen_Studio.jpg' },
+                    { id: 'f8', name: 'Outdoor Student Pavilion / Gazebo', category: 'rooms', type: 'Facility', capacity: 'Shaded open-air study hub with concrete...', availableSlots: 12, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Fully open for reservation', image: '/images/Outdoor_Student_Pavilion.jpg' },
+                    
+                    { id: 'e1', name: 'Epson Multimedia Classroom Projector', category: 'equipment', type: 'Equipment', capacity: '10 units stock · High-lumen portable LCD', availableSlots: 5, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Epson_Multimedia.jpg' },
+                    { id: 'e2', name: 'Sony Mirrorless Vlogging Camera Kit', category: 'equipment', type: 'Equipment', capacity: '5 units stock · Digital camera kit', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg' },
+                    { id: 'e3', name: 'Wireless Microphone Set (Dual Handheld)', category: 'equipment', type: 'Equipment', capacity: '8 units stock · VHF/UHF dual wireless', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Wireless_Microphone_Set.jpg' },
+                    { id: 'e4', name: 'Heavy-Duty Extension Cord (5-Meter)', category: 'equipment', type: 'Equipment', capacity: '15 units stock · Thick-insulated 5-way', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Heavy_Duty_Extension_Cord.jpg' },
+                    { id: 'e5', name: 'Arduino & Raspberry Pi STEM Kit', category: 'equipment', type: 'Equipment', capacity: '12 units stock · Complete hardware', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Arduino_Raspberry_Pi_STEM_Kit.jpg' },
+                    { id: 'e6', name: 'Portable PA System with Wireless Mic', category: 'equipment', type: 'Equipment', capacity: '6 units stock · Rechargeable mobile sound', availableSlots: 2, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Portable_PA_System_with_Wireless_Mic.jpg' },
+                    { id: 'e7', name: 'Compound Monocular Microscope Set', category: 'equipment', type: 'Equipment', capacity: '20 units stock · High-magnification', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Compound_Monocular_Microscope_Set.jpg' },
+                    { id: 'e8', name: 'High-Speed Pocket Wi-Fi / LTE Modem', category: 'equipment', type: 'Equipment', capacity: '10 units stock · Portable wireless router', availableSlots: 6, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/High_Speed_Pocket_WiFi_LTE_Modem.jpg' },
+                    { id: 'e9', name: 'Whiteboard Marker & Eraser Bulk Set', category: 'equipment', type: 'Equipment', capacity: '25 units stock · Set of assorted color dry', availableSlots: 20, status: 'AVAILABLE', statusClass: 'bg-emerald-950 text-emerald-400 border-emerald-800', schedule: 'Stock available', image: '/images/Whiteboard_Marker_Eraser_Bulk_Set.jpg' }
+                ],
+
+                get filteredResources() {
+                    return this.resources.filter(item => {
+                        let matchesCategory = (this.activeTab === 'all' || item.category === this.activeTab);
+                        let matchesSearch = this.searchQuery === '' || item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || item.capacity.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        return matchesCategory && matchesSearch;
+                    });
+                }
+            }));
+        });
+    </script>
 </x-app-layout>
