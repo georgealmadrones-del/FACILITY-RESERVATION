@@ -123,7 +123,7 @@
                                 </div>
                                 <span class="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded font-mono">+</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl bg-zinc-900 text-white border border-zinc-800 text-xs font-bold shadow-sm">
+                            <a href="{{ route('availability') }}" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl bg-zinc-900 text-white border border-zinc-800 text-xs font-bold shadow-sm">
                                 <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 <span>Availability Calendar</span>
                             </a>
