@@ -4,6 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/run-migrations-now', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return "<h2>Success! Migrations ran and tables were created. You can now go back to your dashboard.</h2>";
+    } catch (\Exception $e) {
+        return "<h2>Error: " . $e->getMessage() . "</h2>";
+    }
+});
 
 Route::get('/', function () {
     return redirect()->route('login');
