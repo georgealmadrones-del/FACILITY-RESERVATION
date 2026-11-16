@@ -32,22 +32,16 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'role' => ['required', 'string', 'in:student,faculty'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => ['required', 'string', 'in:student,faculty'],
         ]);
 
-        try {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'role' => $request->role,
-                'password' => Hash::make($request->password),
-            ]);
-        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
-            return back()->withInput()->withErrors([
-                'email' => 'This email address is already registered in the system.'
-            ]);
-        }
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+        ]);
 
         event(new Registered($user));
 

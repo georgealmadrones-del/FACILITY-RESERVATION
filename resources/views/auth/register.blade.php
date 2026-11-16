@@ -20,6 +20,18 @@
             <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs text-red-500" />
         </div>
 
+        <!-- Role Selection -->
+        <div>
+            <label for="role" class="block text-xs font-medium text-[#505081] uppercase tracking-wider mb-1">Register As</label>
+            <select id="role" name="role" required
+                class="w-full px-4 py-2.5 rounded-xl bg-[#F4F5F7] border border-[#8686AC]/40 text-[#272757] focus:outline-none focus:border-[#505081] transition text-sm">
+                <option value="" disabled {{ old('role') ? '' : 'selected' }}>Select your role</option>
+                <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
+                <option value="faculty" {{ old('role') == 'faculty' ? 'selected' : '' }}>Faculty</option>
+            </select>
+            <x-input-error :messages="$errors->get('role')" class="mt-1 text-xs text-red-500" />
+        </div>
+
         <!-- Password with Eye Toggle -->
         <div x-data="{ show: false }">
             <label for="password" class="block text-xs font-medium text-[#505081] uppercase tracking-wider mb-1">Password</label>
