@@ -93,7 +93,7 @@ class ResourceSeeder extends Seeder
             ],
         ]);
 
-        // Seed Equipment
+        // Seed Equipment with Exact Filenames
         DB::table('equipment')->insertOrIgnore([
             [
                 'id' => 1,
@@ -111,7 +111,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Sony Mirrorless Vlogging Camera Kit',
                 'description' => 'Digital camera kit complete with tripod, 16-50mm lens, and shotgun mic.',
                 'total_stock' => 5,
-                'image' => 'images/Sony_Mirrorless_Vlogging_Camera.jpg',
+                'image' => 'images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
                 'created_at' => now(),
@@ -155,7 +155,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Portable PA System with Wireless Mic',
                 'description' => 'Rechargeable mobile sound system with built-in Bluetooth and trolley handle.',
                 'total_stock' => 6,
-                'image' => 'images/Portable_PA_System.jpg',
+                'image' => 'images/Portable_PA_System_with_Wireless_Mic.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
                 'created_at' => now(),
@@ -166,7 +166,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Compound Monocular Microscope Set',
                 'description' => 'High-magnification optical microscopes with LED illumination and prepared slides.',
                 'total_stock' => 20,
-                'image' => 'images/Compound_Monocular_Microscope.jpg',
+                'image' => 'images/Compound_Monocular_Microscope_Set.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
                 'created_at' => now(),
@@ -177,7 +177,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'High-Speed Pocket Wi-Fi / LTE Modem',
                 'description' => 'Portable wireless router with pre-loaded data SIM for remote field activities.',
                 'total_stock' => 10,
-                'image' => 'images/High_Speed_Pocket_WiFi.jpg',
+                'image' => 'images/High_Speed_Pocket_WiFi_Modem.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
                 'created_at' => now(),
@@ -188,7 +188,7 @@ class ResourceSeeder extends Seeder
                 'name' => 'Whiteboard Marker & Eraser Bulk Set',
                 'description' => 'Set of assorted color dry-erase markers, magnetic eraser, and refill ink bottles.',
                 'total_stock' => 25,
-                'image' => 'images/Whiteboard_Marker_Eraser.jpg',
+                'image' => 'images/Whiteboard_Marker_Eraser_Bulk_Set.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
                 'created_at' => now(),
