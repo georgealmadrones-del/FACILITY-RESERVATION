@@ -4,14 +4,10 @@
         <!-- Left Navigation Sidebar -->
         <aside class="w-64 border-r border-[#8686AC]/30 bg-white min-h-screen p-6 flex flex-col justify-between hidden md:flex sticky top-0 z-40 shadow-sm">
             <div class="space-y-8">
-                <!-- Brand Header -->
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-3">
-                    <img src="{{ asset('images/reserva.jpg') }}" alt="RESERVA Logo" class="w-9 h-9 rounded-xl object-cover border border-[#8686AC]/40 shadow-sm" onerror="this.src='{{ asset('reserva.jpg') }}';">
-                    <div>
-                        <span class="font-extrabold text-base tracking-tight text-[#0F0E47] block leading-none">RESERVA</span>
-                        <span class="text-[9px] font-semibold text-[#505081] uppercase tracking-widest block mt-1">RESOURCE SYSTEM</span>
-                    </div>
-                </a>
+                <!-- Minimal Navigation Header (No Reserva branding) -->
+                <div class="px-2 pt-2">
+                    <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">PORTAL NAVIGATION</span>
+                </div>
 
                 <!-- Workspace Menu -->
                 <div class="space-y-6">
@@ -58,8 +54,12 @@
             <!-- Sidebar Footer -->
             <div class="pt-6 border-t border-[#8686AC]/30 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded-xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-bold text-xs text-[#0F0E47]">
-                        {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
+                    <div class="w-8 h-8 rounded-xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-bold text-xs text-[#0F0E47] overflow-hidden">
+                        @if(Auth::user()->profile_photo ?? false)
+                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="w-full h-full object-cover">
+                        @else
+                            {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
+                        @endif
                     </div>
                     <div class="overflow-hidden">
                         <span class="font-bold text-xs text-[#0F0E47] truncate block">{{ Auth::user()->name ?? 'User Name' }}</span>
@@ -92,28 +92,31 @@
                         <span class="text-[#272757] font-bold">12 active slots</span>
                     </div>
 
-                    <!-- Notification Bell & Dropdown -->
+                    <!-- Notification Bell & Dropdown (Connected to real DB notifications) -->
                     <div class="relative" @click.away="notificationsOpen = false">
                         <button @click="notificationsOpen = !notificationsOpen" class="w-10 h-10 rounded-xl bg-[#F4F5F7] hover:bg-[#8686AC]/20 border border-[#8686AC]/30 text-[#272757] flex items-center justify-center transition relative">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                            <template x-if="unreadNotifications > 0">
+                            <template x-if="notifications.length > 0">
                                 <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             </template>
                         </button>
                         <div x-show="notificationsOpen" class="absolute right-0 mt-3 w-80 bg-white border border-[#8686AC]/40 rounded-2xl shadow-2xl p-4 space-y-3 z-50" style="display: none;">
                             <div class="flex items-center justify-between pb-2 border-b border-[#8686AC]/30">
                                 <span class="text-xs font-bold text-[#0F0E47]">Notifications</span>
-                                <button @click="unreadNotifications = 0" class="text-[10px] text-[#505081] hover:underline">Mark all read</button>
+                                <span class="text-[10px] text-[#505081]">Live Database Feed</span>
                             </div>
                             <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
                                 <template x-for="n in notifications" :key="n.id">
                                     <div class="p-2.5 rounded-xl hover:border-[#505081] transition bg-[#F4F5F7] border border-[#8686AC]/30 space-y-1">
                                         <div class="flex items-center justify-between">
-                                            <span class="text-xs font-bold text-[#0F0E47]" x-text="n.title"></span>
-                                            <span class="text-[9px] text-[#505081]" x-text="n.time"></span>
+                                            <span class="text-xs font-bold text-[#0F0E47]" x-text="n.title || 'System Notification'"></span>
+                                            <span class="text-[9px] text-[#505081]" x-text="n.time || 'Recent'"></span>
                                         </div>
-                                        <p class="text-[11px] text-[#505081] leading-tight" x-text="n.message"></p>
+                                        <p class="text-[11px] text-[#505081] leading-tight" x-text="n.message || n.data?.message || 'New update regarding your request.'"></p>
                                     </div>
+                                </template>
+                                <template x-if="notifications.length === 0">
+                                    <p class="text-xs text-center text-[#505081] py-4">No new notifications.</p>
                                 </template>
                             </div>
                         </div>
@@ -146,8 +149,12 @@
                     <div class="lg:col-span-5 bg-white backdrop-blur-xl p-6 rounded-3xl border border-[#8686AC]/30 shadow-xl flex items-center justify-between relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-[#8686AC]/10 rounded-full blur-2xl pointer-events-none"></div>
                         <div class="flex items-center space-x-4 relative z-10">
-                            <div class="w-14 h-14 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-lg text-[#0F0E47] shadow-inner">
-                                {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
+                            <div class="w-14 h-14 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-lg text-[#0F0E47] shadow-inner overflow-hidden">
+                                @if(Auth::user()->profile_photo ?? false)
+                                    <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="w-full h-full object-cover">
+                                @else
+                                    {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
+                                @endif
                             </div>
                             <div>
                                 <div class="flex items-center space-x-2">
@@ -261,7 +268,7 @@
                         <div class="space-y-1">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">NEW REQUEST</span>
                             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Make a reservation</h2>
-                            <p class="text-xs text-[#505081]">Choose a resource and submit directly to your database.</p>
+                            <p class="text-xs text-[#505081]">Choose a resource with capacity/stock details and submit directly to your database.</p>
                         </div>
                     </div>
 
@@ -272,32 +279,44 @@
                                 <h3 class="text-base font-extrabold text-[#0F0E47]">What do you need?</h3>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <button type="button" @click="resourceType = 'facility'" :class="resourceType === 'facility' ? 'border-[#0F0E47] bg-[#F4F5F7] ring-1 ring-[#0F0E47]/40' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
-                                        <span class="text-xs font-bold text-[#0F0E47]">Facility</span>
+                                        <span class="text-xs font-bold text-[#0F0E47]">Facility & Rooms</span>
                                     </button>
                                     <button type="button" @click="resourceType = 'equipment'" :class="resourceType === 'equipment' ? 'border-[#0F0E47] bg-[#F4F5F7] ring-1 ring-[#0F0E47]/40' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
-                                        <span class="text-xs font-bold text-[#0F0E47]">Equipment</span>
+                                        <span class="text-xs font-bold text-[#0F0E47]">Equipment & Gear</span>
                                     </button>
                                 </div>
 
                                 <template x-if="resourceType === 'facility'">
-                                    <div>
-                                        <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select facility</label>
-                                        <select x-model="selectedFacility" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
-                                            <option value="Audio-Visual Room (AVR 2) Main Building">Audio-Visual Room (AVR 2) Main Building</option>
-                                            <option value="Computer Laboratory 3 (ComLab)">Computer Laboratory 3 (ComLab)</option>
-                                            <option value="University Covered Court">University Covered Court</option>
-                                        </select>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select facility</label>
+                                            <select x-model="selectedFacility" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
+                                                <option value="Audio-Visual Room (AVR 2) Main Building">Audio-Visual Room (AVR 2) Main Building (Capacity: 50)</option>
+                                                <option value="Computer Laboratory 3 (ComLab)">Computer Laboratory 3 (ComLab) (Capacity: 40 Workstations)</option>
+                                                <option value="University Covered Court">University Covered Court (Capacity: 500 Persons)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Expected Attendees (Person Capacity)</label>
+                                            <input type="number" x-model="expectedAttendees" min="1" max="500" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
+                                        </div>
                                     </div>
                                 </template>
 
                                 <template x-if="resourceType === 'equipment'">
-                                    <div>
-                                        <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select equipment</label>
-                                        <select x-model="selectedEquipment" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
-                                            <option value="Epson Multimedia Classroom Projector">Epson Multimedia Classroom Projector</option>
-                                            <option value="Sony Mirrorless Vlogging Camera Kit">Sony Mirrorless Vlogging Camera Kit</option>
-                                            <option value="Wireless Microphone Set (Dual Handheld)">Wireless Microphone Set (Dual Handheld)</option>
-                                        </select>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select equipment</label>
+                                            <select x-model="selectedEquipment" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
+                                                <option value="Epson Multimedia Classroom Projector">Epson Multimedia Classroom Projector (10 Units Stock)</option>
+                                                <option value="Sony Mirrorless Vlogging Camera Kit">Sony Mirrorless Vlogging Camera Kit (5 Units Stock)</option>
+                                                <option value="Wireless Microphone Set (Dual Handheld)">Wireless Microphone Set (Dual Handheld) (8 Units Stock)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Equipment Quantity</label>
+                                            <input type="number" x-model="equipmentQuantity" min="1" max="15" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
+                                        </div>
                                     </div>
                                 </template>
                             </div>
@@ -344,6 +363,7 @@
                             <div class="space-y-2 text-xs text-[#272757] pt-2 border-t border-[#8686AC]/30">
                                 <p><strong>Date:</strong> <span x-text="selectedDate"></span></p>
                                 <p><strong>Time:</strong> 10:00 AM - 12:00 PM</p>
+                                <p><strong>Quantity / Capacity:</strong> <span x-text="resourceType === 'facility' ? expectedAttendees + ' Persons' : equipmentQuantity + ' Units'"></span></p>
                             </div>
                             <p class="text-[11px] text-[#505081]">Your reservation will be saved immediately to the database for custodian approval.</p>
                         </div>
@@ -357,7 +377,7 @@
                     <div class="space-y-1">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">MASTER DIRECTORY</span>
                         <h2 class="text-3xl font-extrabold text-[#0F0E47] tracking-tight">Campus Availability Calendar</h2>
-                        <p class="text-xs text-[#505081]">Real-time inventory stock overview across all rooms and equipment.</p>
+                        <p class="text-xs text-[#505081]">Real-time inventory stock overview with capacity & equipment quantity specs.</p>
                     </div>
                 </div>
 
@@ -382,7 +402,7 @@
                                 <div>
                                     <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block" x-text="item.type"></span>
                                     <h3 class="text-base font-bold text-[#0F0E47] mt-0.5 group-hover:text-[#505081] transition" x-text="item.name"></h3>
-                                    <p class="text-xs text-[#505081] mt-1" x-text="item.capacity"></p>
+                                    <p class="text-xs text-[#505081] mt-1 font-semibold" x-text="item.capacity"></p>
                                 </div>
                             </div>
                             <div class="p-6 pt-0 space-y-4">
@@ -395,12 +415,16 @@
                 </div>
             </main>
 
-            <!-- ==================== VIEW 4: MY PROFILE & HISTORY ==================== -->
+            <!-- ==================== VIEW 4: MY PROFILE & EDIT & HISTORY ==================== -->
             <main x-show="currentView === 'profile'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div class="flex items-center space-x-5">
-                        <div class="w-16 h-16 rounded-2xl bg-[#F4F5F7] flex items-center justify-center font-extrabold border border-[#8686AC]/40 text-xl text-[#0F0E47]">
-                            {{ strtoupper(substr(Auth::user()->name ?? 'JD', 0, 2)) }}
+                        <div class="w-16 h-16 rounded-2xl bg-[#F4F5F7] flex items-center justify-center font-extrabold border border-[#8686AC]/40 text-xl text-[#0F0E47] overflow-hidden shadow-inner">
+                            @if(Auth::user()->profile_photo ?? false)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr(Auth::user()->name ?? 'JD', 0, 2)) }}
+                            @endif
                         </div>
                         <div class="space-y-1">
                             <h1 class="text-2xl font-extrabold text-[#0F0E47] tracking-tight">{{ Auth::user()->name ?? 'Juan Dela Cruz' }}</h1>
@@ -410,33 +434,52 @@
                 </div>
 
                 <div class="flex space-x-6 border-b border-[#8686AC]/30 text-xs font-bold">
-                    <button @click="profileTab = 'overview'" :class="profileTab === 'overview' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Overview</button>
-                    <button @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Reservation history</button>
+                    <button @click="profileTab = 'overview'" :class="profileTab === 'overview' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Overview & Edit Profile</button>
+                    <button @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Reservation history & Cancellation</button>
                 </div>
 
-                <!-- Profile Overview Tab -->
+                <!-- Profile Overview & Editable Form Tab -->
                 <div x-show="profileTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-6 bg-white p-6 rounded-3xl border border-[#8686AC]/30 space-y-4 shadow-sm">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Academic Information</h3>
-                        <p class="text-xs text-[#272757]">Name: {{ Auth::user()->name ?? '' }}</p>
-                        <p class="text-xs text-[#272757]">Email: {{ Auth::user()->email ?? '' }}</p>
+                    <div class="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-6 shadow-sm">
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Edit Profile & Photo</h3>
+                        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                            @csrf
+                            @method('patch')
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Full Name</label>
+                                <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Email Address</label>
+                                <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Profile Photo / Avatar</label>
+                                <input type="file" name="profile_photo" class="w-full text-xs text-[#505081] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0F0E47] file:text-white hover:file:bg-[#272757]">
+                            </div>
+                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">
+                                Save Profile Changes
+                            </button>
+                        </form>
                     </div>
-                    <div class="lg:col-span-6 bg-white p-6 rounded-3xl border border-[#8686AC]/30 space-y-4 shadow-sm">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Total Requests</h3>
+                    <div class="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-4 shadow-sm h-fit">
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Total Database Requests</h3>
                         <p class="text-3xl font-extrabold text-[#0F0E47]" x-text="recentReservations.length"></p>
+                        <p class="text-xs text-[#505081]">All bookings are tracked securely in real-time with automatic conflict checking.</p>
                     </div>
                 </div>
 
-                <!-- Reservation History Tab -->
+                <!-- Reservation History & Cancellation Tab -->
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
-                    <h3 class="text-lg font-extrabold text-[#0F0E47]">Full Reservation History</h3>
+                    <h3 class="text-lg font-extrabold text-[#0F0E47]">Full Reservation History & Cancellation Manager</h3>
+                    <p class="text-xs text-[#505081]">Click any reservation row below to open details and cancel or return items instantly.</p>
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
                                 <div @click="selectedReservation = item; detailsModalOpen = true;" class="p-5 flex items-center justify-between hover:bg-[#F4F5F7] transition cursor-pointer">
                                     <div>
                                         <h4 class="text-sm font-bold text-[#0F0E47]" x-text="item.resource_name"></h4>
-                                        <p class="text-xs text-[#505081] mt-0.5" x-text="item.resource_type + ' + ' + item.purpose"></p>
+                                        <p class="text-xs text-[#505081] mt-0.5" x-text="item.resource_type + ' | Purpose: ' + item.purpose"></p>
                                     </div>
                                     <div class="flex items-center space-x-6">
                                         <span class="text-xs text-[#272757] font-medium" x-text="item.start_time"></span>
@@ -448,18 +491,21 @@
                                     </div>
                                 </div>
                             </template>
+                            <template x-if="recentReservations.length === 0">
+                                <div class="p-8 text-center text-xs text-[#505081]">No reservation history found.</div>
+                            </template>
                         </div>
                     </div>
                 </div>
             </main>
         </div>
 
-        <!-- ==================== RESERVATION DETAILS & ACTIONS MODAL ==================== -->
+        <!-- ==================== RESERVATION DETAILS & CANCELLATION MODAL ==================== -->
         <div x-show="detailsModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
             <div @click.away="detailsModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
                 <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
                     <div>
-                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest">REQUEST DETAILS</span>
+                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest">REQUEST DETAILS & CANCELLATION</span>
                         <h3 class="text-lg font-extrabold text-[#0F0E47] mt-0.5" x-text="selectedReservation?.resource_name"></h3>
                     </div>
                     <button @click="detailsModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
@@ -475,7 +521,7 @@
                             }" x-text="selectedReservation?.status"></p>
                         </div>
                         <div>
-                            <span class="text-[10px] font-bold text-[#505081] uppercase">TYPE</span>
+                            <span class="text-[10px] font-bold text-[#505081] uppercase">TYPE & QUANTITY</span>
                             <p class="text-[#272757] font-semibold mt-0.5 capitalize" x-text="selectedReservation?.resource_type"></p>
                         </div>
                     </div>
@@ -522,7 +568,6 @@
                 currentView: 'overview',
                 profileTab: 'overview',
                 notificationsOpen: false,
-                unreadNotifications: 3,
                 bookingStep: 1,
                 resourceType: 'facility',
                 selectedFacility: 'Audio-Visual Room (AVR 2) Main Building',
@@ -570,29 +615,25 @@
                 detailsModalOpen: false,
                 selectedReservation: null,
                 recentReservations: @json($reservations),
-                notifications: [
-                    { id: 1, title: 'Reservation Approved', message: 'Your request for Audio-Visual Room (AVR 2) has been approved.', time: '10m ago' },
-                    { id: 2, title: 'Booking Reminder', message: 'Upcoming reservation scheduled for May 27.', time: '1h ago' },
-                    { id: 3, title: 'Pending Review', message: 'Your equipment request is currently under review.', time: '3h ago' }
-                ],
+                notifications: @json(auth()->user()->notifications ?? []),
                 resources: [
-                    { id: 'f1', name: 'Audio-Visual Room (AVR 2) Main Building', category: 'rooms', type: 'Facility', capacity: 'Air-conditioned room equipped with a wide...', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Audio-Visual.jpg' },
-                    { id: 'f2', name: 'Computer Laboratory 3 (ComLab)', category: 'labs', type: 'Laboratory', capacity: 'Fully air-conditioned computer hub with 4...', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Open after 03:00 PM', image: '/images/Computer_lab3.jpg' },
-                    { id: 'f3', name: 'University Covered Court', category: 'rooms', type: 'Facility', capacity: 'Semi-open multipurpose coliseum style co..', availableSlots: 2, status: 'LIMITED', statusClass: 'bg-amber-50 text-amber-700 border-amber-300', schedule: 'Reserved: 01:00 PM - 03:00 PM', image: '/images/Covered_court.jpg' },
-                    { id: 'f4', name: 'Student Council Conference Room', category: 'rooms', type: 'Facility', capacity: 'Collaborative discussion space furnished...', availableSlots: 0, status: 'UNAVAILABLE', statusClass: 'bg-rose-50 text-rose-700 border-rose-300', schedule: 'Fully booked today', image: '/images/Student_Council_Conference_Room.jpg' },
-                    { id: 'f5', name: 'Speech Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Air-conditioned language and audio trainin...', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Speech_Laboratory.jpg' },
-                    { id: 'f6', name: 'Engineering Physics Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Equipped with heavy-duty workbenches, ...', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Engineering_Physics_Laboratory.jpg' },
-                    { id: 'f7', name: 'HRM / Culinary Kitchen Studio', category: 'rooms', type: 'Facility', capacity: 'Commercial-grade kitchen facility featurin...', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: '1 unit available', image: '/images/Culinary_Kitchen_Studio.jpg' },
-                    { id: 'f8', name: 'Outdoor Student Pavilion / Gazebo', category: 'rooms', type: 'Facility', capacity: 'Shaded open-air study hub with concrete...', availableSlots: 12, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Outdoor_Student_Pavilion.jpg' },
-                    { id: 'e1', name: 'Epson Multimedia Classroom Projector', category: 'equipment', type: 'Equipment', capacity: '10 units stock High-lumen portable LCD', availableSlots: 5, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Epson_Multimedia.jpg' },
-                    { id: 'e2', name: 'Sony Mirrorless Vlogging Camera Kit', category: 'equipment', type: 'Equipment', capacity: '5 units stock Digital camera kit', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg' },
-                    { id: 'e3', name: 'Wireless Microphone Set (Dual Handheld)', category: 'equipment', type: 'Equipment', capacity: '8 units stock VHF/UHF dual wireless', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Wireless_Microphone_Set.jpg' },
-                    { id: 'e4', name: 'Heavy-Duty Extension Cord (5-Meter)', category: 'equipment', type: 'Equipment', capacity: '15 units stock Thick-insulated 5-way', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Heavy_Duty_Extension_Cord.jpg' },
-                    { id: 'e5', name: 'Arduino & Raspberry Pi STEM Kit', category: 'equipment', type: 'Equipment', capacity: '12 units stock Complete hardware', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Arduino_Raspberry_Pi_STEM_Kit.jpg' },
-                    { id: 'e6', name: 'Portable PA System with Wireless Mic', category: 'equipment', type: 'Equipment', capacity: '6 units stock Rechargeable mobile sound', availableSlots: 2, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Portable_PA_System_with_Wireless_Mic.jpg' },
-                    { id: 'e7', name: 'Compound Monocular Microscope Set', category: 'equipment', type: 'Equipment', capacity: '20 units stock High-magnification', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Compound_Monocular_Microscope_Set.jpg' },
-                    { id: 'e8', name: 'High-Speed Pocket Wi-Fi / LTE Modem', category: 'equipment', type: 'Equipment', capacity: '10 units stock Portable wireless router', availableSlots: 6, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/High_Speed_Pocket_WiFi_LTE_Modem.jpg' },
-                    { id: 'e9', name: 'Whiteboard Marker & Eraser Bulk Set', category: 'equipment', type: 'Equipment', capacity: '25 units stock Set of assorted color dry', availableSlots: 20, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Whiteboard_Marker_Eraser_Bulk_Set.jpg' }
+                    { id: 'f1', name: 'Audio-Visual Room (AVR 2) Main Building', category: 'rooms', type: 'Facility', capacity: 'Capacity: 50 Persons | Air-conditioned', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Audio-Visual.jpg' },
+                    { id: 'f2', name: 'Computer Laboratory 3 (ComLab)', category: 'labs', type: 'Laboratory', capacity: 'Capacity: 40 Workstations', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Open after 03:00 PM', image: '/images/Computer_lab3.jpg' },
+                    { id: 'f3', name: 'University Covered Court', category: 'rooms', type: 'Facility', capacity: 'Capacity: 500 Persons', availableSlots: 2, status: 'LIMITED', statusClass: 'bg-amber-50 text-amber-700 border-amber-300', schedule: 'Reserved: 01:00 PM - 03:00 PM', image: '/images/Covered_court.jpg' },
+                    { id: 'f4', name: 'Student Council Conference Room', category: 'rooms', type: 'Facility', capacity: 'Capacity: 20 Persons', availableSlots: 0, status: 'UNAVAILABLE', statusClass: 'bg-rose-50 text-rose-700 border-rose-300', schedule: 'Fully booked today', image: '/images/Student_Council_Conference_Room.jpg' },
+                    { id: 'f5', name: 'Speech Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Capacity: 35 Students', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Speech_Laboratory.jpg' },
+                    { id: 'f6', name: 'Engineering Physics Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Capacity: 30 Students', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Engineering_Physics_Laboratory.jpg' },
+                    { id: 'f7', name: 'HRM / Culinary Kitchen Studio', category: 'rooms', type: 'Facility', capacity: 'Capacity: 25 Chef Stations', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: '1 unit available', image: '/images/Culinary_Kitchen_Studio.jpg' },
+                    { id: 'f8', name: 'Outdoor Student Pavilion / Gazebo', category: 'rooms', type: 'Facility', capacity: 'Capacity: 60 Persons', availableSlots: 12, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Outdoor_Student_Pavilion.jpg' },
+                    { id: 'e1', name: 'Epson Multimedia Classroom Projector', category: 'equipment', type: 'Equipment', capacity: '10 Units Stock Available', availableSlots: 5, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Epson_Multimedia.jpg' },
+                    { id: 'e2', name: 'Sony Mirrorless Vlogging Camera Kit', category: 'equipment', type: 'Equipment', capacity: '5 Units Stock Available', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg' },
+                    { id: 'e3', name: 'Wireless Microphone Set (Dual Handheld)', category: 'equipment', type: 'Equipment', capacity: '8 Units Stock Available', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Wireless_Microphone_Set.jpg' },
+                    { id: 'e4', name: 'Heavy-Duty Extension Cord (5-Meter)', category: 'equipment', type: 'Equipment', capacity: '15 Units Stock Available', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Heavy_Duty_Extension_Cord.jpg' },
+                    { id: 'e5', name: 'Arduino & Raspberry Pi STEM Kit', category: 'equipment', type: 'Equipment', capacity: '12 Units Stock Available', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Arduino_Raspberry_Pi_STEM_Kit.jpg' },
+                    { id: 'e6', name: 'Portable PA System with Wireless Mic', category: 'equipment', type: 'Equipment', capacity: '6 Units Stock Available', availableSlots: 2, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Portable_PA_System_with_Wireless_Mic.jpg' },
+                    { id: 'e7', name: 'Compound Monocular Microscope Set', category: 'equipment', type: 'Equipment', capacity: '20 Units Stock Available', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Compound_Monocular_Microscope_Set.jpg' },
+                    { id: 'e8', name: 'High-Speed Pocket Wi-Fi / LTE Modem', category: 'equipment', type: 'Equipment', capacity: '10 Units Stock Available', availableSlots: 6, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/High_Speed_Pocket_WiFi_LTE_Modem.jpg' },
+                    { id: 'e9', name: 'Whiteboard Marker & Eraser Bulk Set', category: 'equipment', type: 'Equipment', capacity: '25 Units Stock Available', availableSlots: 20, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Whiteboard_Marker_Eraser_Bulk_Set.jpg' }
                 ],
                 get filteredResources() {
                     return this.resources.filter(item => {
