@@ -216,6 +216,72 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Existing Facilities Table -->
+                <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl p-6 space-y-4">
+                    <h3 class="text-base font-extrabold text-[#0F0E47]">Existing Facilities Directory</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase bg-[#F4F5F7]">
+                                    <th class="py-3 px-4">Name</th>
+                                    <th class="py-3 px-4">Capacity</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#8686AC]/20">
+                                <template x-for="fac in facilities" :key="fac.id">
+                                    <tr class="hover:bg-[#F4F5F7]/50">
+                                        <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="fac.name"></td>
+                                        <td class="py-3 px-4" x-text="fac.capacity + ' Persons'"></td>
+                                        <td class="py-3 px-4 uppercase font-semibold" x-text="fac.status"></td>
+                                        <td class="py-3 px-4 text-right space-x-2">
+                                            <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm('Delete this facility?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Existing Equipment Table -->
+                <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl p-6 space-y-4">
+                    <h3 class="text-base font-extrabold text-[#0F0E47]">Existing Equipment Stock Directory</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase bg-[#F4F5F7]">
+                                    <th class="py-3 px-4">Name</th>
+                                    <th class="py-3 px-4">Total Stock</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#8686AC]/20">
+                                <template x-for="eq in equipment" :key="eq.id">
+                                    <tr class="hover:bg-[#F4F5F7]/50">
+                                        <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="eq.name"></td>
+                                        <td class="py-3 px-4" x-text="eq.total_stock + ' Units'"></td>
+                                        <td class="py-3 px-4 uppercase font-semibold" x-text="eq.status"></td>
+                                        <td class="py-3 px-4 text-right space-x-2">
+                                            <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm('Delete this equipment?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </main>
 
             <!-- ================= VIEW 3: USER MANAGEMENT ================= -->
@@ -234,7 +300,6 @@
                                         <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase" :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'" x-text="user.is_active ? 'ACTIVE' : 'DEACTIVATED'"></span>
                                     </div>
                                     <p class="text-xs text-[#505081]" x-text="user.email + ' | Role: ' + user.role"></p>
-                                    <p class="text-[11px] text-[#8686AC] mt-0.5 font-mono" x-text="'Password Hash / Info: ' + (user.password ? user.password.substring(0, 25) + '...' : 'N/A')"></p>
                                 </div>
                                 <div class="flex items-center space-x-3">
                                     <form :action="'/admin/users/' + user.id + '/toggle-status'" method="POST">
@@ -300,6 +365,8 @@
                 selectedReservationId: null,
                 reservations: @json($reservations),
                 users: @json($users),
+                facilities: @json($facilities),
+                equipment: @json($equipment),
 
                 openRejectModal(id) {
                     this.selectedReservationId = id;

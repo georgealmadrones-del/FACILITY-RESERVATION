@@ -22,8 +22,20 @@ class AdminController extends Controller
 
         $reservations = Reservation::with(['user', 'facility', 'equipment'])->latest()->get();
         $users = User::latest()->get();
+        // Fetch facilities and equipment for inventory tab
+        $facilities = Facility::latest()->get();
+        $equipment = Equipment::latest()->get();
 
-        return view('admin.dashboard', compact('totalBookings', 'approvedCount', 'pendingCount', 'rejectedCount', 'reservations', 'users'));
+        return view('admin.dashboard', compact(
+            'totalBookings', 
+            'approvedCount', 
+            'pendingCount', 
+            'rejectedCount', 
+            'reservations', 
+            'users', 
+            'facilities', 
+            'equipment'
+        ));
     }
 
     public function reservations()
@@ -164,7 +176,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'capacity' => 'required|integer|min:1',
             'status' => 'required|string',
         ]);
 
@@ -177,7 +189,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'capacity' => 'required|integer|min:1',
             'status' => 'required|string',
         ]);
 
