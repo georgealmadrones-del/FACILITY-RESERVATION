@@ -11,8 +11,13 @@ Route::get('/run-migrations-now', function () {
         $exitCode = Artisan::call('migrate', ['--force' => true]);
         $output = Artisan::output();
         return "<pre style='background: #111; color: #0f0; padding: 20px; font-size: 16px; font-family: monospace;'>Exit Code: {$exitCode}\n\nMigration Output:\n{$output}</pre>";
-    } catch (\Exception $e) {
-        return "<h2 style='color: red; padding: 20px;'>Error: " . $e->getMessage() . "</h2>";
+    } catch (\Throwable $e) {
+        return "<div style='background: #300; color: #fff; padding: 20px; font-family: monospace;'>" .
+               "<h2>Migration Exception:</h2>" .
+               "<p><strong>Message:</strong> " . $e->getMessage() . "</p>" .
+               "<p><strong>File:</strong> " . $e->getFile() . ":" . $e->getLine() . "</p>" .
+               "<pre>" . $e->getTraceAsString() . "</pre>" .
+               "</div>";
     }
 });
 
