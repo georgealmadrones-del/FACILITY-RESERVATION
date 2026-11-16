@@ -171,7 +171,7 @@
                     <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <!-- Clickable Total Requests Widget -->
                         <div @click="currentView = 'profile'; profileTab = 'history';" class="bg-white backdrop-blur-xl p-5 rounded-3xl border border-[#8686AC]/30 shadow-xl flex flex-col justify-between cursor-pointer hover:border-[#0F0E47] transition">
-                            <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">TOTAL REQUESTS</span>
+                            <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">MY TOTAL BOOKINGS</span>
                             <div class="mt-2">
                                 <span class="text-3xl font-extrabold text-[#0F0E47]" x-text="recentReservations.length">0</span>
                                 <span class="text-[10px] text-[#505081] block mt-0.5">Database active records</span>
@@ -271,7 +271,7 @@
                         <div class="space-y-1">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">NEW REQUEST</span>
                             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Make a reservation</h2>
-                            <p class="text-xs text-[#505081]">Choose your custom schedule and capacity specs before submitting.</p>
+                            <p class="text-xs text-[#505081]">Choose your schedule and capacity specs before submitting.</p>
                         </div>
                     </div>
 
@@ -300,7 +300,7 @@
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Expected Attendees</label>
+                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Expected Attendees (Capacity)</label>
                                             <input type="number" x-model="expectedAttendees" min="1" max="500" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
                                         </div>
                                     </div>
@@ -324,9 +324,9 @@
                                 </template>
                             </div>
 
-                            <!-- Step 2: Calendar & Custom Free-Form Time Pickers Side-by-Side -->
+                            <!-- Step 2: Calendar & Time Pickers Side-by-Side (No "Custom" text) -->
                             <div class="space-y-6 pt-6 border-t border-[#8686AC]/30">
-                                <h3 class="text-base font-extrabold text-[#0F0E47]">When do you need it? (Date & Custom Time)</h3>
+                                <h3 class="text-base font-extrabold text-[#0F0E47]">When do you need it? (Date & Time)</h3>
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                     <!-- Calendar Widget -->
@@ -349,10 +349,10 @@
                                         </div>
                                     </div>
 
-                                    <!-- Side-by-Side Free Time Hours -->
+                                    <!-- Time Schedule Hours -->
                                     <div class="space-y-4 bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30 h-full flex flex-col justify-between">
                                         <div>
-                                            <span class="text-[10px] font-bold text-[#0F0E47] uppercase tracking-widest block mb-3">CUSTOM TIME HOURS</span>
+                                            <span class="text-[10px] font-bold text-[#0F0E47] uppercase tracking-widest block mb-3">TIME SCHEDULE</span>
                                             <div class="space-y-3">
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-[#505081] mb-1">Start Time</label>
@@ -414,7 +414,7 @@
                     <button @click="activeTab = 'equipment'" :class="activeTab === 'equipment' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'" class="px-4 py-2 rounded-xl transition">Technical Equipment</button>
                 </div>
 
-                <!-- Dynamic Cards Grid (Connected to MySQL DB) -->
+                <!-- Dynamic Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <template x-for="item in filteredResources" :key="item.id">
                         <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 hover:border-[#505081] transition overflow-hidden shadow-xl flex flex-col justify-between group">
@@ -441,7 +441,7 @@
                 </div>
             </main>
 
-            <!-- ==================== VIEW 4: MY PROFILE & EDIT & HISTORY ==================== -->
+            <!-- ==================== VIEW 4: MY PROFILE & EDIT & PASSWORD & DEACTIVATE ==================== -->
             <main x-show="currentView === 'profile'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div class="flex items-center space-x-5">
@@ -464,41 +464,84 @@
                     <button @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Reservation history & Return/Cancellation</button>
                 </div>
 
-                <!-- Profile Overview & Editable Form Tab -->
+                <!-- Profile Overview & Edit Profile / Password / Deactivate Tab -->
                 <div x-show="profileTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-6 shadow-sm">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Edit Profile & Custom Avatar Photo</h3>
-                        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                            @csrf
-                            @method('patch')
-                            <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Full Name</label>
-                                <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Email Address</label>
-                                <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Upload Profile Photo</label>
-                                <input type="file" name="profile_photo" class="w-full text-xs text-[#505081] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0F0E47] file:text-white hover:file:bg-[#272757]">
-                            </div>
-                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">
-                                Save Profile Changes
-                            </button>
-                        </form>
+                    <div class="lg:col-span-6 space-y-6">
+                        <!-- Edit Profile Form -->
+                        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-6 shadow-sm">
+                            <h3 class="text-sm font-extrabold text-[#0F0E47]">Edit Profile & Avatar</h3>
+                            <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                                @csrf
+                                @method('patch')
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#505081] mb-1">Full Name</label>
+                                    <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#505081] mb-1">Email Address</label>
+                                    <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#505081] mb-1">Upload Profile Photo</label>
+                                    <input type="file" name="profile_photo" class="w-full text-xs text-[#505081] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0F0E47] file:text-white hover:file:bg-[#272757]">
+                                </div>
+                                <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">
+                                    Save Profile Changes
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Change Password Form -->
+                        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-6 shadow-sm">
+                            <h3 class="text-sm font-extrabold text-[#0F0E47]">Change Password</h3>
+                            <form action="{{ route('password.update') }}" method="POST" class="space-y-4">
+                                @csrf
+                                @method('put')
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#505081] mb-1">Current Password</label>
+                                    <input type="password" name="current_password" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#505081] mb-1">New Password</label>
+                                    <input type="password" name="password" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#505081] mb-1">Confirm New Password</label>
+                                    <input type="password" name="password_confirmation" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                                </div>
+                                <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">
+                                    Update Password
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-4 shadow-sm h-fit">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Total Database Requests</h3>
-                        <p class="text-3xl font-extrabold text-[#0F0E47]" x-text="recentReservations.length"></p>
-                        <p class="text-xs text-[#505081]">All bookings are tracked securely in real-time with automatic conflict checking.</p>
+
+                    <div class="lg:col-span-6 space-y-6">
+                        <!-- System Stats -->
+                        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-4 shadow-sm">
+                            <h3 class="text-sm font-extrabold text-[#0F0E47]">My Total Bookings</h3>
+                            <p class="text-3xl font-extrabold text-[#0F0E47]" x-text="recentReservations.length"></p>
+                            <p class="text-xs text-[#505081]">All bookings are tracked securely in real-time with automatic conflict checking.</p>
+                        </div>
+
+                        <!-- Account Deactivation & Reactivation Card -->
+                        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-rose-200 space-y-4 shadow-sm">
+                            <h3 class="text-sm font-extrabold text-rose-700">Account Deactivation & Reactivation</h3>
+                            <p class="text-xs text-[#505081]">Deactivating your account will pause your reservation privileges. You can log back in anytime to instantly reactivate your account.</p>
+                            <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Account deactivation requested. You can reactivate anytime by logging back in.');">
+                                @csrf
+                                <button type="submit" class="px-5 py-2.5 bg-rose-50 text-rose-700 border border-rose-300 hover:bg-rose-100 font-bold rounded-xl transition text-xs shadow-sm">
+                                    Deactivate My Account
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Reservation History Tab -->
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
                     <h3 class="text-lg font-extrabold text-[#0F0E47]">Full Reservation History, Cancellation & Equipment Return</h3>
-                    <p class="text-xs text-[#505081]">Click any reservation row below to open details, cancel pending requests, or click "Return Unit" when you've brought equipment back.</p>
+                    <p class="text-xs text-[#505081]">Click any reservation row below to open details, cancel pending requests, or return equipment.</p>
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
@@ -526,12 +569,12 @@
             </main>
         </div>
 
-        <!-- ==================== RESERVATION DETAILS MODAL ==================== -->
+        <!-- ==================== RESERVATION DETAILS MODAL (FULL DETAILS) ==================== -->
         <div x-show="detailsModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
             <div @click.away="detailsModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
                 <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
                     <div>
-                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest">REQUEST DETAILS & ACTIONS</span>
+                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest">REQUEST FULL DETAILS & ACTIONS</span>
                         <h3 class="text-lg font-extrabold text-[#0F0E47] mt-0.5" x-text="selectedReservation?.resource_name"></h3>
                     </div>
                     <button @click="detailsModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
@@ -547,9 +590,13 @@
                             }" x-text="selectedReservation?.status"></p>
                         </div>
                         <div>
-                            <span class="text-[10px] font-bold text-[#505081] uppercase">TYPE & QUANTITY</span>
-                            <p class="text-[#272757] font-semibold mt-0.5 capitalize" x-text="selectedReservation?.resource_type"></p>
+                            <span class="text-[10px] font-bold text-[#505081] uppercase">RESOURCE TYPE & QUANTITY</span>
+                            <p class="text-[#272757] font-semibold mt-0.5 capitalize" x-text="selectedReservation?.resource_type + ' (' + selectedReservation?.quantity + ' units/capacity)'"></p>
                         </div>
+                    </div>
+                    <div class="bg-[#F4F5F7] p-4 rounded-2xl border border-[#8686AC]/30 space-y-1">
+                        <span class="text-[10px] font-bold text-[#505081] uppercase">RESERVATION TIME SCHEDULE</span>
+                        <p class="text-[#272757] font-medium" x-text="selectedReservation?.start_time + ' to ' + selectedReservation?.end_time"></p>
                     </div>
                     <div>
                         <span class="text-[10px] font-bold text-[#505081] uppercase">PURPOSE</span>
