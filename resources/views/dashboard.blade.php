@@ -1,35 +1,41 @@
 <x-app-layout>
-    <div x-data="reservationDashboard()" class="min-h-screen bg-[#F4F5F7] text-[#272757] font-['Inter',sans-serif] flex relative overflow-x-hidden">
+    <div class="min-h-screen bg-[#F4F5F7] text-[#272757] font-['Inter',sans-serif] flex relative overflow-x-hidden"
+         x-data="reservationDashboard()">
         
         <!-- Left Navigation Sidebar -->
         <aside class="w-64 border-r border-[#8686AC]/30 bg-white min-h-screen p-6 flex flex-col justify-between hidden md:flex sticky top-0 z-40 shadow-sm">
             <div class="space-y-8">
-                <!-- Navigation Header -->
                 <div class="px-2 pt-2">
                     <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">PORTAL NAVIGATION</span>
                 </div>
-
-                <!-- Workspace Menu -->
                 <div class="space-y-6">
                     <div>
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block mb-3">WORKSPACE</span>
                         <nav class="space-y-1">
-                            <button @click="currentView = 'overview'" :class="currentView === 'overview' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                            <button @click="currentView = 'overview'"
+                                :class="currentView === 'overview' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                                 <svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                                 <span>Overview</span>
                             </button>
-                            <button @click="currentView = 'new-reservation'; bookingStep = 1;" :class="currentView === 'new-reservation' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition text-xs font-semibold">
+                            <button @click="currentView = 'new-reservation'; bookingStep = 1;"
+                                :class="currentView === 'new-reservation' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                                class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition text-xs font-semibold">
                                 <div class="flex items-center space-x-3">
                                     <svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                     <span>New reservation</span>
                                 </div>
-                                <span class="text-[10px] bg-[#8686AC]/20 text-[#272757] px-1.5 py-0.5 rounded font-mono">+</span>
+                                <span class="text-[10px] bg-[#8686AC]/20 px-1.5 py-0.5 rounded font-mono">+</span>
                             </button>
-                            <button @click="currentView = 'availability-calendar'" :class="currentView === 'availability-calendar' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border transition text-xs font-semibold">
+                            <button @click="currentView = 'availability-calendar'"
+                                :class="currentView === 'availability-calendar' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border transition text-xs font-semibold">
                                 <svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 <span>Availability Calendar</span>
                             </button>
-                            <button @click="currentView = 'profile'; profileTab = 'overview';" :class="currentView === 'profile' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                            <button @click="currentView = 'profile'; profileTab = 'overview';"
+                                :class="currentView === 'profile' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                                 <svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                 <span>My profile</span>
                             </button>
@@ -38,11 +44,12 @@
                     <div>
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block mb-3">MANAGE</span>
                         <nav class="space-y-1">
-                            <button @click="currentView = 'profile'; profileTab = 'history';" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border border-transparent transition text-xs font-semibold">
+                            <button @click="currentView = 'profile'; profileTab = 'history';"
+                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border border-transparent transition text-xs font-semibold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>Reservation history</span>
                             </button>
-                            <a href="#" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] transition text-xs font-semibold">
+                            <a href="#" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] transition text-xs font-semibold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>Help & policies</span>
                             </a>
@@ -50,7 +57,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Sidebar Footer -->
             <div class="pt-6 border-t border-[#8686AC]/30 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
@@ -77,22 +83,21 @@
 
         <!-- Main Dashboard Viewport -->
         <div class="flex-grow flex flex-col min-h-screen">
-            <!-- Top App Bar (View Portal removed) -->
+            <!-- Top App Bar -->
             <header class="h-20 border-b border-[#8686AC]/30 bg-white/80 backdrop-blur-md px-6 lg:px-10 flex items-center justify-between sticky top-0 z-30 shadow-sm">
                 <div class="w-full max-w-md relative">
                     <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-[#505081]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     <input type="text" x-model="searchQuery" placeholder="Search rooms, labs, or equipment..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl pl-10 pr-12 py-2.5 text-xs text-[#272757] focus:outline-none focus:border-[#505081] transition placeholder-[#505081]/60">
-                    <span class="absolute right-3 top-3 text-[10px] font-mono text-[#505081] bg-white px-1.5 py-0.5 rounded border border-[#8686AC]/30">HK</span>
+                    <span class="absolute right-3 top-2.5 text-[10px] font-mono text-[#505081] bg-white px-1.5 py-0.5 rounded border border-[#8686AC]/30">HK</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="hidden md:flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#F4F5F7] border border-[#8686AC]/30 text-xs text-[#272757] shadow-sm">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span class="font-medium">System operational</span>
                         <span class="text-[#8686AC]">|</span>
-                        <span class="text-[#272757] font-bold">12 active slots</span>
+                        <span class="text-[#272757] font-bold">Live DB Mode</span>
                     </div>
-
-                    <!-- Notification Bell & Dropdown (Connected to real DB notifications) -->
+                    <!-- Notification Bell -->
                     <div class="relative" @click.away="notificationsOpen = false">
                         <button @click="notificationsOpen = !notificationsOpen" class="w-10 h-10 rounded-xl bg-[#F4F5F7] hover:bg-[#8686AC]/20 border border-[#8686AC]/30 text-[#272757] flex items-center justify-center transition relative">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -107,7 +112,7 @@
                             </div>
                             <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
                                 <template x-for="n in notifications" :key="n.id">
-                                    <div class="p-2.5 rounded-xl hover:border-[#505081] transition bg-[#F4F5F7] border border-[#8686AC]/30 space-y-1">
+                                    <div class="p-2.5 rounded-xl bg-[#F4F5F7] border border-[#8686AC]/30 space-y-1">
                                         <div class="flex items-center justify-between">
                                             <span class="text-xs font-bold text-[#0F0E47]" x-text="n.title || 'System Notification'"></span>
                                             <span class="text-[9px] text-[#505081]" x-text="n.time || 'Recent'"></span>
@@ -134,7 +139,7 @@
                         </h1>
                         <p class="text-xs text-[#505081]">Here is what is happening with your campus resources today.</p>
                     </div>
-                    <button @click="currentView = 'new-reservation'; bookingStep = 1;" class="px-6 py-3 bg-[#272757] hover:bg-[#505081] text-white font-bold text-xs rounded-xl transition shadow-lg flex items-center space-x-2 shrink-0">
+                    <button @click="currentView = 'new-reservation'; bookingStep = 1;" class="px-6 py-3 bg-[#0F0E47] hover:bg-[#505081] text-white font-bold text-xs rounded-xl transition shadow-lg flex items-center space-x-2 shrink-0">
                         <span class="text-base font-extrabold leading-none">+</span>
                         <span>New reservation</span>
                     </button>
@@ -172,7 +177,6 @@
                                 <span class="text-[10px] text-[#505081] block mt-0.5">Database active records</span>
                             </div>
                         </div>
-                        
                         <div class="bg-white backdrop-blur-xl p-5 rounded-3xl border border-[#8686AC]/30 shadow-xl flex flex-col justify-between">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">APPROVAL RATE</span>
                             <div class="mt-2">
@@ -259,8 +263,8 @@
                     <input type="hidden" name="resource_type" x-model="resourceType">
                     <input type="hidden" name="resource_name" x-model="resourceType === 'facility' ? selectedFacility : selectedEquipment">
                     <input type="hidden" name="category" x-model="resourceType === 'facility' ? 'rooms' : 'equipment'">
-                    <input type="hidden" name="start_time" x-model="selectedDate + ' ' + selectedTimeSlot.split(' - ')[0]">
-                    <input type="hidden" name="end_time" x-model="selectedDate + ' ' + selectedTimeSlot.split(' - ')[1]">
+                    <input type="hidden" name="start_time" x-model="selectedDate + ' ' + selectedTimeSlot.split(' ')[0]">
+                    <input type="hidden" name="end_time" x-model="selectedDate + ' ' + selectedTimeSlot.split(' ')[2]">
                     <input type="hidden" name="quantity" x-model="resourceType === 'facility' ? expectedAttendees : equipmentQuantity">
 
                     <div class="flex items-center justify-between border-b border-[#8686AC]/30 pb-6">
@@ -285,14 +289,15 @@
                                     </button>
                                 </div>
 
+                                <!-- Dynamic Facility Select (Connected to DB) -->
                                 <template x-if="resourceType === 'facility'">
                                     <div class="space-y-4">
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select facility</label>
+                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select facility from database</label>
                                             <select x-model="selectedFacility" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
-                                                <option value="Audio-Visual Room (AVR 2) Main Building">Audio-Visual Room (AVR 2) Main Building (Capacity: 50 Persons)</option>
-                                                <option value="Computer Laboratory 3 (ComLab)">Computer Laboratory 3 (ComLab) (Capacity: 40 Workstations)</option>
-                                                <option value="University Covered Court">University Covered Court (Capacity: 500 Persons)</option>
+                                                @foreach($facilities ?? [] as $facility)
+                                                    <option value="{{ $facility->name }}">{{ $facility->name }} (Capacity: {{ $facility->capacity }} Persons - {{ $facility->status }})</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                         <div>
@@ -302,14 +307,15 @@
                                     </div>
                                 </template>
 
+                                <!-- Dynamic Equipment Select (Connected to DB) -->
                                 <template x-if="resourceType === 'equipment'">
                                     <div class="space-y-4">
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select equipment</label>
+                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select equipment from database</label>
                                             <select x-model="selectedEquipment" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
-                                                <option value="Epson Multimedia Classroom Projector">Epson Multimedia Classroom Projector (10 Units Stock)</option>
-                                                <option value="Sony Mirrorless Vlogging Camera Kit">Sony Mirrorless Vlogging Camera Kit (5 Units Stock)</option>
-                                                <option value="Wireless Microphone Set (Dual Handheld)">Wireless Microphone Set (Dual Handheld) (8 Units Stock)</option>
+                                                @foreach($equipment ?? [] as $item)
+                                                    <option value="{{ $item->name }}">{{ $item->name }} ({{ $item->quantity }} Units Stock - {{ $item->status }})</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                         <div>
@@ -323,7 +329,6 @@
                             <!-- Step 2: Time Slot & Date Picker -->
                             <div class="space-y-6 pt-6 border-t border-[#8686AC]/30">
                                 <h3 class="text-base font-extrabold text-[#0F0E47]">When do you need it? (Date & Time Slot)</h3>
-                                
                                 <div>
                                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select Time Slot</label>
                                     <select x-model="selectedTimeSlot" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
@@ -334,7 +339,6 @@
                                         <option value="05:00 PM - 07:00 PM">05:00 PM - 07:00 PM (Evening Session)</option>
                                     </select>
                                 </div>
-
                                 <div class="bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30 max-w-md">
                                     <!-- Month Header with Arrows -->
                                     <div class="flex items-center justify-between mb-4">
@@ -357,7 +361,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">Purpose / Reason for reservation</label>
-                                    <textarea name="purpose" x-model="purposeReason" rows="3" placeholder="e.g., Thesis defense presentation, faculty meeting..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
+                                    <textarea name="purpose" x-model="purposeReason" rows="3" placeholder="e.g. Thesis defense presentation, faculty meeting..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                                 </div>
                             </div>
 
@@ -388,7 +392,7 @@
                     <div class="space-y-1">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">MASTER DIRECTORY</span>
                         <h2 class="text-3xl font-extrabold text-[#0F0E47] tracking-tight">Campus Availability Calendar</h2>
-                        <p class="text-xs text-[#505081]">Real-time inventory stock overview with capacity & equipment quantity specs.</p>
+                        <p class="text-xs text-[#505081]">Real-time database inventory stock overview with capacity & equipment quantity specs.</p>
                     </div>
                 </div>
 
@@ -400,11 +404,12 @@
                     <button @click="activeTab = 'equipment'" :class="activeTab === 'equipment' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'" class="px-4 py-2 rounded-xl transition">Technical Equipment</button>
                 </div>
 
+                <!-- Dynamic Cards Grid (Connected to MySQL DB) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <template x-for="item in filteredResources" :key="item.id">
                         <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 hover:border-[#505081] transition overflow-hidden shadow-xl flex flex-col justify-between group">
                             <div class="relative h-44 w-full border-b border-[#8686AC]/30 bg-[#F4F5F7]">
-                                <img :src="item.image" :alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90" onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80'">
+                                <img :src="item.image" alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90" onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80'">
                                 <div class="absolute top-3 right-3">
                                     <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border shadow-sm backdrop-blur-md" :class="item.statusClass" x-text="item.status"></span>
                                 </div>
@@ -480,7 +485,7 @@
                     </div>
                 </div>
 
-                <!-- Reservation History & Return/Cancellation Tab -->
+                <!-- Reservation History Tab -->
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
                     <h3 class="text-lg font-extrabold text-[#0F0E47]">Full Reservation History, Cancellation & Equipment Return</h3>
                     <p class="text-xs text-[#505081]">Click any reservation row below to open details, cancel pending requests, or click "Return Unit" when you've brought equipment back.</p>
@@ -511,7 +516,7 @@
             </main>
         </div>
 
-        <!-- ==================== RESERVATION DETAILS, RETURN & CANCELLATION MODAL ==================== -->
+        <!-- ==================== RESERVATION DETAILS MODAL ==================== -->
         <div x-show="detailsModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
             <div @click.away="detailsModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
                 <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
@@ -546,8 +551,7 @@
                         Close
                     </button>
                     <div class="flex items-center space-x-3">
-                        <!-- Return Equipment Button (Marks item returned) -->
-                        <template x-if="selectedReservation?.status === 'approved'">
+                        <template x-if="selectedReservation?.status === 'approved' && selectedReservation?.resource_type === 'equipment'">
                             <form :action="'/reservations/' + selectedReservation?.id + '/return'" method="POST">
                                 @csrf
                                 <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-lg">
@@ -555,11 +559,10 @@
                                 </button>
                             </form>
                         </template>
-                        <!-- Cancel Request Button -->
                         <template x-if="selectedReservation?.status === 'pending' || selectedReservation?.status === 'approved'">
                             <form :action="'/reservations/' + selectedReservation?.id + '/cancel'" method="POST">
                                 @csrf
-                                <button type="submit" class="px-4 py-2 bg-rose-50 text-rose-700 border border-rose-300 hover:bg-rose-100 text-xs font-bold rounded-xl transition">
+                                <button type="submit" class="px-4 py-2 bg-rose-50 text-rose-700 border border-rose-300 hover:bg-rose-100 font-bold rounded-xl transition text-xs">
                                     Cancel Request
                                 </button>
                             </form>
@@ -581,17 +584,18 @@
                 notificationsOpen: false,
                 bookingStep: 1,
                 resourceType: 'facility',
-                selectedFacility: 'Audio-Visual Room (AVR 2) Main Building',
-                selectedEquipment: 'Epson Multimedia Classroom Projector',
+                selectedFacility: '{{ $facilities->first()->name ?? '' }}',
+                selectedEquipment: '{{ $equipment->first()->name ?? '' }}',
                 expectedAttendees: 30,
                 equipmentQuantity: 1,
-                selectedDate: 'May 27, 2026',
-                selectedTimeSlot: '10:00 AM - 12:00 PM',
+                selectedDate: '{{ date("F j, Y") }}',
+                selectedTimeSlot: '08:00 AM - 10:00 AM',
                 purposeReason: '',
-                // Dynamic Calendar State
+
                 currentMonth: new Date().getMonth(),
                 currentYear: new Date().getFullYear(),
-                selectedDay: 27,
+                selectedDay: new Date().getDate(),
+
                 get monthName() {
                     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                     return months[this.currentMonth];
@@ -623,33 +627,50 @@
                     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                     this.selectedDate = `${months[this.currentMonth]} ${day}, ${this.currentYear}`;
                 },
+
                 detailsModalOpen: false,
                 selectedReservation: null,
                 recentReservations: @json($reservations),
                 notifications: @json(auth()->user()->notifications ?? []),
+
+                // Fully dynamic resources array bound live to database facilities & equipment
                 resources: [
-                    { id: 'f1', name: 'Audio-Visual Room (AVR 2) Main Building', category: 'rooms', type: 'Facility', capacity: 'Capacity: 50 Persons | Air-conditioned', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Audio-Visual.jpg' },
-                    { id: 'f2', name: 'Computer Laboratory 3 (ComLab)', category: 'labs', type: 'Laboratory', capacity: 'Capacity: 40 Workstations', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Open after 03:00 PM', image: '/images/Computer_lab3.jpg' },
-                    { id: 'f3', name: 'University Covered Court', category: 'rooms', type: 'Facility', capacity: 'Capacity: 500 Persons', availableSlots: 2, status: 'LIMITED', statusClass: 'bg-amber-50 text-amber-700 border-amber-300', schedule: 'Reserved: 01:00 PM - 03:00 PM', image: '/images/Covered_court.jpg' },
-                    { id: 'f4', name: 'Student Council Conference Room', category: 'rooms', type: 'Facility', capacity: 'Capacity: 20 Persons', availableSlots: 0, status: 'UNAVAILABLE', statusClass: 'bg-rose-50 text-rose-700 border-rose-300', schedule: 'Fully booked today', image: '/images/Student_Council_Conference_Room.jpg' },
-                    { id: 'f5', name: 'Speech Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Capacity: 35 Students', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Speech_Laboratory.jpg' },
-                    { id: 'f6', name: 'Engineering Physics Laboratory', category: 'labs', type: 'Laboratory', capacity: 'Capacity: 30 Students', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Engineering_Physics_Laboratory.jpg' },
-                    { id: 'f7', name: 'HRM / Culinary Kitchen Studio', category: 'rooms', type: 'Facility', capacity: 'Capacity: 25 Chef Stations', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: '1 unit available', image: '/images/Culinary_Kitchen_Studio.jpg' },
-                    { id: 'f8', name: 'Outdoor Student Pavilion / Gazebo', category: 'rooms', type: 'Facility', capacity: 'Capacity: 60 Persons', availableSlots: 12, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Fully open for reservation', image: '/images/Outdoor_Student_Pavilion.jpg' },
-                    { id: 'e1', name: 'Epson Multimedia Classroom Projector', category: 'equipment', type: 'Equipment', capacity: '10 Units Stock Available', availableSlots: 5, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Epson_Multimedia.jpg' },
-                    { id: 'e2', name: 'Sony Mirrorless Vlogging Camera Kit', category: 'equipment', type: 'Equipment', capacity: '5 Units Stock Available', availableSlots: 3, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg' },
-                    { id: 'e3', name: 'Wireless Microphone Set (Dual Handheld)', category: 'equipment', type: 'Equipment', capacity: '8 Units Stock Available', availableSlots: 4, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Wireless_Microphone_Set.jpg' },
-                    { id: 'e4', name: 'Heavy-Duty Extension Cord (5-Meter)', category: 'equipment', type: 'Equipment', capacity: '15 Units Stock Available', availableSlots: 10, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Heavy_Duty_Extension_Cord.jpg' },
-                    { id: 'e5', name: 'Arduino & Raspberry Pi STEM Kit', category: 'equipment', type: 'Equipment', capacity: '12 Units Stock Available', availableSlots: 8, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Arduino_Raspberry_Pi_STEM_Kit.jpg' },
-                    { id: 'e6', name: 'Portable PA System with Wireless Mic', category: 'equipment', type: 'Equipment', capacity: '6 Units Stock Available', availableSlots: 2, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Portable_PA_System_with_Wireless_Mic.jpg' },
-                    { id: 'e7', name: 'Compound Monocular Microscope Set', category: 'equipment', type: 'Equipment', capacity: '20 Units Stock Available', availableSlots: 15, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Compound_Monocular_Microscope_Set.jpg' },
-                    { id: 'e8', name: 'High-Speed Pocket Wi-Fi / LTE Modem', category: 'equipment', type: 'Equipment', capacity: '10 Units Stock Available', availableSlots: 6, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/High_Speed_Pocket_WiFi_LTE_Modem.jpg' },
-                    { id: 'e9', name: 'Whiteboard Marker & Eraser Bulk Set', category: 'equipment', type: 'Equipment', capacity: '25 Units Stock Available', availableSlots: 20, status: 'AVAILABLE', statusClass: 'bg-emerald-50 text-emerald-700 border-emerald-300', schedule: 'Stock available', image: '/images/Whiteboard_Marker_Eraser_Bulk_Set.jpg' }
+                    @foreach($facilities ?? [] as $facility)
+                        {
+                            id: 'f-{{ $facility->id }}',
+                            name: '{{ addslashes($facility->name) }}',
+                            category: 'rooms',
+                            type: 'Facility',
+                            capacity: 'Capacity: {{ $facility->capacity }} Persons',
+                            availableSlots: {{ $facility->capacity > 30 ? 10 : 2 }},
+                            status: '{{ strtoupper($facility->status) }}',
+                            statusClass: '{{ strtolower($facility->status) === "available" ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-rose-50 text-rose-700 border-rose-300" }}',
+                            schedule: '{{ $facility->status }}',
+                            image: '/images/Audio-Visual.jpg'
+                        },
+                    @endforeach
+                    @foreach($equipment ?? [] as $item)
+                        {
+                            id: 'e-{{ $item->id }}',
+                            name: '{{ addslashes($item->name) }}',
+                            category: 'equipment',
+                            type: 'Equipment',
+                            capacity: 'Stock Available: {{ $item->quantity }} Units',
+                            availableSlots: {{ $item->quantity }},
+                            status: '{{ $item->quantity > 0 ? "AVAILABLE" : "OUT OF STOCK" }}',
+                            statusClass: '{{ $item->quantity > 0 ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-rose-50 text-rose-700 border-rose-300" }}',
+                            schedule: '{{ $item->category }}',
+                            image: '/images/Epson_Multimedia.jpg'
+                        },
+                    @endforeach
                 ],
+
                 get filteredResources() {
                     return this.resources.filter(item => {
                         let matchesCategory = (this.activeTab === 'all' || item.category === this.activeTab);
-                        let matchesSearch = this.searchQuery === '' || item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || item.capacity.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        let matchesSearch = this.searchQuery === '' || 
+                            item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                            item.capacity.toLowerCase().includes(this.searchQuery.toLowerCase());
                         return matchesCategory && matchesSearch;
                     });
                 }
