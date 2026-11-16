@@ -3,45 +3,42 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservationController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Authenticated User & Admin Routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    
-    // Main Dashboard & Real-Time Reservations
+    // User Routes
     Route::get('/dashboard', [ReservationController::class, 'index'])->name('dashboard');
-    
-    // Store New Reservation Request
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
-    
-    // Cancel a Reservation
     Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
-    
-    // Return Borrowed Unit/Equipment
     Route::post('/reservations/{id}/return', [ReservationController::class, 'returnUnit'])->name('reservations.return');
 
-    // Availability Calendar Page View
     Route::get('/availability', function () {
         return view('dashboard');
     })->name('availability');
 
-    // Profile Edit Page (Breeze default)
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Admin Dashboard & Management Actions (Handled by ReservationController)
+    // Admin Database-Driven Routes
     Route::get('/admin/dashboard', [ReservationController::class, 'adminIndex'])->name('admin.dashboard');
     Route::post('/admin/reservations/{id}/approve', [ReservationController::class, 'approve'])->name('admin.reservations.approve');
     Route::post('/admin/reservations/{id}/reject', [ReservationController::class, 'reject'])->name('admin.reservations.reject');
+
+    // Facility Management
+    Route::post('/admin/facilities', [ReservationController::class, 'storeFacility'])->name('admin.facilities.store');
+    Route::put('/admin/facilities/{id}', [ReservationController::class, 'updateFacility'])->name('admin.facilities.update');
+    Route::delete('/admin/facilities/{id}', [ReservationController::class, 'deleteFacility'])->name('admin.facilities.delete');
+
+    // Equipment Management
+    Route::post('/admin/equipment', [ReservationController::class, 'storeEquipment'])->name('admin.equipment.store');
+    Route::put('/admin/equipment/{id}', [ReservationController::class, 'updateEquipment'])->name('admin.equipment.update');
+    Route::delete('/admin/equipment/{id}', [ReservationController::class, 'deleteEquipment'])->name('admin.equipment.delete');
+
+    // User Management
+    Route::post('/admin/users/{id}/toggle', [ReservationController::class, 'toggleUserStatus'])->name('admin.users.toggle');
 });
 
 require __DIR__.'/auth.php';

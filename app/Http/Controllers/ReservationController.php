@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Reservation;
+use App\Models\Facility;
+use App\Models\Equipment;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
@@ -12,7 +15,9 @@ class ReservationController extends Controller
     public function index()
     {
         $reservations = Auth::user()->reservations()->latest()->get();
-        return view('dashboard', compact('reservations'));
+        $facilities = Facility::all();
+        $equipment = Equipment::all();
+        return view('dashboard', compact('reservations', 'facilities', 'equipment'));
     }
 
     // Store a new reservation request
@@ -36,7 +41,7 @@ class ReservationController extends Controller
             'start_time' => $validated['start_time'],
             'end_time' => $validated['end_time'],
             'quantity' => $validated['quantity'],
-            'status' => 'pending', // Lowercase to match DB check constraint
+            'status' => 'pending',
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Reservation submitted successfully!');
@@ -68,30 +73,78 @@ class ReservationController extends Controller
         return back()->with('error', 'Unable to process return for this item.');
     }
 
-    // ==================== ADMIN METHODS ====================
+    // ==================== ADMIN DATABASE METHODS ====================
 
-    // Display admin dashboard with all system reservations
     public function adminIndex()
     {
         $reservations = Reservation::latest()->get();
-        return view('admin.dashboard', compact('reservations'));
+        $facilities = Facility::all();
+        $equipment = Equipment::all();
+        $users = User::all();
+
+        return view('admin.dashboard', compact('reservations', 'facilities', 'equipment', 'users'));
     }
 
-    // Approve a user reservation (Admin action)
     public function approve($id)
     {
-        $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'approved']);
-
-        return back()->with('success', 'Reservation approved successfully.');
+        Reservation::findOrFail($id)->update(['status' => 'approved']);
+        return back()->with('success', 'Reservation approved.');
     }
 
-    // Reject/Cancel a user reservation (Admin action)
     public function reject($id)
     {
-        $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'cancelled']);
+        Reservation::findOrFail($id)->update(['status' => 'cancelled']);
+        return back()->with('success', 'Reservation rejected.');
+    }
 
-        return back()->with('success', 'Reservation has been rejected.');
+    // Facility CRUD
+    public function storeFacility(Request $request)
+    {
+        $validated = $request->validate(['name' => 'required|string', 'capacity' => 'required|integer', 'status' => 'required|string']);
+        Facility::create($validated);
+        return back()->with('success', 'Facility added successfully.');
+    }
+
+    public function updateFacility(Request $request, $id)
+    {
+        $facility = Facility::findOrFail($id);
+        $facility->update($request->validate(['name' => 'required|string', 'capacity' => 'required|integer', 'status' => 'required|string']));
+        return back()->with('success', 'Facility updated successfully.');
+    }
+
+    public function deleteFacility($id)
+    {
+        Facility::findOrFail($id)->delete();
+        return back()->with('success', 'Facility deleted.');
+    }
+
+    // Equipment CRUD
+    public function storeEquipment(Request $request)
+    {
+        $validated = $request->validate(['name' => 'required|string', 'quantity' => 'required|integer', 'category' => 'required|string', 'status' => 'required|string']);
+        Equipment::create($validated);
+        return back()->with('success', 'Equipment added successfully.');
+    }
+
+    public function updateEquipment(Request $request, $id)
+    {
+        $item = Equipment::findOrFail($id);
+        $item->update($request->validate(['name' => 'required|string', 'quantity' => 'required|integer', 'category' => 'required|string', 'status' => 'required|string']));
+        return back()->with('success', 'Equipment updated successfully.');
+    }
+
+    public function deleteEquipment($id)
+    {
+        Equipment::findOrFail($id)->delete();
+        return back()->with('success', 'Equipment deleted.');
+    }
+
+    // User Management (Deactivate / Update Role)
+    public function toggleUserStatus($id)
+    {
+        $user = User::findOrFail($id);
+        // Toggle role between student/faculty and inactive or toggle a status flag if you have one
+        $user->update(['role' => $user->role === 'inactive' ? 'student' : 'inactive']);
+        return back()->with('success', 'User status updated.');
     }
 }
