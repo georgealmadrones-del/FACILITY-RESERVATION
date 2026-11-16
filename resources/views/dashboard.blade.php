@@ -263,15 +263,15 @@
                     <input type="hidden" name="resource_type" x-model="resourceType">
                     <input type="hidden" name="resource_name" x-model="resourceType === 'facility' ? selectedFacility : selectedEquipment">
                     <input type="hidden" name="category" x-model="resourceType === 'facility' ? 'rooms' : 'equipment'">
-                    <input type="hidden" name="start_time" x-model="selectedDate + ' ' + selectedTimeSlot.split(' ')[0]">
-                    <input type="hidden" name="end_time" x-model="selectedDate + ' ' + selectedTimeSlot.split(' ')[2]">
+                    <input type="hidden" name="start_time" x-model="selectedDate + ' ' + startTime">
+                    <input type="hidden" name="end_time" x-model="selectedDate + ' ' + endTime">
                     <input type="hidden" name="quantity" x-model="resourceType === 'facility' ? expectedAttendees : equipmentQuantity">
 
                     <div class="flex items-center justify-between border-b border-[#8686AC]/30 pb-6">
                         <div class="space-y-1">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">NEW REQUEST</span>
                             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Make a reservation</h2>
-                            <p class="text-xs text-[#505081]">Choose exact time slots and capacity specs before submitting to your database.</p>
+                            <p class="text-xs text-[#505081]">Choose your custom schedule and capacity specs before submitting.</p>
                         </div>
                     </div>
 
@@ -289,7 +289,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Dynamic Facility Select (Connected to DB) -->
                                 <template x-if="resourceType === 'facility'">
                                     <div class="space-y-4">
                                         <div>
@@ -301,13 +300,12 @@
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Expected Attendees (Person Capacity)</label>
+                                            <label class="block text-xs font-semibold text-[#505081] mb-1.5">Expected Attendees</label>
                                             <input type="number" x-model="expectedAttendees" min="1" max="500" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
                                         </div>
                                     </div>
                                 </template>
 
-                                <!-- Dynamic Equipment Select (Connected to DB) -->
                                 <template x-if="resourceType === 'equipment'">
                                     <div class="space-y-4">
                                         <div>
@@ -326,39 +324,50 @@
                                 </template>
                             </div>
 
-                            <!-- Step 2: Time Slot & Date Picker -->
+                            <!-- Step 2: Calendar & Custom Free-Form Time Pickers Side-by-Side -->
                             <div class="space-y-6 pt-6 border-t border-[#8686AC]/30">
-                                <h3 class="text-base font-extrabold text-[#0F0E47]">When do you need it? (Date & Time Slot)</h3>
-                                <div>
-                                    <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select Time Slot</label>
-                                    <select x-model="selectedTimeSlot" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
-                                        <option value="08:00 AM - 10:00 AM">08:00 AM - 10:00 AM (Morning Session 1)</option>
-                                        <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM (Morning Session 2)</option>
-                                        <option value="01:00 PM - 03:00 PM">01:00 PM - 03:00 PM (Afternoon Session 1)</option>
-                                        <option value="03:00 PM - 05:00 PM">03:00 PM - 05:00 PM (Afternoon Session 2)</option>
-                                        <option value="05:00 PM - 07:00 PM">05:00 PM - 07:00 PM (Evening Session)</option>
-                                    </select>
+                                <h3 class="text-base font-extrabold text-[#0F0E47]">When do you need it? (Date & Custom Time)</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                    <!-- Calendar Widget -->
+                                    <div class="bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <button type="button" @click="prevMonth()" class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&larr;</button>
+                                            <span class="text-xs font-extrabold text-[#0F0E47]" x-text="monthName + ' ' + currentYear"></span>
+                                            <button type="button" @click="nextMonth()" class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&rarr;</button>
+                                        </div>
+                                        <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-[#505081] font-semibold mb-2">
+                                            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                                        </div>
+                                        <div class="grid grid-cols-7 gap-1 text-center text-xs">
+                                            <template x-for="i in firstDayIndex">
+                                                <div></div>
+                                            </template>
+                                            <template x-for="day in daysInMonth" :key="day">
+                                                <button type="button" @click="selectDate(day)" :class="selectedDay === day ? 'bg-[#0F0E47] text-white font-extrabold shadow-md' : 'bg-white text-[#272757] hover:bg-[#8686AC]/20 border border-[#8686AC]/30'" class="h-8 rounded-lg flex items-center justify-center transition" x-text="day"></button>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Side-by-Side Free Time Hours -->
+                                    <div class="space-y-4 bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30 h-full flex flex-col justify-between">
+                                        <div>
+                                            <span class="text-[10px] font-bold text-[#0F0E47] uppercase tracking-widest block mb-3">CUSTOM TIME HOURS</span>
+                                            <div class="space-y-3">
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-[#505081] mb-1">Start Time</label>
+                                                    <input type="time" x-model="startTime" class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-[#505081] mb-1">End Time</label>
+                                                    <input type="time" x-model="endTime" class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="text-[11px] text-[#505081] pt-2">Active Date: <strong class="text-[#0F0E47]" x-text="selectedDate"></strong></p>
+                                    </div>
                                 </div>
-                                <div class="bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30 max-w-md">
-                                    <!-- Month Header with Arrows -->
-                                    <div class="flex items-center justify-between mb-4">
-                                        <button type="button" @click="prevMonth()" class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&larr;</button>
-                                        <span class="text-xs font-extrabold text-[#0F0E47]" x-text="monthName + ' ' + currentYear"></span>
-                                        <button type="button" @click="nextMonth()" class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&rarr;</button>
-                                    </div>
-                                    <!-- Days Grid -->
-                                    <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-[#505081] font-semibold mb-2">
-                                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-                                    </div>
-                                    <div class="grid grid-cols-7 gap-1 text-center text-xs">
-                                        <template x-for="i in firstDayIndex">
-                                            <div></div>
-                                        </template>
-                                        <template x-for="day in daysInMonth" :key="day">
-                                            <button type="button" @click="selectDate(day)" :class="selectedDay === day ? 'bg-[#0F0E47] text-white font-extrabold shadow-md' : 'bg-white text-[#272757] hover:bg-[#8686AC]/20 border border-[#8686AC]/30'" class="h-8 rounded-lg flex items-center justify-center transition" x-text="day"></button>
-                                        </template>
-                                    </div>
-                                </div>
+
                                 <div>
                                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">Purpose / Reason for reservation</label>
                                     <textarea name="purpose" x-model="purposeReason" rows="3" placeholder="e.g. Thesis defense presentation, faculty meeting..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
@@ -372,12 +381,13 @@
                             </div>
                         </div>
 
+                        <!-- Summary Card -->
                         <div class="lg:col-span-4 bg-white backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-2xl space-y-6">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">SUMMARY</span>
                             <h4 class="text-base font-extrabold text-[#0F0E47]" x-text="resourceType === 'facility' ? selectedFacility : selectedEquipment"></h4>
                             <div class="space-y-2 text-xs text-[#272757] pt-2 border-t border-[#8686AC]/30">
                                 <p><strong>Date:</strong> <span x-text="selectedDate"></span></p>
-                                <p><strong>Time Slot:</strong> <span x-text="selectedTimeSlot"></span></p>
+                                <p><strong>Time:</strong> <span x-text="startTime + ' to ' + endTime"></span></p>
                                 <p><strong>Quantity / Capacity:</strong> <span x-text="resourceType === 'facility' ? expectedAttendees + ' Persons' : equipmentQuantity + ' Units'"></span></p>
                             </div>
                             <p class="text-[11px] text-[#505081]">Your reservation will be saved immediately to the database for custodian approval.</p>
@@ -589,7 +599,8 @@
                 expectedAttendees: 30,
                 equipmentQuantity: 1,
                 selectedDate: '{{ date("F j, Y") }}',
-                selectedTimeSlot: '08:00 AM - 10:00 AM',
+                startTime: '08:00',
+                endTime: '10:00',
                 purposeReason: '',
 
                 currentMonth: new Date().getMonth(),
@@ -630,8 +641,8 @@
 
                 detailsModalOpen: false,
                 selectedReservation: null,
-                recentReservations: @json($reservations),
-                notifications: @json(auth()->user()->notifications ?? []),
+                recentReservations: @json($reservations),[cite: 39]
+                notifications: @json(auth()->user()->notifications ?? []),[cite: 39]
 
                 // Fully dynamic resources array bound live to database facilities & equipment
                 resources: [
@@ -642,10 +653,8 @@
                             category: 'rooms',
                             type: 'Facility',
                             capacity: 'Capacity: {{ $facility->capacity }} Persons',
-                            availableSlots: {{ $facility->capacity > 30 ? 10 : 2 }},
                             status: '{{ strtoupper($facility->status) }}',
                             statusClass: '{{ strtolower($facility->status) === "available" ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-rose-50 text-rose-700 border-rose-300" }}',
-                            schedule: '{{ $facility->status }}',
                             image: '/images/Audio-Visual.jpg'
                         },
                     @endforeach
@@ -656,10 +665,8 @@
                             category: 'equipment',
                             type: 'Equipment',
                             capacity: 'Stock Available: {{ $item->quantity }} Units',
-                            availableSlots: {{ $item->quantity }},
                             status: '{{ $item->quantity > 0 ? "AVAILABLE" : "OUT OF STOCK" }}',
                             statusClass: '{{ $item->quantity > 0 ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-rose-50 text-rose-700 border-rose-300" }}',
-                            schedule: '{{ $item->category }}',
                             image: '/images/Epson_Multimedia.jpg'
                         },
                     @endforeach
