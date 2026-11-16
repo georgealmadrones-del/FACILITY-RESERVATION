@@ -594,8 +594,8 @@
                 notificationsOpen: false,
                 bookingStep: 1,
                 resourceType: 'facility',
-                selectedFacility: '{{ $facilities->first()->name ?? '' }}',
-                selectedEquipment: '{{ $equipment->first()->name ?? '' }}',
+                selectedFacility: '{{ optional($facilities->first())->name ?? "" }}',
+                selectedEquipment: '{{ optional($equipment->first())->name ?? "" }}',
                 expectedAttendees: 30,
                 equipmentQuantity: 1,
                 selectedDate: '{{ date("F j, Y") }}',
@@ -641,10 +641,9 @@
 
                 detailsModalOpen: false,
                 selectedReservation: null,
-                recentReservations: @json($reservations),[cite: 39]
-                notifications: @json(auth()->user()->notifications ?? []),[cite: 39]
+                recentReservations: @json($reservations),
+                notifications: [],
 
-                // Fully dynamic resources array bound live to database facilities & equipment
                 resources: [
                     @foreach($facilities ?? [] as $facility)
                         {
