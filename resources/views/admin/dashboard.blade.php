@@ -76,15 +76,15 @@
                     </div>
                     <div @click="filterStatus = 'pending'" :class="filterStatus === 'pending' ? 'border-amber-500 bg-amber-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                         <span class="text-[10px] font-bold text-amber-600 uppercase">Pending</span>
-                        <p class="text-2xl font-extrabold text-amber-700 mt-1" x-text="reservations.filter(r => r.status === 'pending').length">0</p>
+                        <p class="text-2xl font-extrabold text-amber-700 mt-1" x-text="reservations.filter(r => r.status.toLowerCase() === 'pending').length">0</p>
                     </div>
                     <div @click="filterStatus = 'approved'" :class="filterStatus === 'approved' ? 'border-emerald-500 bg-emerald-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                         <span class="text-[10px] font-bold text-emerald-600 uppercase">Approved</span>
-                        <p class="text-2xl font-extrabold text-emerald-700 mt-1" x-text="reservations.filter(r => r.status === 'approved').length">0</p>
+                        <p class="text-2xl font-extrabold text-emerald-700 mt-1" x-text="reservations.filter(r => r.status.toLowerCase() === 'approved').length">0</p>
                     </div>
                     <div @click="filterStatus = 'rejected'" :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                         <span class="text-[10px] font-bold text-rose-600 uppercase">Rejected / Cancelled</span>
-                        <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => r.status === 'rejected' || r.status === 'cancelled').length">0</p>
+                        <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => ['rejected', 'cancelled'].includes(r.status.toLowerCase())).length">0</p>
                     </div>
                 </div>
             </div>
@@ -119,16 +119,16 @@
                                     <td class="py-4 px-6 text-[#272757] font-medium" x-text="item.start_time + ' - ' + item.end_time"></td>
                                     <td class="py-4 px-6">
                                         <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border uppercase inline-block" :class="{
-                                            'bg-emerald-50 text-emerald-700 border-emerald-300': item.status === 'approved',
-                                            'bg-amber-50 text-amber-700 border-amber-300': item.status === 'pending',
-                                            'bg-rose-50 text-rose-700 border-rose-300': item.status === 'rejected' || item.status === 'cancelled'
+                                            'bg-emerald-50 text-emerald-700 border-emerald-300': item.status.toLowerCase() === 'approved',
+                                            'bg-amber-50 text-amber-700 border-amber-300': item.status.toLowerCase() === 'pending',
+                                            'bg-rose-50 text-rose-700 border-rose-300': ['rejected', 'cancelled'].includes(item.status.toLowerCase())
                                         }" x-text="item.status"></span>
                                         <template x-if="item.rejection_reason">
                                             <p class="text-[10px] text-rose-600 mt-1 italic" x-text="'Reason: ' + item.rejection_reason"></p>
                                         </template>
                                     </td>
                                     <td class="py-4 px-6 text-right">
-                                        <template x-if="item.status === 'pending'">
+                                        <template x-if="item.status.toLowerCase() === 'pending'">
                                             <div class="flex items-center justify-end space-x-2">
                                                 <form :action="'/admin/reservations/' + item.id + '/approve'" method="POST" class="inline">
                                                     @csrf
@@ -137,7 +137,7 @@
                                                 <button type="button" @click="openRejectModal(item.id)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Reject</button>
                                             </div>
                                         </template>
-                                        <template x-if="item.status !== 'pending'">
+                                        <template x-if="item.status.toLowerCase() !== 'pending'">
                                             <span class="text-[#505081] font-semibold text-[11px]" x-text="item.status.toUpperCase()"></span>
                                         </template>
                                     </td>
@@ -331,14 +331,14 @@
     <div x-show="rejectModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
         <div @click.away="rejectModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
             <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
-                <h3 class="text-lg font-extrabold text-[#0F0E47]">Rejection Reason</h3>
+                <h3 class="text-lg font-extrabold text-[#0F0E47]">Rejection Reason Required</h3>
                 <button type="button" @click="rejectModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
             <form :action="'/admin/reservations/' + selectedReservationId + '/reject'" method="POST" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-xs font-semibold text-[#505081] mb-1.5">Reason</label>
-                    <textarea name="rejection_reason" rows="4" placeholder="e.g. Schedule conflict..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
+                    <label class="block text-xs font-semibold text-[#505081] mb-1.5">Reason for Rejection</label>
+                    <textarea name="rejection_reason" rows="4" placeholder="e.g. Schedule conflict / Equipment unavailable..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" @click="rejectModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
@@ -446,9 +446,9 @@ document.addEventListener('alpine:init', () => {
         get filteredReservations() {
             if (this.filterStatus === 'all') return this.reservations;
             if (this.filterStatus === 'rejected') {
-                return this.reservations.filter(r => r.status === 'rejected' || r.status === 'cancelled');
+                return this.reservations.filter(r => ['rejected', 'cancelled'].includes(r.status.toLowerCase()));
             }
-            return this.reservations.filter(r => r.status === this.filterStatus);
+            return this.reservations.filter(r => r.status.toLowerCase() === this.filterStatus);
         }
     }));
 });

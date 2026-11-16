@@ -26,10 +26,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Admin Routes
+    // Admin Routes (Using match for POST and PATCH to eliminate 405 errors)
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::post('/admin/reservations/{reservation}/approve', [AdminController::class, 'approveReservation'])->name('admin.reservations.approve');
-    Route::post('/admin/reservations/{reservation}/reject', [AdminController::class, 'rejectReservation'])->name('admin.reservations.reject');
+    Route::match(['post', 'patch'], '/admin/reservations/{reservation}/approve', [AdminController::class, 'approve'])->name('admin.reservations.approve');
+    Route::match(['post', 'patch'], '/admin/reservations/{reservation}/reject', [AdminController::class, 'reject'])->name('admin.reservations.reject');
 
     // Facility Management
     Route::post('/admin/facilities', [AdminController::class, 'storeFacility'])->name('admin.facilities.store');
