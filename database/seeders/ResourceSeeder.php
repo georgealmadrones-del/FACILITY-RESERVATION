@@ -9,8 +9,8 @@ class ResourceSeeder extends Seeder
 {
     public function run(): void
     {
-        // Seed Facilities
-        DB::table('facilities')->insertOrIgnore([
+        // Seed Facilities with updateOrInsert to fix existing rows
+        $facilities = [
             [
                 'id' => 1,
                 'name' => 'Audio-Visual Room (AVR 2) - Main Building',
@@ -18,8 +18,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Audio-Visual.jpg',
                 'capacity' => null,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 2,
@@ -28,8 +26,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Computer_lab3.jpg',
                 'capacity' => null,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 3,
@@ -38,8 +34,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Covered_court.jpg',
                 'capacity' => null,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 4,
@@ -48,8 +42,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Student_Council_Conference_Room.jpg',
                 'capacity' => null,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 5,
@@ -58,8 +50,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Speech_Laboratory.jpg',
                 'capacity' => null,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 6,
@@ -68,8 +58,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Engineering_Physics_Laboratory.jpg',
                 'capacity' => null,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 7,
@@ -78,8 +66,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Culinary_Kitchen_Studio.jpg',
                 'capacity' => null,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 8,
@@ -88,13 +74,26 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Outdoor_Student_Pavilion.jpg',
                 'capacity' => null,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
-        ]);
+        ];
 
-        // Seed Equipment with Exact Filenames
-        DB::table('equipment')->insertOrIgnore([
+        foreach ($facilities as $facility) {
+            DB::table('facilities')->updateOrInsert(
+                ['id' => $facility['id']],
+                [
+                    'name' => $facility['name'],
+                    'description' => $facility['description'],
+                    'image' => $facility['image'],
+                    'capacity' => $facility['capacity'],
+                    'status' => $facility['status'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
+        // Seed Equipment with updateOrInsert
+        $equipmentList = [
             [
                 'id' => 1,
                 'name' => 'Epson Multimedia Classroom Projector',
@@ -103,8 +102,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Epson_Multimedia.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 2,
@@ -114,8 +111,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Sony_Mirrorless_Vlogging_Camera_Kit.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 3,
@@ -125,8 +120,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Wireless_Microphone_Set.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 4,
@@ -136,8 +129,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Heavy_Duty_Extension_Cord.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 5,
@@ -147,8 +138,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Arduino_Raspberry_Pi_STEM_Kit.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 6,
@@ -158,8 +147,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Portable_PA_System_with_Wireless_Mic.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 7,
@@ -169,8 +156,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Compound_Monocular_Microscope_Set.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 8,
@@ -180,8 +165,6 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/High_Speed_Pocket_WiFi_Modem.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id' => 9,
@@ -191,9 +174,23 @@ class ResourceSeeder extends Seeder
                 'image' => 'images/Whiteboard_Marker_Eraser_Bulk_Set.jpg',
                 'quantity' => 1,
                 'status' => 'Available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
-        ]);
+        ];
+
+        foreach ($equipmentList as $item) {
+            DB::table('equipment')->updateOrInsert(
+                ['id' => $item['id']],
+                [
+                    'name' => $item['name'],
+                    'description' => $item['description'],
+                    'total_stock' => $item['total_stock'],
+                    'image' => $item['image'],
+                    'quantity' => $item['quantity'],
+                    'status' => $item['status'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
     }
 }
