@@ -14,17 +14,9 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-[#F4F5F7] text-[#272757] min-h-screen flex flex-col justify-center items-center">
+    <body class="font-sans antialiased bg-[#F4F5F7] text-[#272757] min-h-screen flex flex-col justify-center items-center px-4">
         
         <div class="w-full sm:max-w-md px-6 py-8 bg-white border border-[#8686AC]/30 shadow-xl overflow-hidden sm:rounded-2xl">
-            <!-- Brand / Header -->
-            <div class="text-center mb-6">
-                <a href="/" class="text-xl font-bold tracking-tight text-[#0F0E47] inline-flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-[#505081]"></span>
-                    CampusReserve
-                </a>
-            </div>
-
             {{ $slot }}
         </div>
 
