@@ -8,25 +8,25 @@
             </div>
             <div class="space-y-6">
                 <nav class="space-y-1">
-                    <button @click="currentView = 'bookings'"
+                    <button type="button" @click.prevent="currentView = 'bookings'"
                         :class="currentView === 'bookings' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                         <span>Bookings</span>
                     </button>
-                    <button @click="currentView = 'inventory'"
+                    <button type="button" @click.prevent="currentView = 'inventory'"
                         :class="currentView === 'inventory' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                         <span>Inventory & Stocks</span>
                     </button>
-                    <button @click="currentView = 'users'"
+                    <button type="button" @click.prevent="currentView = 'users'"
                         :class="currentView === 'users' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         <span>Users</span>
                     </button>
-                    <button @click="currentView = 'reports'"
+                    <button type="button" @click.prevent="currentView = 'reports'"
                         :class="currentView === 'reports' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -134,7 +134,7 @@
                                                     @csrf
                                                     <button type="submit" class="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold text-[11px] hover:bg-emerald-800 transition">Approve</button>
                                                 </form>
-                                                <button @click="openRejectModal(item.id)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Reject</button>
+                                                <button type="button" @click="openRejectModal(item.id)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Reject</button>
                                             </div>
                                         </template>
                                         <template x-if="item.status !== 'pending'">
@@ -229,7 +229,7 @@
                                     <td class="py-3 px-4" x-text="fac.capacity + ' Persons'"></td>
                                     <td class="py-3 px-4 uppercase font-semibold" x-text="fac.status"></td>
                                     <td class="py-3 px-4 text-right space-x-2">
-                                        <button @click="openEditFacility(fac)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
+                                        <button type="button" @click="openEditFacility(fac)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
                                         <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
@@ -263,7 +263,7 @@
                                     <td class="py-3 px-4" x-text="eq.total_stock + ' Units'"></td>
                                     <td class="py-3 px-4 uppercase font-semibold" x-text="eq.status"></td>
                                     <td class="py-3 px-4 text-right space-x-2">
-                                        <button @click="openEditEquipment(eq)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
+                                        <button type="button" @click="openEditEquipment(eq)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
                                         <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
@@ -332,7 +332,7 @@
         <div @click.away="rejectModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
             <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
                 <h3 class="text-lg font-extrabold text-[#0F0E47]">Rejection Reason</h3>
-                <button @click="rejectModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
+                <button type="button" @click="rejectModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
             <form :action="'/admin/reservations/' + selectedReservationId + '/reject'" method="POST" class="space-y-4">
                 @csrf
@@ -353,7 +353,7 @@
         <div @click.away="editFacilityModal = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
             <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
                 <h3 class="text-lg font-extrabold text-[#0F0E47]">Edit Facility</h3>
-                <button @click="editFacilityModal = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
+                <button type="button" @click="editFacilityModal = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
             <form :action="'/admin/facilities/' + formFacility.id" method="POST" class="space-y-4">
                 @csrf
@@ -386,7 +386,7 @@
         <div @click.away="editEquipmentModal = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
             <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
                 <h3 class="text-lg font-extrabold text-[#0F0E47]">Edit Equipment Stock</h3>
-                <button @click="editEquipmentModal = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
+                <button type="button" @click="editEquipmentModal = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
             <form :action="'/admin/equipment/' + formEquipment.id" method="POST" class="space-y-4">
                 @csrf
