@@ -21,6 +21,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction \
 ENV APP_ENV=production
 EXPOSE 10000
 
-# Make start.sh executable and use it as the default container command
-RUN chmod +x /app/start.sh
+# Fix Windows line endings in start.sh and make it executable
+RUN sed -i -e 's/\r$//' /app/start.sh \
+    && chmod +x /app/start.sh
+
 CMD ["/app/start.sh"]
