@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="{ adminTab: 'approvals' }" class="min-h-screen bg-[#F4F5F7] text-[#272757] font-['Inter',sans-serif] flex relative overflow-x-hidden">
+    <div x-data="adminDashboard()" class="min-h-screen bg-[#F4F5F7] text-[#272757] font-['Inter',sans-serif] flex relative overflow-x-hidden">
         
         <!-- Admin Left Sidebar -->
         <aside class="w-64 border-r border-[#8686AC]/30 bg-white min-h-screen p-6 flex flex-col justify-between hidden md:flex sticky top-0 z-40 shadow-sm">
@@ -81,27 +81,55 @@
                         <div>
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">CONTROL CENTER</span>
                             <h1 class="text-3xl font-extrabold text-[#0F0E47] tracking-tight mt-1">Facility & Equipment Requests</h1>
-                            <p class="text-xs text-[#505081]">Real-time database reservations awaiting review.</p>
+                            <p class="text-xs text-[#505081]">Click the stat cards below to filter table results instantly.</p>
                         </div>
                     </div>
 
+                    <!-- Clickable Stat Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-3xl border border-[#8686AC]/30 shadow-xl">
-                            <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">TOTAL REQUESTS</span>
+                        <!-- Total Requests Card -->
+                        <div @click="filterStatus = 'all'" 
+                             :class="filterStatus === 'all' ? 'border-[#0F0E47] ring-2 ring-[#0F0E47]/20 bg-indigo-50/40' : 'border-[#8686AC]/30 bg-white hover:border-[#0F0E47]'"
+                             class="p-6 rounded-3xl border shadow-xl cursor-pointer transition transform hover:-translate-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">TOTAL REQUESTS</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800" x-show="filterStatus === 'all'">Active Filter</span>
+                            </div>
                             <h3 class="text-3xl font-extrabold text-[#0F0E47] mt-2">{{ count($reservations) }}</h3>
+                            <p class="text-xs text-[#505081] mt-1">Click to view all records</p>
                         </div>
-                        <div class="bg-white p-6 rounded-3xl border border-[#8686AC]/30 shadow-xl">
-                            <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">PENDING</span>
+
+                        <!-- Pending Card -->
+                        <div @click="filterStatus = 'pending'" 
+                             :class="filterStatus === 'pending' ? 'border-amber-600 ring-2 ring-amber-600/20 bg-amber-50/40' : 'border-[#8686AC]/30 bg-white hover:border-amber-600'"
+                             class="p-6 rounded-3xl border shadow-xl cursor-pointer transition transform hover:-translate-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">PENDING</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800" x-show="filterStatus === 'pending'">Active Filter</span>
+                            </div>
                             <h3 class="text-3xl font-extrabold text-[#0F0E47] mt-2">{{ $reservations->where('status', 'pending')->count() }}</h3>
+                            <p class="text-xs text-[#505081] mt-1">Click to filter pending</p>
                         </div>
-                        <div class="bg-white p-6 rounded-3xl border border-[#8686AC]/30 shadow-xl">
-                            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">APPROVED</span>
+
+                        <!-- Approved Card -->
+                        <div @click="filterStatus = 'approved'" 
+                             :class="filterStatus === 'approved' ? 'border-emerald-600 ring-2 ring-emerald-600/20 bg-emerald-50/40' : 'border-[#8686AC]/30 bg-white hover:border-emerald-600'"
+                             class="p-6 rounded-3xl border shadow-xl cursor-pointer transition transform hover:-translate-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">APPROVED & ACTIVE</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800" x-show="filterStatus === 'approved'">Active Filter</span>
+                            </div>
                             <h3 class="text-3xl font-extrabold text-[#0F0E47] mt-2">{{ $reservations->where('status', 'approved')->count() }}</h3>
+                            <p class="text-xs text-[#505081] mt-1">Click to filter approved</p>
                         </div>
                     </div>
 
+                    <!-- Filterable Reservations Table -->
                     <section class="space-y-4">
-                        <h3 class="text-lg font-extrabold text-[#0F0E47]">All Database Reservations</h3>
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-extrabold text-[#0F0E47]">Database Reservations List</h3>
+                            <span class="text-xs font-semibold text-[#505081]" x-text="'Showing filter: ' + filterStatus.toUpperCase()"></span>
+                        </div>
                         <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                             <table class="w-full text-left border-collapse">
                                 <thead>
@@ -115,7 +143,10 @@
                                 </thead>
                                 <tbody class="divide-y divide-[#8686AC]/20 text-xs">
                                     @forelse($reservations as $item)
-                                        <tr class="hover:bg-[#F4F5F7]/80 transition">
+                                        <tr class="hover:bg-[#F4F5F7]/80 transition"
+                                            x-show="filterStatus === 'all' || 
+                                                    (filterStatus === 'pending' && '{{ $item->status }}' === 'pending') || 
+                                                    (filterStatus === 'approved' && ('{{ $item->status }}' === 'approved' || '{{ $item->status }}' === 'returned'))">
                                             <td class="py-4 px-6 font-bold text-[#0F0E47]">{{ $item->user->name ?? 'User #' . $item->user_id }}</td>
                                             <td class="py-4 px-6"><span class="font-bold text-[#0F0E47] block">{{ $item->resource_name }}</span><span class="text-[10px] text-[#505081]">Qty: {{ $item->quantity }}</span></td>
                                             <td class="py-4 px-6"><span class="block">{{ $item->start_time }}</span><span class="text-[10px] text-[#505081]">{{ $item->purpose }}</span></td>
@@ -257,4 +288,14 @@
             </main>
         </div>
     </div>
+
+    <!-- Alpine.js Component State -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('adminDashboard', () => ({
+                adminTab: 'approvals',
+                filterStatus: 'all'
+            }));
+        });
+    </script>
 </x-app-layout>
