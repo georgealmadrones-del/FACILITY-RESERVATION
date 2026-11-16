@@ -10,22 +10,22 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('reservations', function (Blueprint $table) {
-    id();
-    foreignId('user_id')->constrained()->onDelete('cascade');
-    string('resource_name');
-    string('resource_type'); // 'facility' or 'equipment'
-    string('category'); // 'rooms', 'labs', 'equipment'
-    dateTime('start_time');
-    dateTime('end_time');
-    integer('quantity_or_attendees')->default(1);
-    text('purpose');
-    string('status')->default('PENDING'); // PENDING, APPROVED, ACTIVE, RETURNED, CANCELLED
-    timestamp('returned_at')->nullable();
-    timestamps();
-});
-}
+    {
+        Schema::create('reservations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('resource_name');
+            $table->string('resource_type'); // 'facility' or 'equipment'
+            $table->string('category'); // 'rooms', 'labs', 'equipment'
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
+            $table->integer('quantity_or_attendees')->default(1);
+            $table->text('purpose');
+            $table->string('status')->default('PENDING'); // PENDING, APPROVED, ACTIVE, RETURNED, CANCELLED
+            $table->timestamp('returned_at')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.
