@@ -37,6 +37,34 @@ class AdminController extends Controller
             'equipment'
         ));
     }
+    public function approve($reservation)
+{
+    if (!$reservation instanceof Reservation) {
+        $reservation = Reservation::findOrFail($reservation);
+    }
+
+    $reservation->update(['status' => 'APPROVED']);
+
+    return back()->with('success', 'Reservation approved successfully.');
+}
+
+public function reject(Request $request, $reservation)
+{
+    $request->validate([
+        'rejection_reason' => 'required|string|max:255'
+    ]);
+
+    if (!$reservation instanceof Reservation) {
+        $reservation = Reservation::findOrFail($reservation);
+    }
+
+    $reservation->update([
+        'status' => 'REJECTED',
+        'rejection_reason' => $request->rejection_reason
+    ]);
+
+    return back()->with('success', 'Reservation rejected with reason.');
+}
 
     public function reservations()
     {
