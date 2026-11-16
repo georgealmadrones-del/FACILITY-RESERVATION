@@ -37,6 +37,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Admin Dashboard Route
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // Add this admin dashboard route so the redirect works:
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard'); // Or point to your admin controller
+    })->name('admin.dashboard');
+
+    // ... your other routes below
+});
 });
 
 require __DIR__.'/auth.php';
