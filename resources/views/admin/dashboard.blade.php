@@ -30,6 +30,12 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                                 <span>User Management</span>
                             </button>
+                            <button @click="currentView = 'reports'"
+                                :class="currentView === 'reports' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span>Reports & Audit Logs</span>
+                            </button>
                         </nav>
                     </div>
                 </div>
@@ -69,7 +75,6 @@
                     <h2 class="text-2xl font-extrabold text-[#0F0E47]">Facility & Equipment Requests Control Center</h2>
                     <p class="text-xs text-[#505081]">Click the stat cards below to filter table results instantly.</p>
                     
-                    <!-- Stat Cards Filtering -->
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4">
                         <div @click="filterStatus = 'all'" :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'" class="p-5 rounded-2xl border cursor-pointer transition shadow-sm">
                             <span class="text-[10px] font-bold text-[#505081] uppercase">TOTAL REQUESTS</span>
@@ -90,7 +95,6 @@
                     </div>
                 </div>
 
-                <!-- Reservations Table -->
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                     <div class="p-6 border-b border-[#8686AC]/30 flex justify-between items-center">
                         <h3 class="text-sm font-extrabold text-[#0F0E47]">Database Reservations List</h3>
@@ -156,20 +160,70 @@
                 </div>
             </main>
 
-            <!-- ================= VIEW 2: INVENTORY ================= -->
+            <!-- ================= VIEW 2: FACILITY & STOCK INVENTORY ================= -->
             <main x-show="currentView === 'inventory'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
-                <div class="bg-white p-6 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
                     <h2 class="text-2xl font-extrabold text-[#0F0E47]">Facility & Stock Inventory</h2>
-                    <p class="text-xs text-[#505081]">Manage campus facilities and equipment stock count.</p>
+                    <p class="text-xs text-[#505081]">Manage campus facilities and equipment stock quantities in real time.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Add Facility Card -->
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Add New Facility / Room</h3>
+                        <form action="{{ route('admin.facilities.store') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Facility Name</label>
+                                <input type="text" name="name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity (Persons)</label>
+                                <input type="number" name="capacity" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Status</label>
+                                <select name="status" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
+                                    <option value="available">Available</option>
+                                    <option value="maintenance">Maintenance</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Add Facility</button>
+                        </form>
+                    </div>
+
+                    <!-- Add Equipment Card -->
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Add New Equipment Stock</h3>
+                        <form action="{{ route('admin.equipment.store') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Equipment Name</label>
+                                <input type="text" name="name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Total Stock Quantity</label>
+                                <input type="number" name="total_stock" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Status</label>
+                                <select name="status" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
+                                    <option value="available">Available</option>
+                                    <option value="unavailable">Unavailable</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Add Equipment Stock</button>
+                        </form>
+                    </div>
                 </div>
             </main>
 
-            <!-- ================= VIEW 3: USER MANAGEMENT (Deactivate & View Password Info) ================= -->
+            <!-- ================= VIEW 3: USER MANAGEMENT ================= -->
             <main x-show="currentView === 'users'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-6">
                     <div>
                         <h2 class="text-2xl font-extrabold text-[#0F0E47]">User Accounts Directory</h2>
-                        <p class="text-xs text-[#505081]">Manage student and faculty accounts, view passwords/credentials, and toggle account activation status.</p>
+                        <p class="text-xs text-[#505081]">Manage student and faculty accounts, inspect passwords/credentials, and toggle account activation status.</p>
                     </div>
                     <div class="divide-y divide-[#8686AC]/20">
                         <template x-for="user in users" :key="user.id">
@@ -180,7 +234,7 @@
                                         <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase" :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'" x-text="user.is_active ? 'ACTIVE' : 'DEACTIVATED'"></span>
                                     </div>
                                     <p class="text-xs text-[#505081]" x-text="user.email + ' | Role: ' + user.role"></p>
-                                    <p class="text-[11px] text-[#8686AC] mt-0.5 font-mono" x-text="'Password Hash / Info: ' + (user.password ? user.password.substring(0, 20) + '...' : 'N/A')"></p>
+                                    <p class="text-[11px] text-[#8686AC] mt-0.5 font-mono" x-text="'Password Hash / Info: ' + (user.password ? user.password.substring(0, 25) + '...' : 'N/A')"></p>
                                 </div>
                                 <div class="flex items-center space-x-3">
                                     <form :action="'/admin/users/' + user.id + '/toggle-status'" method="POST">
@@ -190,6 +244,25 @@
                                 </div>
                             </div>
                         </template>
+                    </div>
+                </div>
+            </main>
+
+            <!-- ================= VIEW 4: REPORTS & AUDIT LOGS ================= -->
+            <main x-show="currentView === 'reports'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-[#0F0E47]">Reports & Audit Logs</h2>
+                            <p class="text-xs text-[#505081]">Review historical reservation records and export official PDF reports.</p>
+                        </div>
+                        <a href="{{ route('admin.reports.pdf') }}" class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Export PDF Report</a>
+                    </div>
+                    <div class="bg-[#F4F5F7] p-4 rounded-2xl border border-[#8686AC]/30 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-[#505081] uppercase">TOTAL LOGGED RECORDS</span>
+                            <p class="text-xl font-extrabold text-[#0F0E47]" x-text="reservations.length"></p>
+                        </div>
                     </div>
                 </div>
             </main>
