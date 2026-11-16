@@ -3,7 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL; // <-- Add this import
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,9 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Force HTTPS for all route generations in production (Render)
+        // Automatically run database migrations on production/Render deployment
         if ($this->app->environment('production')) {
-            URL::forceScheme('https');
+            try {
+                Artisan::call('migrate', ['--force' => true]);
+            } catch (\Exception $e) {
+                // Ignore if DB isn't fully ready yet
+            }
         }
     }
 }
