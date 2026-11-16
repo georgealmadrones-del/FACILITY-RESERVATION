@@ -5,4 +5,5 @@ php artisan route:cache
 php artisan view:cache
 php artisan migrate --force
 
-# Start your web server (e.g., Apache, Nginx, or php artisan serve)
+# Start the Laravel development server bound to Render's port
+php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
