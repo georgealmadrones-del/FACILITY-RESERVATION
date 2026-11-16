@@ -132,7 +132,6 @@
                                             <div class="flex items-center justify-end space-x-2">
                                                 <form :action="'/admin/reservations/' + item.id + '/approve'" method="POST" class="inline">
                                                     @csrf
-                                                    @method('PATCH')
                                                     <button type="submit" class="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold text-[11px] hover:bg-emerald-800 transition">Approve</button>
                                                 </form>
                                                 <button @click="openRejectModal(item.id)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Reject</button>
@@ -337,7 +336,6 @@
             </div>
             <form :action="'/admin/reservations/' + selectedReservationId + '/reject'" method="POST" class="space-y-4">
                 @csrf
-                @method('PATCH')
                 <div>
                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">Reason</label>
                     <textarea name="rejection_reason" rows="4" placeholder="e.g. Schedule conflict..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
