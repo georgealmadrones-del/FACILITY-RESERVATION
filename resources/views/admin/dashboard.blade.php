@@ -237,6 +237,7 @@
                                         <td class="py-3 px-4" x-text="fac.capacity + ' Persons'"></td>
                                         <td class="py-3 px-4 uppercase font-semibold" x-text="fac.status"></td>
                                         <td class="py-3 px-4 text-right space-x-2">
+                                            <button @click="openEditFacility(fac)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
                                             <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -270,6 +271,7 @@
                                         <td class="py-3 px-4" x-text="eq.total_stock + ' Units'"></td>
                                         <td class="py-3 px-4 uppercase font-semibold" x-text="eq.status"></td>
                                         <td class="py-3 px-4 text-right space-x-2">
+                                            <button @click="openEditEquipment(eq)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
                                             <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -353,6 +355,72 @@
                 </form>
             </div>
         </div>
+
+        <!-- ================= EDIT FACILITY MODAL ================= -->
+        <div x-show="editFacilityModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
+            <div @click.away="editFacilityModal = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
+                <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
+                    <h3 class="text-lg font-extrabold text-[#0F0E47]">Edit Facility</h3>
+                    <button @click="editFacilityModal = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
+                </div>
+                <form :action="'/admin/facilities/' + formFacility.id" method="POST" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+                    <div>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Facility Name</label>
+                        <input type="text" name="name" x-model="formFacility.name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity (Persons)</label>
+                        <input type="number" name="capacity" x-model="formFacility.capacity" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Status</label>
+                        <select name="status" x-model="formFacility.status" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
+                            <option value="available">Available</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" @click="editFacilityModal = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
+                        <button type="submit" class="px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= EDIT EQUIPMENT MODAL ================= -->
+        <div x-show="editEquipmentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
+            <div @click.away="editEquipmentModal = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
+                <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
+                    <h3 class="text-lg font-extrabold text-[#0F0E47]">Edit Equipment Stock</h3>
+                    <button @click="editEquipmentModal = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
+                </div>
+                <form :action="'/admin/equipment/' + formEquipment.id" method="POST" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+                    <div>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Equipment Name</label>
+                        <input type="text" name="name" x-model="formEquipment.name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Total Stock Quantity</label>
+                        <input type="number" name="total_stock" x-model="formEquipment.total_stock" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Status</label>
+                        <select name="status" x-model="formEquipment.status" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
+                            <option value="available">Available</option>
+                            <option value="unavailable">Unavailable</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" @click="editEquipmentModal = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
+                        <button type="submit" class="px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Alpine.js Script -->
@@ -368,9 +436,25 @@
                 facilities: @json($facilities),
                 equipment: @json($equipment),
 
+                editFacilityModal: false,
+                formFacility: {},
+
+                editEquipmentModal: false,
+                formEquipment: {},
+
                 openRejectModal(id) {
                     this.selectedReservationId = id;
                     this.rejectModalOpen = true;
+                },
+
+                openEditFacility(fac) {
+                    this.formFacility = { ...fac };
+                    this.editFacilityModal = true;
+                },
+
+                openEditEquipment(eq) {
+                    this.formEquipment = { ...eq };
+                    this.editEquipmentModal = true;
                 },
 
                 get filteredReservations() {
