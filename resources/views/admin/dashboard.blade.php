@@ -6,38 +6,35 @@
         <aside class="w-64 border-r border-[#8686AC]/30 bg-white min-h-screen p-6 flex flex-col justify-between hidden md:flex sticky top-0 z-40 shadow-sm">
             <div class="space-y-8">
                 <div class="px-2 pt-2">
-                    <span class="text-[10px] font-bold text-rose-600 uppercase tracking-widest block">ADMINISTRATOR PANEL</span>
+                    <span class="text-[10px] font-bold text-rose-600 uppercase tracking-widest block">Admin Portal</span>
                 </div>
                 <div class="space-y-6">
-                    <div>
-                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block mb-3">DATABASE MANAGEMENT</span>
-                        <nav class="space-y-1">
-                            <button @click="currentView = 'bookings'"
-                                :class="currentView === 'bookings' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
-                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                                <span>Bookings & Approvals</span>
-                            </button>
-                            <button @click="currentView = 'inventory'"
-                                :class="currentView === 'inventory' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
-                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                                <span>Facility & Stock Inventory</span>
-                            </button>
-                            <button @click="currentView = 'users'"
-                                :class="currentView === 'users' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
-                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                                <span>User Management</span>
-                            </button>
-                            <button @click="currentView = 'reports'"
-                                :class="currentView === 'reports' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
-                                class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <span>Reports & Audit Logs</span>
-                            </button>
-                        </nav>
-                    </div>
+                    <nav class="space-y-1">
+                        <button @click="currentView = 'bookings'"
+                            :class="currentView === 'bookings' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                            class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                            <span>Bookings</span>
+                        </button>
+                        <button @click="currentView = 'inventory'"
+                            :class="currentView === 'inventory' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                            class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <span>Inventory & Stocks</span>
+                        </button>
+                        <button @click="currentView = 'users'"
+                            :class="currentView === 'users' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                            class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <span>Users</span>
+                        </button>
+                        <button @click="currentView = 'reports'"
+                            :class="currentView === 'reports' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
+                            class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Reports</span>
+                        </button>
+                    </nav>
                 </div>
             </div>
             <div class="pt-6 border-t border-[#8686AC]/30 flex items-center justify-between">
@@ -47,7 +44,7 @@
                     </div>
                     <div class="overflow-hidden">
                         <span class="font-bold text-xs text-[#0F0E47] truncate block">{{ Auth::user()->name }}</span>
-                        <span class="text-[10px] text-rose-600 truncate block font-bold">Master Custodian</span>
+                        <span class="text-[10px] text-rose-600 truncate block font-bold">Custodian</span>
                     </div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
@@ -64,32 +61,32 @@
             <header class="h-20 border-b border-[#8686AC]/30 bg-white/80 backdrop-blur-md px-6 lg:px-10 flex items-center justify-between sticky top-0 z-30 shadow-sm">
                 <div class="flex items-center space-x-3">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-bold text-[#0F0E47]">Live Database Mode Active</span>
+                    <span class="text-xs font-bold text-[#0F0E47]">Connected</span>
                 </div>
-                <span class="text-xs font-bold text-[#505081]">Logged in as Master Custodian</span>
+                <span class="text-xs font-bold text-[#505081]">Master Custodian</span>
             </header>
 
-            <!-- ================= VIEW 1: BOOKINGS & APPROVALS ================= -->
+            <!-- ================= VIEW 1: BOOKINGS ================= -->
             <main x-show="currentView === 'bookings'" class="flex-grow p-6 lg:p-10 space-y-8">
                 <div class="bg-white backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
-                    <h2 class="text-2xl font-extrabold text-[#0F0E47]">Facility & Equipment Requests Control Center</h2>
-                    <p class="text-xs text-[#505081]">Click the stat cards below to filter table results instantly.</p>
+                    <h2 class="text-2xl font-extrabold text-[#0F0E47]">Requests & Bookings</h2>
+                    <p class="text-xs text-[#505081]">Click cards to filter requests.</p>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4">
-                        <div @click="filterStatus = 'all'" :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'" class="p-5 rounded-2xl border cursor-pointer transition shadow-sm">
-                            <span class="text-[10px] font-bold text-[#505081] uppercase">TOTAL REQUESTS</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2">
+                        <div @click="filterStatus = 'all'" :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
+                            <span class="text-[10px] font-bold text-[#505081] uppercase">Total</span>
                             <p class="text-2xl font-extrabold text-[#0F0E47] mt-1" x-text="reservations.length">0</p>
                         </div>
-                        <div @click="filterStatus = 'pending'" :class="filterStatus === 'pending' ? 'border-amber-500 bg-amber-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-5 rounded-2xl border cursor-pointer transition shadow-sm">
-                            <span class="text-[10px] font-bold text-amber-600 uppercase">PENDING</span>
+                        <div @click="filterStatus = 'pending'" :class="filterStatus === 'pending' ? 'border-amber-500 bg-amber-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
+                            <span class="text-[10px] font-bold text-amber-600 uppercase">Pending</span>
                             <p class="text-2xl font-extrabold text-amber-700 mt-1" x-text="reservations.filter(r => r.status === 'pending').length">0</p>
                         </div>
-                        <div @click="filterStatus = 'approved'" :class="filterStatus === 'approved' ? 'border-emerald-500 bg-emerald-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-5 rounded-2xl border cursor-pointer transition shadow-sm">
-                            <span class="text-[10px] font-bold text-emerald-600 uppercase">APPROVED & ACTIVE</span>
+                        <div @click="filterStatus = 'approved'" :class="filterStatus === 'approved' ? 'border-emerald-500 bg-emerald-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
+                            <span class="text-[10px] font-bold text-emerald-600 uppercase">Approved</span>
                             <p class="text-2xl font-extrabold text-emerald-700 mt-1" x-text="reservations.filter(r => r.status === 'approved').length">0</p>
                         </div>
-                        <div @click="filterStatus = 'rejected'" :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-5 rounded-2xl border cursor-pointer transition shadow-sm">
-                            <span class="text-[10px] font-bold text-rose-600 uppercase">REJECTED / CANCELLED</span>
+                        <div @click="filterStatus = 'rejected'" :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
+                            <span class="text-[10px] font-bold text-rose-600 uppercase">Rejected / Cancelled</span>
                             <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => r.status === 'rejected' || r.status === 'cancelled').length">0</p>
                         </div>
                     </div>
@@ -97,18 +94,18 @@
 
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                     <div class="p-6 border-b border-[#8686AC]/30 flex justify-between items-center">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Database Reservations List</h3>
-                        <span class="text-xs font-bold text-[#505081]" x-text="'Showing filter: ' + filterStatus.toUpperCase()"></span>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Reservation List</h3>
+                        <span class="text-xs font-bold text-[#505081]" x-text="'Filter: ' + filterStatus.toUpperCase()"></span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase tracking-wider bg-[#F4F5F7]">
-                                    <th class="py-4 px-6">USER & PURPOSE</th>
-                                    <th class="py-4 px-6">RESOURCE & QTY</th>
-                                    <th class="py-4 px-6">SCHEDULE</th>
-                                    <th class="py-4 px-6">STATUS & REASON</th>
-                                    <th class="py-4 px-6 text-right">ACTIONS</th>
+                                    <th class="py-4 px-6">User & Purpose</th>
+                                    <th class="py-4 px-6">Resource & Qty</th>
+                                    <th class="py-4 px-6">Schedule</th>
+                                    <th class="py-4 px-6">Status</th>
+                                    <th class="py-4 px-6 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-[#8686AC]/20 text-xs">
@@ -120,7 +117,7 @@
                                         </td>
                                         <td class="py-4 px-6">
                                             <span class="font-bold text-[#0F0E47] block" x-text="item.resource_name"></span>
-                                            <span class="text-[10px] text-[#505081]" x-text="item.resource_type + ' (' + item.quantity + ' units)'"></span>
+                                            <span class="text-[10px] text-[#505081]" x-text="item.resource_type + ' (' + item.quantity + ')'"></span>
                                         </td>
                                         <td class="py-4 px-6 text-[#272757] font-medium" x-text="item.start_time + ' - ' + item.end_time"></td>
                                         <td class="py-4 px-6">
@@ -144,14 +141,14 @@
                                                 </div>
                                             </template>
                                             <template x-if="item.status !== 'pending'">
-                                                <span class="text-[#505081] font-semibold text-[11px]" x-text="item.status.toUpperCase() + ' PROCESSED'"></span>
+                                                <span class="text-[#505081] font-semibold text-[11px]" x-text="item.status.toUpperCase()"></span>
                                             </template>
                                         </td>
                                     </tr>
                                 </template>
                                 <template x-if="filteredReservations.length === 0">
                                     <tr>
-                                        <td colspan="5" class="py-8 text-center text-[#505081] text-xs">No reservations match this filter.</td>
+                                        <td colspan="5" class="py-8 text-center text-[#505081] text-xs">No reservations found.</td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -160,25 +157,25 @@
                 </div>
             </main>
 
-            <!-- ================= VIEW 2: FACILITY & STOCK INVENTORY ================= -->
+            <!-- ================= VIEW 2: INVENTORY ================= -->
             <main x-show="currentView === 'inventory'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
-                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-2">
                     <h2 class="text-2xl font-extrabold text-[#0F0E47]">Facility & Stock Inventory</h2>
-                    <p class="text-xs text-[#505081]">Manage campus facilities and equipment stock quantities in real time.</p>
+                    <p class="text-xs text-[#505081]">Add, edit, or remove rooms and equipment stocks.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Add Facility Card -->
+                    <!-- Add Facility -->
                     <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Add New Facility / Room</h3>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Add Facility</h3>
                         <form action="{{ route('admin.facilities.store') }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Facility Name</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
                                 <input type="text" name="name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity (Persons)</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity</label>
                                 <input type="number" name="capacity" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
@@ -188,21 +185,21 @@
                                     <option value="maintenance">Maintenance</option>
                                 </select>
                             </div>
-                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Add Facility</button>
+                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Facility</button>
                         </form>
                     </div>
 
-                    <!-- Add Equipment Card -->
+                    <!-- Add Equipment -->
                     <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Add New Equipment Stock</h3>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Add Equipment Stock</h3>
                         <form action="{{ route('admin.equipment.store') }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Equipment Name</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
                                 <input type="text" name="name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Total Stock Quantity</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Quantity</label>
                                 <input type="number" name="total_stock" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
@@ -212,14 +209,14 @@
                                     <option value="unavailable">Unavailable</option>
                                 </select>
                             </div>
-                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Add Equipment Stock</button>
+                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Equipment</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Existing Facilities Table -->
+                <!-- Facilities Table -->
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl p-6 space-y-4">
-                    <h3 class="text-base font-extrabold text-[#0F0E47]">Existing Facilities Directory</h3>
+                    <h3 class="text-base font-extrabold text-[#0F0E47]">Facilities List</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
@@ -241,7 +238,7 @@
                                             <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Delete this facility?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Delete</button>
+                                                <button type="submit" onclick="return confirm('Delete facility?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -251,9 +248,9 @@
                     </div>
                 </div>
 
-                <!-- Existing Equipment Table -->
+                <!-- Equipment Table -->
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl p-6 space-y-4">
-                    <h3 class="text-base font-extrabold text-[#0F0E47]">Existing Equipment Stock Directory</h3>
+                    <h3 class="text-base font-extrabold text-[#0F0E47]">Equipment List</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
@@ -275,7 +272,7 @@
                                             <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Delete this equipment?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Delete</button>
+                                                <button type="submit" onclick="return confirm('Delete equipment?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -286,12 +283,12 @@
                 </div>
             </main>
 
-            <!-- ================= VIEW 3: USER MANAGEMENT ================= -->
+            <!-- ================= VIEW 3: USERS ================= -->
             <main x-show="currentView === 'users'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-6">
                     <div>
-                        <h2 class="text-2xl font-extrabold text-[#0F0E47]">User Accounts Directory</h2>
-                        <p class="text-xs text-[#505081]">Manage student and faculty accounts, inspect passwords/credentials, and toggle account activation status.</p>
+                        <h2 class="text-2xl font-extrabold text-[#0F0E47]">User Accounts</h2>
+                        <p class="text-xs text-[#505081]">Manage activation status for student and faculty accounts.</p>
                     </div>
                     <div class="divide-y divide-[#8686AC]/20">
                         <template x-for="user in users" :key="user.id">
@@ -299,14 +296,14 @@
                                 <div>
                                     <div class="flex items-center space-x-3">
                                         <h4 class="text-sm font-bold text-[#0F0E47]" x-text="user.name"></h4>
-                                        <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase" :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'" x-text="user.is_active ? 'ACTIVE' : 'DEACTIVATED'"></span>
+                                        <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase" :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'" x-text="user.is_active ? 'Active' : 'Deactivated'"></span>
                                     </div>
                                     <p class="text-xs text-[#505081]" x-text="user.email + ' | Role: ' + user.role"></p>
                                 </div>
                                 <div class="flex items-center space-x-3">
                                     <form :action="'/admin/users/' + user.id + '/toggle-status'" method="POST">
                                         @csrf
-                                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition border shadow-sm" :class="user.is_active ? 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'" x-text="user.is_active ? 'Deactivate Account' : 'Reactivate Account'"></button>
+                                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition border shadow-sm" :class="user.is_active ? 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'" x-text="user.is_active ? 'Deactivate' : 'Reactivate'"></button>
                                     </form>
                                 </div>
                             </div>
@@ -315,19 +312,19 @@
                 </div>
             </main>
 
-            <!-- ================= VIEW 4: REPORTS & AUDIT LOGS ================= -->
+            <!-- ================= VIEW 4: REPORTS ================= -->
             <main x-show="currentView === 'reports'" class="flex-grow p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-6">
                     <div class="flex justify-between items-center">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-[#0F0E47]">Reports & Audit Logs</h2>
-                            <p class="text-xs text-[#505081]">Review historical reservation records and export official PDF reports.</p>
+                            <h2 class="text-2xl font-extrabold text-[#0F0E47]">Reports</h2>
+                            <p class="text-xs text-[#505081]">Export reservation logs and records.</p>
                         </div>
-                        <a href="{{ route('admin.reports.pdf') }}" class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Export PDF Report</a>
+                        <a href="{{ route('admin.reports.pdf') }}" class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Export PDF</a>
                     </div>
                     <div class="bg-[#F4F5F7] p-4 rounded-2xl border border-[#8686AC]/30 flex items-center justify-between">
                         <div>
-                            <span class="text-[10px] font-bold text-[#505081] uppercase">TOTAL LOGGED RECORDS</span>
+                            <span class="text-[10px] font-bold text-[#505081] uppercase">Total Logs</span>
                             <p class="text-xl font-extrabold text-[#0F0E47]" x-text="reservations.length"></p>
                         </div>
                     </div>
@@ -335,18 +332,18 @@
             </main>
         </div>
 
-        <!-- ================= REJECTION REASON MODAL ================= -->
+        <!-- REJECT MODAL -->
         <div x-show="rejectModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
             <div @click.away="rejectModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
                 <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
-                    <h3 class="text-lg font-extrabold text-[#0F0E47]">Provide Rejection Reason</h3>
+                    <h3 class="text-lg font-extrabold text-[#0F0E47]">Rejection Reason</h3>
                     <button @click="rejectModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
                 </div>
                 <form :action="'/admin/reservations/' + selectedReservationId + '/reject'" method="POST" class="space-y-4">
                     @csrf
                     <div>
-                        <label class="block text-xs font-semibold text-[#505081] mb-1.5">Reason for Rejection</label>
-                        <textarea name="rejection_reason" rows="4" placeholder="e.g. Schedule conflict with laboratory maintenance..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1.5">Reason</label>
+                        <textarea name="rejection_reason" rows="4" placeholder="e.g. Schedule conflict..." class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
                         <button type="button" @click="rejectModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
@@ -356,7 +353,7 @@
             </div>
         </div>
 
-        <!-- ================= EDIT FACILITY MODAL ================= -->
+        <!-- EDIT FACILITY MODAL -->
         <div x-show="editFacilityModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
             <div @click.away="editFacilityModal = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
                 <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
@@ -367,11 +364,11 @@
                     @csrf
                     @method('PUT')
                     <div>
-                        <label class="block text-xs font-semibold text-[#505081] mb-1">Facility Name</label>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
                         <input type="text" name="name" x-model="formFacility.name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity (Persons)</label>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity</label>
                         <input type="number" name="capacity" x-model="formFacility.capacity" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                     </div>
                     <div>
@@ -383,13 +380,13 @@
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
                         <button type="button" @click="editFacilityModal = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
-                        <button type="submit" class="px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Changes</button>
+                        <button type="submit" class="px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- ================= EDIT EQUIPMENT MODAL ================= -->
+        <!-- EDIT EQUIPMENT MODAL -->
         <div x-show="editEquipmentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
             <div @click.away="editEquipmentModal = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
                 <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
@@ -400,11 +397,11 @@
                     @csrf
                     @method('PUT')
                     <div>
-                        <label class="block text-xs font-semibold text-[#505081] mb-1">Equipment Name</label>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
                         <input type="text" name="name" x-model="formEquipment.name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-[#505081] mb-1">Total Stock Quantity</label>
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Total Stock</label>
                         <input type="number" name="total_stock" x-model="formEquipment.total_stock" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                     </div>
                     <div>
@@ -416,7 +413,7 @@
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
                         <button type="button" @click="editEquipmentModal = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
-                        <button type="submit" class="px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Changes</button>
+                        <button type="submit" class="px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save</button>
                     </div>
                 </form>
             </div>
