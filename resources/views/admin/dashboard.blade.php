@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="adminDashboard()" class="min-h-screen bg-[#F4F5F7] text-[#272757] font-['Inter',sans-serif] flex relative overflow-x-hidden">
+    <div x-data="{ adminTab: 'approvals' }" class="min-h-screen bg-[#F4F5F7] text-[#272757] font-['Inter',sans-serif] flex relative overflow-x-hidden">
         
         <!-- Admin Left Sidebar -->
         <aside class="w-64 border-r border-[#8686AC]/30 bg-white min-h-screen p-6 flex flex-col justify-between hidden md:flex sticky top-0 z-40 shadow-sm">
@@ -11,17 +11,36 @@
                 <div class="space-y-6">
                     <div>
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block mb-3">DATABASE MANAGEMENT</span>
-                        <nav class="space-y-1">
-                            <button @click="adminTab = 'approvals'" :class="adminTab === 'approvals' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+                        <nav class="space-y-2">
+                            <!-- Bookings Tab -->
+                            <button @click="adminTab = 'approvals'" 
+                                :class="adminTab === 'approvals' ? 'bg-[#0F0E47] text-white shadow-md' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7]'" 
+                                class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-bold transition text-left">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                                 <span>Bookings & Approvals</span>
                             </button>
-                            <button @click="adminTab = 'inventory'" :class="adminTab === 'inventory' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+
+                            <!-- Inventory Tab -->
+                            <button @click="adminTab = 'inventory'" 
+                                :class="adminTab === 'inventory' ? 'bg-[#0F0E47] text-white shadow-md' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7]'" 
+                                class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-bold transition text-left">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                                 <span>Facility & Stock Inventory</span>
                             </button>
-                            <button @click="adminTab = 'users'" :class="adminTab === 'users' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+
+                            <!-- Users Tab -->
+                            <button @click="adminTab = 'users'" 
+                                :class="adminTab === 'users' ? 'bg-[#0F0E47] text-white shadow-md' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7]'" 
+                                class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-bold transition text-left">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                                 <span>User Management</span>
                             </button>
-                            <button @click="adminTab = 'reports'" :class="adminTab === 'reports' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
+
+                            <!-- Reports Tab -->
+                            <button @click="adminTab = 'reports'" 
+                                :class="adminTab === 'reports' ? 'bg-[#0F0E47] text-white shadow-md' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7]'" 
+                                class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-bold transition text-left">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 <span>Reports & Audit Logs</span>
                             </button>
                         </nav>
@@ -238,10 +257,4 @@
             </main>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('adminDashboard', () => ({ adminTab: 'approvals' }));
-        });
-    </script>
 </x-app-layout>
