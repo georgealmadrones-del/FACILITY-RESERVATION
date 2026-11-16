@@ -5,31 +5,28 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Facility & Equipment Booking') }}</title>
 
-        <!-- Google Fonts: Plus Jakarta Sans -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-        <style>
-            body {
-                font-family: 'Plus Jakarta Sans', sans-serif;
-            }
-        </style>
     </head>
-    <body class="antialiased bg-[#09090B] text-zinc-100 selection:bg-zinc-100 selection:text-black">
-        <!-- Subtle Ambient Background Glow -->
-        <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-            <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-zinc-800/20 rounded-full blur-[140px]"></div>
-            <div class="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-zinc-700/10 rounded-full blur-[140px]"></div>
-        </div>
+    <body class="font-sans antialiased bg-[#0F0E47] text-white min-h-screen flex flex-col justify-center items-center">
+        
+        <div class="w-full sm:max-w-md px-6 py-8 bg-[#272757] border border-[#505081]/50 shadow-2xl overflow-hidden sm:rounded-2xl">
+            <!-- Brand / Header -->
+            <div class="text-center mb-6">
+                <a href="/" class="text-xl font-bold tracking-tight text-white inline-flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#8686AC]"></span>
+                    CampusReserve
+                </a>
+            </div>
 
-        <div class="relative z-10 min-h-screen">
             {{ $slot }}
         </div>
+
     </body>
 </html>
