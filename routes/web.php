@@ -10,15 +10,10 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // User Routes
     Route::get('/dashboard', [ReservationController::class, 'index'])->name('dashboard');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     Route::post('/reservations/{id}/return', [ReservationController::class, 'returnUnit'])->name('reservations.return');
-
-    Route::get('/availability', function () {
-        return view('dashboard');
-    })->name('availability');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
