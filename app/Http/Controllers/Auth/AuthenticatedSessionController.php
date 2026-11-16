@@ -28,10 +28,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Check user role and redirect admin to admin dashboard
         $user = auth()->user();
 
-        if ($user->role === 'admin') {
+        // Check if user is admin by email or role, and auto-fix role if needed
+        if ($user->email === 'admin@email.com' || $user->role === 'admin') {
+            if ($user->role !== 'admin') {
+                $user->update(['role' => 'admin']);
+            }
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }
 
