@@ -10,7 +10,7 @@ use App\Http\Controllers\ReservationController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Authenticated User Routes
