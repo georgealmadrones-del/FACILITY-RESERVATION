@@ -97,7 +97,7 @@
                         <span class="text-[#8686AC]">|</span>
                         <span class="text-[#272757] font-bold">Live DB Mode</span>
                     </div>
-                    <!-- Notification Bell -->
+                    <!-- Real-Time Notification Bell -->
                     <div class="relative" @click.away="notificationsOpen = false">
                         <button @click="notificationsOpen = !notificationsOpen" class="w-10 h-10 rounded-xl bg-[#F4F5F7] hover:bg-[#8686AC]/20 border border-[#8686AC]/30 text-[#272757] flex items-center justify-center transition relative">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -114,10 +114,10 @@
                                 <template x-for="n in notifications" :key="n.id">
                                     <div class="p-2.5 rounded-xl bg-[#F4F5F7] border border-[#8686AC]/30 space-y-1">
                                         <div class="flex items-center justify-between">
-                                            <span class="text-xs font-bold text-[#0F0E47]" x-text="n.title || 'System Notification'"></span>
-                                            <span class="text-[9px] text-[#505081]" x-text="n.time || 'Recent'"></span>
+                                            <span class="text-xs font-bold text-[#0F0E47]" x-text="n.data?.title || 'System Notification'"></span>
+                                            <span class="text-[9px] text-[#505081]" x-text="new Date(n.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></span>
                                         </div>
-                                        <p class="text-[11px] text-[#505081] leading-tight" x-text="n.message || n.data?.message || 'New update regarding your request.'"></p>
+                                        <p class="text-[11px] text-[#505081] leading-tight" x-text="n.data?.message || n.message || 'New update regarding your request.'"></p>
                                     </div>
                                 </template>
                                 <template x-if="notifications.length === 0">
@@ -169,7 +169,7 @@
                     </div>
 
                     <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <!-- Clickable Total Requests Widget -->
+                        <!-- Clickable Total Bookings Widget -->
                         <div @click="currentView = 'profile'; profileTab = 'history';" class="bg-white backdrop-blur-xl p-5 rounded-3xl border border-[#8686AC]/30 shadow-xl flex flex-col justify-between cursor-pointer hover:border-[#0F0E47] transition">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">MY TOTAL BOOKINGS</span>
                             <div class="mt-2">
@@ -239,7 +239,7 @@
                                                 <span class="px-3 py-1 text-[10px] font-bold rounded-full border shadow-sm" :class="{
                                                     'bg-emerald-50 text-emerald-700 border-emerald-300': item.status === 'approved' || item.status === 'returned',
                                                     'bg-amber-50 text-amber-700 border-amber-300': item.status === 'pending',
-                                                    'bg-rose-50 text-rose-700 border-rose-300': item.status === 'cancelled'
+                                                    'bg-rose-50 text-rose-700 border-rose-300': item.status === 'cancelled' || item.status === 'rejected'
                                                 }" x-text="item.status.toUpperCase()"></span>
                                             </td>
                                         </tr>
@@ -324,7 +324,7 @@
                                 </template>
                             </div>
 
-                            <!-- Step 2: Calendar & Time Pickers Side-by-Side (No "Custom" text) -->
+                            <!-- Step 2: Calendar & Time Pickers Side-by-Side -->
                             <div class="space-y-6 pt-6 border-t border-[#8686AC]/30">
                                 <h3 class="text-base font-extrabold text-[#0F0E47]">When do you need it? (Date & Time)</h3>
                                 
@@ -555,7 +555,7 @@
                                         <span class="px-3 py-1 text-[10px] font-bold rounded-full border" :class="{
                                             'bg-emerald-50 text-emerald-700 border-emerald-300': item.status === 'approved' || item.status === 'returned',
                                             'bg-amber-50 text-amber-700 border-amber-300': item.status === 'pending',
-                                            'bg-rose-50 text-rose-700 border-rose-300': item.status === 'cancelled'
+                                            'bg-rose-50 text-rose-700 border-rose-300': item.status === 'cancelled' || item.status === 'rejected'
                                         }" x-text="item.status.toUpperCase()"></span>
                                     </div>
                                 </div>
@@ -586,7 +586,7 @@
                             <p class="font-bold mt-0.5 uppercase" :class="{
                                 'text-emerald-700': selectedReservation?.status === 'approved' || selectedReservation?.status === 'returned',
                                 'text-amber-700': selectedReservation?.status === 'pending',
-                                'text-rose-700': selectedReservation?.status === 'cancelled'
+                                'text-rose-700': selectedReservation?.status === 'cancelled' || selectedReservation?.status === 'rejected'
                             }" x-text="selectedReservation?.status"></p>
                         </div>
                         <div>
@@ -602,6 +602,13 @@
                         <span class="text-[10px] font-bold text-[#505081] uppercase">PURPOSE</span>
                         <p class="text-[#272757] bg-[#F4F5F7] p-3 rounded-xl border border-[#8686AC]/30 mt-0.5" x-text="selectedReservation?.purpose"></p>
                     </div>
+                    <!-- Display Rejection Reason if Rejected -->
+                    <template x-if="selectedReservation?.status === 'rejected' && selectedReservation?.rejection_reason">
+                        <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-rose-700 uppercase">REJECTION REASON FROM ADMIN</span>
+                            <p class="text-rose-900 font-medium" x-text="selectedReservation?.rejection_reason"></p>
+                        </div>
+                    </template>
                 </div>
                 <div class="pt-4 border-t border-[#8686AC]/30 flex items-center justify-between">
                     <button @click="detailsModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
@@ -689,7 +696,7 @@
                 detailsModalOpen: false,
                 selectedReservation: null,
                 recentReservations: @json($reservations),
-                notifications: [],
+                notifications: @json($notifications ?? []),
 
                 resources: [
                     @foreach($facilities ?? [] as $facility)

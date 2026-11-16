@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Reservation;
 use App\Models\Facility;
 use App\Models\Equipment;
+use App\Models\User;
 use App\Notifications\ReservationStatusChanged;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -17,12 +18,13 @@ class AdminController extends Controller
         $totalBookings = Reservation::count();
         $approvedCount = Reservation::where('status', 'approved')->count();
         $pendingCount = Reservation::where('status', 'pending')->count();
-        $rejectedCount = Reservation::where('status', 'rejected')->count();
+        $rejectedCount = Reservation::whereIn('status', ['rejected', 'cancelled'])->count();
 
-        // Updated variable name to $reservations to match the dashboard view
-        $reservations = Reservation::with(['user', 'facility', 'equipment'])->latest()->take(10)->get();
+        // Fetch reservations and all users for user management & directory
+        $reservations = Reservation::with(['user', 'facility', 'equipment'])->latest()->get();
+        $users = User::latest()->get();
 
-        return view('admin.dashboard', compact('totalBookings', 'approvedCount', 'pendingCount', 'rejectedCount', 'reservations'));
+        return view('admin.dashboard', compact('totalBookings', 'approvedCount', 'pendingCount', 'rejectedCount', 'reservations', 'users'));
     }
 
     public function reservations()
@@ -48,10 +50,55 @@ class AdminController extends Controller
             'rejection_reason' => $request->status === 'rejected' ? $request->rejection_reason : null,
         ]);
 
-        // Dispatch database notification to the user directly
-        $reservation->user->notify(new ReservationStatusChanged($reservation));
+        if ($reservation->user) {
+            $reservation->user->notify(new ReservationStatusChanged($reservation));
+        }
 
         return back()->with('success', 'Reservation status updated successfully!');
+    }
+
+    // Dedicated rejection handler with mandatory reason validation
+    public function rejectReservation(Request $request, Reservation $reservation)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
+        $reservation->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        if ($reservation->user) {
+            $reservation->user->notify(new ReservationStatusChanged($reservation));
+        }
+
+        return back()->with('success', 'Reservation rejected with reason successfully!');
+    }
+
+    // Dedicated approval handler
+    public function approveReservation(Reservation $reservation)
+    {
+        $reservation->update([
+            'status' => 'approved',
+            'rejection_reason' => null,
+        ]);
+
+        if ($reservation->user) {
+            $reservation->user->notify(new ReservationStatusChanged($reservation));
+        }
+
+        return back()->with('success', 'Reservation approved successfully!');
+    }
+
+    // Toggle User Account Activation / Deactivation Status
+    public function toggleUserStatus(User $user)
+    {
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        $statusText = $user->is_active ? 'reactivated' : 'deactivated';
+        return back()->with('success', "User account has been {$statusText} successfully!");
     }
 
     public function reports(Request $request)
@@ -70,11 +117,10 @@ class AdminController extends Controller
             $query->whereDate('start_time', '<=', $request->date_to);
         }
 
-        // Calculate metrics for filtered reports view
         $totalFiltered = (clone $query)->count();
         $approvedCount = (clone $query)->where('status', 'approved')->count();
         $pendingCount  = (clone $query)->where('status', 'pending')->count();
-        $rejectedCount = (clone $query)->where('status', 'rejected')->count();
+        $rejectedCount = (clone $query)->whereIn('status', ['rejected', 'cancelled'])->count();
 
         $reservations = $query->latest()->paginate(20)->withQueryString();
 

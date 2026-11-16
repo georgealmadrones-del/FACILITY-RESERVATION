@@ -12,13 +12,17 @@ use Illuminate\Support\Facades\Auth;
 class ReservationController extends Controller
 {
     // Display dashboard with user reservations
-    public function index()
-    {
-        $reservations = Auth::user()->reservations()->latest()->get();
-        $facilities = Facility::all();
-        $equipment = Equipment::all();
-        return view('dashboard', compact('reservations', 'facilities', 'equipment'));
-    }
+   public function index()
+{
+    $facilities = Facility::all();
+    $equipment = Equipment::all();
+    $reservations = auth()->user()->reservations()->latest()->get();
+    
+    // Fetch live database notifications for the logged-in user
+    $notifications = auth()->user()->notifications()->latest()->take(10)->get();
+
+    return view('dashboard', compact('facilities', 'equipment', 'reservations', 'notifications'));
+}
 
     // Store a new reservation request
     public function store(Request $request)

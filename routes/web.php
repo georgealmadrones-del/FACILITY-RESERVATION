@@ -39,6 +39,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // User Management
     Route::post('/admin/users/{id}/toggle', [ReservationController::class, 'toggleUserStatus'])->name('admin.users.toggle');
+
+    Route::post('/admin/reservations/{reservation}/approve', [AdminController::class, 'approveReservation']);
+Route::post('/admin/reservations/{reservation}/reject', [AdminController::class, 'rejectReservation']);
+Route::post('/admin/users/{user}/toggle-status', [AdminController::class, 'toggleUserStatus']);
 });
 
 require __DIR__.'/auth.php';
