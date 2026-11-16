@@ -4,7 +4,7 @@
         <!-- Left Navigation Sidebar -->
         <aside class="w-64 border-r border-[#8686AC]/30 bg-white min-h-screen p-6 flex flex-col justify-between hidden md:flex sticky top-0 z-40 shadow-sm">
             <div class="space-y-8">
-                <!-- Minimal Navigation Header (No Reserva branding) -->
+                <!-- Navigation Header -->
                 <div class="px-2 pt-2">
                     <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">PORTAL NAVIGATION</span>
                 </div>
@@ -77,7 +77,7 @@
 
         <!-- Main Dashboard Viewport -->
         <div class="flex-grow flex flex-col min-h-screen">
-            <!-- Top App Bar -->
+            <!-- Top App Bar (View Portal removed) -->
             <header class="h-20 border-b border-[#8686AC]/30 bg-white/80 backdrop-blur-md px-6 lg:px-10 flex items-center justify-between sticky top-0 z-30 shadow-sm">
                 <div class="w-full max-w-md relative">
                     <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-[#505081]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -121,11 +121,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <a href="{{ url('/') }}" target="_blank" class="text-xs text-[#272757] hover:text-[#0F0E47] transition bg-[#F4F5F7] hover:bg-[#8686AC]/20 px-3.5 py-2 rounded-xl border border-[#8686AC]/30 flex items-center space-x-1.5 shadow-sm font-medium">
-                        <span>View Portal</span>
-                        <span>&rarr;</span>
-                    </a>
                 </div>
             </header>
 
@@ -146,7 +141,8 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-5 bg-white backdrop-blur-xl p-6 rounded-3xl border border-[#8686AC]/30 shadow-xl flex items-center justify-between relative overflow-hidden">
+                    <!-- Clickable Profile Widget -->
+                    <div @click="currentView = 'profile'; profileTab = 'overview';" class="lg:col-span-5 bg-white backdrop-blur-xl p-6 rounded-3xl border border-[#8686AC]/30 shadow-xl flex items-center justify-between relative overflow-hidden cursor-pointer hover:border-[#0F0E47] transition">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-[#8686AC]/10 rounded-full blur-2xl pointer-events-none"></div>
                         <div class="flex items-center space-x-4 relative z-10">
                             <div class="w-14 h-14 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-lg text-[#0F0E47] shadow-inner overflow-hidden">
@@ -164,16 +160,19 @@
                                 <p class="text-xs text-[#505081] mt-0.5">{{ Auth::user()->role ?? 'Student' }}</p>
                             </div>
                         </div>
+                        <span class="text-xs text-[#505081] font-bold">&rarr;</span>
                     </div>
 
                     <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="bg-white backdrop-blur-xl p-5 rounded-3xl border border-[#8686AC]/30 shadow-xl flex flex-col justify-between">
+                        <!-- Clickable Total Requests Widget -->
+                        <div @click="currentView = 'profile'; profileTab = 'history';" class="bg-white backdrop-blur-xl p-5 rounded-3xl border border-[#8686AC]/30 shadow-xl flex flex-col justify-between cursor-pointer hover:border-[#0F0E47] transition">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">TOTAL REQUESTS</span>
                             <div class="mt-2">
                                 <span class="text-3xl font-extrabold text-[#0F0E47]" x-text="recentReservations.length">0</span>
                                 <span class="text-[10px] text-[#505081] block mt-0.5">Database active records</span>
                             </div>
                         </div>
+                        
                         <div class="bg-white backdrop-blur-xl p-5 rounded-3xl border border-[#8686AC]/30 shadow-xl flex flex-col justify-between">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-wider block">APPROVAL RATE</span>
                             <div class="mt-2">
@@ -260,15 +259,15 @@
                     <input type="hidden" name="resource_type" x-model="resourceType">
                     <input type="hidden" name="resource_name" x-model="resourceType === 'facility' ? selectedFacility : selectedEquipment">
                     <input type="hidden" name="category" x-model="resourceType === 'facility' ? 'rooms' : 'equipment'">
-                    <input type="hidden" name="start_time" x-model="selectedDate + ' 10:00:00'">
-                    <input type="hidden" name="end_time" x-model="selectedDate + ' 12:00:00'">
+                    <input type="hidden" name="start_time" x-model="selectedDate + ' ' + selectedTimeSlot.split(' - ')[0]">
+                    <input type="hidden" name="end_time" x-model="selectedDate + ' ' + selectedTimeSlot.split(' - ')[1]">
                     <input type="hidden" name="quantity" x-model="resourceType === 'facility' ? expectedAttendees : equipmentQuantity">
 
                     <div class="flex items-center justify-between border-b border-[#8686AC]/30 pb-6">
                         <div class="space-y-1">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">NEW REQUEST</span>
                             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Make a reservation</h2>
-                            <p class="text-xs text-[#505081]">Choose a resource with capacity/stock details and submit directly to your database.</p>
+                            <p class="text-xs text-[#505081]">Choose exact time slots and capacity specs before submitting to your database.</p>
                         </div>
                     </div>
 
@@ -291,7 +290,7 @@
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select facility</label>
                                             <select x-model="selectedFacility" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
-                                                <option value="Audio-Visual Room (AVR 2) Main Building">Audio-Visual Room (AVR 2) Main Building (Capacity: 50)</option>
+                                                <option value="Audio-Visual Room (AVR 2) Main Building">Audio-Visual Room (AVR 2) Main Building (Capacity: 50 Persons)</option>
                                                 <option value="Computer Laboratory 3 (ComLab)">Computer Laboratory 3 (ComLab) (Capacity: 40 Workstations)</option>
                                                 <option value="University Covered Court">University Covered Court (Capacity: 500 Persons)</option>
                                             </select>
@@ -321,9 +320,21 @@
                                 </template>
                             </div>
 
-                            <!-- Step 2: Dynamic Calendar Picker -->
+                            <!-- Step 2: Time Slot & Date Picker -->
                             <div class="space-y-6 pt-6 border-t border-[#8686AC]/30">
-                                <h3 class="text-base font-extrabold text-[#0F0E47]">When do you need it?</h3>
+                                <h3 class="text-base font-extrabold text-[#0F0E47]">When do you need it? (Date & Time Slot)</h3>
+                                
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select Time Slot</label>
+                                    <select x-model="selectedTimeSlot" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
+                                        <option value="08:00 AM - 10:00 AM">08:00 AM - 10:00 AM (Morning Session 1)</option>
+                                        <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM (Morning Session 2)</option>
+                                        <option value="01:00 PM - 03:00 PM">01:00 PM - 03:00 PM (Afternoon Session 1)</option>
+                                        <option value="03:00 PM - 05:00 PM">03:00 PM - 05:00 PM (Afternoon Session 2)</option>
+                                        <option value="05:00 PM - 07:00 PM">05:00 PM - 07:00 PM (Evening Session)</option>
+                                    </select>
+                                </div>
+
                                 <div class="bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30 max-w-md">
                                     <!-- Month Header with Arrows -->
                                     <div class="flex items-center justify-between mb-4">
@@ -362,7 +373,7 @@
                             <h4 class="text-base font-extrabold text-[#0F0E47]" x-text="resourceType === 'facility' ? selectedFacility : selectedEquipment"></h4>
                             <div class="space-y-2 text-xs text-[#272757] pt-2 border-t border-[#8686AC]/30">
                                 <p><strong>Date:</strong> <span x-text="selectedDate"></span></p>
-                                <p><strong>Time:</strong> 10:00 AM - 12:00 PM</p>
+                                <p><strong>Time Slot:</strong> <span x-text="selectedTimeSlot"></span></p>
                                 <p><strong>Quantity / Capacity:</strong> <span x-text="resourceType === 'facility' ? expectedAttendees + ' Persons' : equipmentQuantity + ' Units'"></span></p>
                             </div>
                             <p class="text-[11px] text-[#505081]">Your reservation will be saved immediately to the database for custodian approval.</p>
@@ -435,13 +446,13 @@
 
                 <div class="flex space-x-6 border-b border-[#8686AC]/30 text-xs font-bold">
                     <button @click="profileTab = 'overview'" :class="profileTab === 'overview' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Overview & Edit Profile</button>
-                    <button @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Reservation history & Cancellation</button>
+                    <button @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Reservation history & Return/Cancellation</button>
                 </div>
 
                 <!-- Profile Overview & Editable Form Tab -->
                 <div x-show="profileTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <div class="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-6 shadow-sm">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Edit Profile & Photo</h3>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Edit Profile & Custom Avatar Photo</h3>
                         <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                             @csrf
                             @method('patch')
@@ -454,7 +465,7 @@
                                 <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Profile Photo / Avatar</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Upload Profile Photo</label>
                                 <input type="file" name="profile_photo" class="w-full text-xs text-[#505081] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0F0E47] file:text-white hover:file:bg-[#272757]">
                             </div>
                             <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">
@@ -469,10 +480,10 @@
                     </div>
                 </div>
 
-                <!-- Reservation History & Cancellation Tab -->
+                <!-- Reservation History & Return/Cancellation Tab -->
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
-                    <h3 class="text-lg font-extrabold text-[#0F0E47]">Full Reservation History & Cancellation Manager</h3>
-                    <p class="text-xs text-[#505081]">Click any reservation row below to open details and cancel or return items instantly.</p>
+                    <h3 class="text-lg font-extrabold text-[#0F0E47]">Full Reservation History, Cancellation & Equipment Return</h3>
+                    <p class="text-xs text-[#505081]">Click any reservation row below to open details, cancel pending requests, or click "Return Unit" when you've brought equipment back.</p>
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
@@ -500,12 +511,12 @@
             </main>
         </div>
 
-        <!-- ==================== RESERVATION DETAILS & CANCELLATION MODAL ==================== -->
+        <!-- ==================== RESERVATION DETAILS, RETURN & CANCELLATION MODAL ==================== -->
         <div x-show="detailsModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
             <div @click.away="detailsModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
                 <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
                     <div>
-                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest">REQUEST DETAILS & CANCELLATION</span>
+                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest">REQUEST DETAILS & ACTIONS</span>
                         <h3 class="text-lg font-extrabold text-[#0F0E47] mt-0.5" x-text="selectedReservation?.resource_name"></h3>
                     </div>
                     <button @click="detailsModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
@@ -535,12 +546,12 @@
                         Close
                     </button>
                     <div class="flex items-center space-x-3">
-                        <!-- Return Unit Button -->
-                        <template x-if="selectedReservation?.status === 'approved' && selectedReservation?.resource_type === 'equipment'">
+                        <!-- Return Equipment Button (Marks item returned) -->
+                        <template x-if="selectedReservation?.status === 'approved'">
                             <form :action="'/reservations/' + selectedReservation?.id + '/return'" method="POST">
                                 @csrf
-                                <button type="submit" class="px-4 py-2 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow-lg">
-                                    Return Unit
+                                <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-lg">
+                                    Return Equipment
                                 </button>
                             </form>
                         </template>
