@@ -312,7 +312,7 @@
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">Select equipment from database</label>
                                             <select x-model="selectedEquipment" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
                                                 @foreach($equipment ?? [] as $item)
-                                                    <option value="{{ $item->name }}">{{ $item->name }} ({{ $item->quantity }} Units Stock - {{ $item->status }})</option>
+                                                    <option value="{{ $item->name }}">{{ $item->name }} ({{ $item->total_stock }} Units Stock - {{ $item->status }})</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -717,9 +717,9 @@
                             name: '{{ addslashes($item->name) }}',
                             category: 'equipment',
                             type: 'Equipment',
-                            capacity: 'Stock Available: {{ $item->quantity }} Units',
-                            status: '{{ $item->quantity > 0 ? "AVAILABLE" : "OUT OF STOCK" }}',
-                            statusClass: '{{ $item->quantity > 0 ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-rose-50 text-rose-700 border-rose-300" }}',
+                            capacity: 'Stock Available: {{ $item->total_stock }} Units',
+                            status: '{{ $item->total_stock > 0 ? "AVAILABLE" : "OUT OF STOCK" }}',
+                            statusClass: '{{ $item->total_stock > 0 ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-rose-50 text-rose-700 border-rose-300" }}',
                             image: '/images/Epson_Multimedia.jpg'
                         },
                     @endforeach

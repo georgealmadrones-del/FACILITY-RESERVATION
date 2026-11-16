@@ -20,7 +20,6 @@ class AdminController extends Controller
         $pendingCount = Reservation::where('status', 'pending')->count();
         $rejectedCount = Reservation::whereIn('status', ['rejected', 'cancelled'])->count();
 
-        // Fetch reservations and all users for user management & directory
         $reservations = Reservation::with(['user', 'facility', 'equipment'])->latest()->get();
         $users = User::latest()->get();
 
@@ -57,7 +56,6 @@ class AdminController extends Controller
         return back()->with('success', 'Reservation status updated successfully!');
     }
 
-    // Dedicated rejection handler with mandatory reason validation
     public function rejectReservation(Request $request, Reservation $reservation)
     {
         $request->validate([
@@ -76,7 +74,6 @@ class AdminController extends Controller
         return back()->with('success', 'Reservation rejected with reason successfully!');
     }
 
-    // Dedicated approval handler
     public function approveReservation(Reservation $reservation)
     {
         $reservation->update([
@@ -91,7 +88,6 @@ class AdminController extends Controller
         return back()->with('success', 'Reservation approved successfully!');
     }
 
-    // Toggle User Account Activation / Deactivation Status
     public function toggleUserStatus(User $user)
     {
         $user->is_active = !$user->is_active;
