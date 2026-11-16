@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservationController;
+use App\Models\Reservation;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Authenticated User Routes
+// Authenticated User & Admin Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     
     // Main Dashboard & Real-Time Reservations
@@ -28,9 +29,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Return Borrowed Unit/Equipment
     Route::post('/reservations/{id}/return', [ReservationController::class, 'returnUnit'])->name('reservations.return');
 
-    // Availability Calendar Page View (or switchable in dashboard)
+    // Availability Calendar Page View
     Route::get('/availability', function () {
-        return view('dashboard'); // Routed to dashboard workspace
+        return view('dashboard');
     })->name('availability');
 
     // Profile Edit Page (Breeze default)
@@ -38,16 +39,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Admin Dashboard Route
-Route::middleware(['auth', 'verified'])->group(function () {
-    
-    // Add this admin dashboard route so the redirect works:
+    // Admin Dashboard Route & Management Actions
     Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard'); // Or point to your admin controller
+        $reservations = Reservation::latest()->get();
+        return view('admin.dashboard', compact('reservations'));
     })->name('admin.dashboard');
 
-    // ... your other routes below
-});
+    Route::post('/admin/reservations/{id}/approve', function ($id) {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'approved']);
+        return back();
+    })->name('admin.reservations.approve');
+
+    Route::post('/admin/reservations/{id}/reject', function ($id) {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'cancelled']);
+        return back();
+    })->name('admin.reservations.reject');
 });
 
 require __DIR__.'/auth.php';
