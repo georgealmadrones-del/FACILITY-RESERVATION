@@ -4,6 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Artisan;
+
+// Temporary migration trigger to create your missing tables on Render
+Route::get('/run-migrations-now', function () {
+    $exitCode = Artisan::call('migrate', ['--force' => true]);
+    return "Migration executed with exit code: " . $exitCode . "<br>Output: <pre>" . Artisan::output() . "</pre>";
+});
 
 Route::get('/', function () {
     return redirect()->route('login');
