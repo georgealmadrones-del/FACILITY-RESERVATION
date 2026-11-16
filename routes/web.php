@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservationController;
-use App\Models\Reservation;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,23 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Admin Dashboard Route & Management Actions
-    Route::get('/admin/dashboard', function () {
-        $reservations = Reservation::latest()->get();
-        return view('admin.dashboard', compact('reservations'));
-    })->name('admin.dashboard');
-
-    Route::post('/admin/reservations/{id}/approve', function ($id) {
-        $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'approved']);
-        return back();
-    })->name('admin.reservations.approve');
-
-    Route::post('/admin/reservations/{id}/reject', function ($id) {
-        $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'cancelled']);
-        return back();
-    })->name('admin.reservations.reject');
+    // Admin Dashboard & Management Actions (Handled by ReservationController)
+    Route::get('/admin/dashboard', [ReservationController::class, 'adminIndex'])->name('admin.dashboard');
+    Route::post('/admin/reservations/{id}/approve', [ReservationController::class, 'approve'])->name('admin.reservations.approve');
+    Route::post('/admin/reservations/{id}/reject', [ReservationController::class, 'reject'])->name('admin.reservations.reject');
 });
 
 require __DIR__.'/auth.php';

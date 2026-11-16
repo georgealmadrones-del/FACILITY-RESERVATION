@@ -42,7 +42,7 @@ class ReservationController extends Controller
         return redirect()->route('dashboard')->with('success', 'Reservation submitted successfully!');
     }
 
-    // Cancel a reservation
+    // Cancel a reservation (User action)
     public function cancel($id)
     {
         $reservation = Reservation::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
@@ -55,7 +55,7 @@ class ReservationController extends Controller
         return back()->with('error', 'This reservation can no longer be cancelled.');
     }
 
-    // Return a borrowed unit/equipment
+    // Return a borrowed unit/equipment (User action)
     public function returnUnit($id)
     {
         $reservation = Reservation::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
@@ -66,5 +66,32 @@ class ReservationController extends Controller
         }
 
         return back()->with('error', 'Unable to process return for this item.');
+    }
+
+    // ==================== ADMIN METHODS ====================
+
+    // Display admin dashboard with all system reservations
+    public function adminIndex()
+    {
+        $reservations = Reservation::latest()->get();
+        return view('admin.dashboard', compact('reservations'));
+    }
+
+    // Approve a user reservation (Admin action)
+    public function approve($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'approved']);
+
+        return back()->with('success', 'Reservation approved successfully.');
+    }
+
+    // Reject/Cancel a user reservation (Admin action)
+    public function reject($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Reservation has been rejected.');
     }
 }
