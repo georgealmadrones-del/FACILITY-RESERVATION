@@ -21,22 +21,23 @@ class ReservationController extends Controller
         return view('dashboard', compact('facilities', 'equipment', 'reservations', 'notifications'));
     }
 
-    // Store a new reservation request
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'facility_id' => 'nullable|exists:facilities,id',
-            'equipment_id' => 'nullable|exists:equipment,id',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
-            'purpose' => 'required|string|max:255',
-        ]);
+{
+    $validated = $request->validate([
+        'resource_type' => 'required|string',
+        'resource_name' => 'required|string',
+        'category'      => 'required|string',
+        'start_time'    => 'required|string',
+        'end_time'      => 'required|string',
+        'quantity'      => 'required|integer|min:1',
+        'purpose'       => 'required|string|max:255',
+    ]);
 
-        auth()->user()->reservations()->create($validated);
+    // Create the reservation linked to the authenticated user
+    $request->user()->reservations()->create($validated);
 
-        return redirect()->route('dashboard')->with('success', 'Reservation request submitted successfully.');
-    }
-
+    return redirect()->route('dashboard')->with('success', 'Reservation submitted successfully!');
+}
     // Cancel a reservation
     public function cancel($id)
     {
