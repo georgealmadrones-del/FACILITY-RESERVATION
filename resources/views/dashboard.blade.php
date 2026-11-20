@@ -247,7 +247,7 @@
                     <div class="flex justify-between items-center">
                         <div>
                             <h3 class="text-lg font-extrabold text-[#0F0E47]">My recent reservations</h3>
-                            <p class="text-xs text-[#505081]">Click any reservation to view full details, cancel, or return items.</p>
+                            <p class="text-xs text-[#505081]">Click any reservation to view full details, rejection reason, cancel, or return items.</p>
                         </div>
                         <button type="button" @click="currentView = 'profile'; profileTab = 'history';" class="text-xs font-bold text-[#505081] hover:text-[#0F0E47] transition flex items-center space-x-1">
                             <span>View all history</span>
@@ -276,6 +276,9 @@
                                                     <div>
                                                         <span class="font-bold text-[#0F0E47] block" x-text="item.resource_name"></span>
                                                         <span class="text-[10px] text-[#505081] capitalize" x-text="item.resource_type"></span>
+                                                        <template x-if="item.rejection_reason">
+                                                            <p class="text-[10px] text-rose-600 mt-0.5 italic" x-text="'Reason: ' + item.rejection_reason"></p>
+                                                        </template>
                                                     </div>
                                                 </div>
                                             </td>
@@ -651,7 +654,7 @@
                 <!-- Reservation History Tab -->
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
                     <h3 class="text-lg font-extrabold text-[#0F0E47]">Full Reservation History, Cancellation & Equipment Return</h3>
-                    <p class="text-xs text-[#505081]">Click any reservation row below to open details, cancel pending requests, or return equipment.</p>
+                    <p class="text-xs text-[#505081]">Click any reservation row below to open details, view rejection reasons, cancel pending requests, or return equipment.</p>
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
@@ -659,6 +662,9 @@
                                     <div>
                                         <h4 class="text-sm font-bold text-[#0F0E47]" x-text="item.resource_name"></h4>
                                         <p class="text-xs text-[#505081] mt-0.5" x-text="item.resource_type + ' | Purpose: ' + item.purpose"></p>
+                                        <template x-if="item.rejection_reason">
+                                            <p class="text-[11px] text-rose-600 mt-1 italic" x-text="'Rejection Reason: ' + item.rejection_reason"></p>
+                                        </template>
                                     </div>
                                     <div class="flex items-center space-x-6">
                                         <span class="text-xs text-[#272757] font-medium" x-text="item.start_time"></span>
@@ -721,10 +727,11 @@
                     <p class="text-[#272757] bg-[#F4F5F7] p-3 rounded-xl border border-[#8686AC]/30 mt-0.5" x-text="selectedReservation?.purpose"></p>
                 </div>
 
-                <template x-if="selectedReservation?.rejection_reason">
+                <template x-if="(selectedReservation?.status || '').toLowerCase() === 'rejected' || selectedReservation?.rejection_reason">
                     <div>
                         <span class="text-[10px] font-bold text-rose-600 uppercase">REJECTION REASON</span>
-                        <p class="text-rose-700 bg-rose-50 p-3 rounded-xl border border-rose-200 mt-0.5" x-text="selectedReservation?.rejection_reason"></p>
+                        <p class="text-rose-700 bg-rose-50 p-3 rounded-xl border border-rose-200 mt-0.5"
+                            x-text="selectedReservation?.rejection_reason || 'No reason provided.'"></p>
                     </div>
                 </template>
             </div>
