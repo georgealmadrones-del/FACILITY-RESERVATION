@@ -35,6 +35,7 @@
                 </nav>
             </div>
         </div>
+
         <div class="pt-6 border-t border-[#8686AC]/30 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 rounded-xl bg-[#0F0E47] text-white flex items-center justify-center font-bold text-xs">
@@ -64,6 +65,19 @@
             <span class="text-xs font-bold text-[#505081]">Master Custodian</span>
         </header>
 
+        @if(session('success'))
+            <div class="mx-6 lg:mx-10 mt-6 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl text-xs font-bold">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if($errors->any())
+            <div class="mx-6 lg:mx-10 mt-6 bg-rose-50 border border-rose-300 text-rose-800 px-4 py-3 rounded-2xl text-xs font-bold space-y-1">
+                @foreach($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
         <!-- ================= VIEW 1: BOOKINGS ================= -->
         <main x-show="currentView === 'bookings'" class="flex-grow p-6 lg:p-10 space-y-8">
             <div class="bg-white backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
@@ -76,15 +90,15 @@
                     </div>
                     <div @click="filterStatus = 'pending'" :class="filterStatus === 'pending' ? 'border-amber-500 bg-amber-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                         <span class="text-[10px] font-bold text-amber-600 uppercase">Pending</span>
-                        <p class="text-2xl font-extrabold text-amber-700 mt-1" x-text="reservations.filter(r => r.status.toLowerCase() === 'pending').length">0</p>
+                        <p class="text-2xl font-extrabold text-amber-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'pending').length">0</p>
                     </div>
                     <div @click="filterStatus = 'approved'" :class="filterStatus === 'approved' ? 'border-emerald-500 bg-emerald-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                         <span class="text-[10px] font-bold text-emerald-600 uppercase">Approved</span>
-                        <p class="text-2xl font-extrabold text-emerald-700 mt-1" x-text="reservations.filter(r => r.status.toLowerCase() === 'approved').length">0</p>
+                        <p class="text-2xl font-extrabold text-emerald-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'approved').length">0</p>
                     </div>
                     <div @click="filterStatus = 'rejected'" :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'" class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                         <span class="text-[10px] font-bold text-rose-600 uppercase">Rejected / Cancelled</span>
-                        <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => ['rejected', 'cancelled'].includes(r.status.toLowerCase())).length">0</p>
+                        <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => ['rejected', 'cancelled'].includes((r.status || '').toLowerCase())).length">0</p>
                     </div>
                 </div>
             </div>
@@ -118,17 +132,19 @@
                                     </td>
                                     <td class="py-4 px-6 text-[#272757] font-medium" x-text="item.start_time + ' - ' + item.end_time"></td>
                                     <td class="py-4 px-6">
-                                        <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border uppercase inline-block" :class="{
-                                            'bg-emerald-50 text-emerald-700 border-emerald-300': item.status.toLowerCase() === 'approved',
-                                            'bg-amber-50 text-amber-700 border-amber-300': item.status.toLowerCase() === 'pending',
-                                            'bg-rose-50 text-rose-700 border-rose-300': ['rejected', 'cancelled'].includes(item.status.toLowerCase())
-                                        }" x-text="item.status"></span>
+                                        <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border uppercase inline-block"
+                                            :class="{
+                                                'bg-emerald-50 text-emerald-700 border-emerald-300': (item.status || '').toLowerCase() === 'approved',
+                                                'bg-amber-50 text-amber-700 border-amber-300': (item.status || '').toLowerCase() === 'pending',
+                                                'bg-rose-50 text-rose-700 border-rose-300': ['rejected', 'cancelled'].includes((item.status || '').toLowerCase())
+                                            }"
+                                            x-text="item.status"></span>
                                         <template x-if="item.rejection_reason">
                                             <p class="text-[10px] text-rose-600 mt-1 italic" x-text="'Reason: ' + item.rejection_reason"></p>
                                         </template>
                                     </td>
                                     <td class="py-4 px-6 text-right">
-                                        <template x-if="item.status.toLowerCase() === 'pending'">
+                                        <template x-if="(item.status || '').toLowerCase() === 'pending'">
                                             <div class="flex items-center justify-end space-x-2">
                                                 <form :action="'/admin/reservations/' + item.id + '/approve'" method="POST" class="inline">
                                                     @csrf
@@ -137,8 +153,8 @@
                                                 <button type="button" @click="openRejectModal(item.id)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Reject</button>
                                             </div>
                                         </template>
-                                        <template x-if="item.status.toLowerCase() !== 'pending'">
-                                            <span class="text-[#505081] font-semibold text-[11px]" x-text="item.status.toUpperCase()"></span>
+                                        <template x-if="(item.status || '').toLowerCase() !== 'pending'">
+                                            <span class="text-[#505081] font-semibold text-[11px]" x-text="(item.status || '').toUpperCase()"></span>
                                         </template>
                                     </td>
                                 </tr>
@@ -172,7 +188,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity</label>
-                            <input type="number" name="capacity" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                            <input type="number" name="capacity" min="1" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-[#505081] mb-1">Status</label>
@@ -184,6 +200,7 @@
                         <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Facility</button>
                     </form>
                 </div>
+
                 <!-- Add Equipment -->
                 <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
                     <h3 class="text-sm font-extrabold text-[#0F0E47]">Add Equipment Stock</h3>
@@ -195,7 +212,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-[#505081] mb-1">Quantity</label>
-                            <input type="number" name="total_stock" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                            <input type="number" name="total_stock" min="1" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-[#505081] mb-1">Status</label>
@@ -291,14 +308,18 @@
                             <div class="space-y-1">
                                 <div class="flex items-center space-x-3">
                                     <h4 class="text-sm font-bold text-[#0F0E47]" x-text="user.name"></h4>
-                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase" :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'" x-text="user.is_active ? 'Active' : 'Deactivated'"></span>
+                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase"
+                                        :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'"
+                                        x-text="user.is_active ? 'Active' : 'Deactivated'"></span>
                                 </div>
                                 <p class="text-xs text-[#505081]" x-text="user.email + ' | Role: ' + user.role"></p>
                             </div>
                             <div class="flex items-center space-x-3">
                                 <form :action="'/admin/users/' + user.id + '/toggle-status'" method="POST">
                                     @csrf
-                                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition border shadow-sm" :class="user.is_active ? 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'" x-text="user.is_active ? 'Deactivate' : 'Reactivate'"></button>
+                                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition border shadow-sm"
+                                        :class="user.is_active ? 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'"
+                                        x-text="user.is_active ? 'Deactivate' : 'Reactivate'"></button>
                                 </form>
                             </div>
                         </div>
@@ -364,7 +385,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity</label>
-                    <input type="number" name="capacity" x-model="formFacility.capacity" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                    <input type="number" name="capacity" min="1" x-model="formFacility.capacity" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-[#505081] mb-1">Status</label>
@@ -397,7 +418,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-[#505081] mb-1">Total Stock</label>
-                    <input type="number" name="total_stock" x-model="formEquipment.total_stock" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                    <input type="number" name="total_stock" min="1" x-model="formEquipment.total_stock" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-[#505081] mb-1">Status</label>
@@ -423,32 +444,36 @@ document.addEventListener('alpine:init', () => {
         filterStatus: 'all',
         rejectModalOpen: false,
         selectedReservationId: null,
-        reservations: @json($reservations),
-        users: @json($users),
-        facilities: @json($facilities),
-        equipment: @json($equipment),
+        reservations: @json($reservations ?? []),
+        users: @json($users ?? []),
+        facilities: @json($facilities ?? []),
+        equipment: @json($equipment ?? []),
         editFacilityModal: false,
         formFacility: {},
         editEquipmentModal: false,
         formEquipment: {},
+
         openRejectModal(id) {
             this.selectedReservationId = id;
             this.rejectModalOpen = true;
         },
+
         openEditFacility(fac) {
             this.formFacility = { ...fac };
             this.editFacilityModal = true;
         },
+
         openEditEquipment(eq) {
             this.formEquipment = { ...eq };
             this.editEquipmentModal = true;
         },
+
         get filteredReservations() {
             if (this.filterStatus === 'all') return this.reservations;
             if (this.filterStatus === 'rejected') {
-                return this.reservations.filter(r => ['rejected', 'cancelled'].includes(r.status.toLowerCase()));
+                return this.reservations.filter(r => ['rejected', 'cancelled'].includes((r.status || '').toLowerCase()));
             }
-            return this.reservations.filter(r => r.status.toLowerCase() === this.filterStatus);
+            return this.reservations.filter(r => (r.status || '').toLowerCase() === this.filterStatus);
         }
     }));
 });
