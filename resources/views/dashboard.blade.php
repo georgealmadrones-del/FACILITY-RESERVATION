@@ -729,25 +729,25 @@
                 </div>
             </main>
 
-            <!-- VIEW 5: HELP & SUPPORT CHAT -->
-            <main x-show="currentView === 'support-chat'" class="p-6 lg:p-10 space-y-6" style="display: none;">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#8686AC]/30 pb-5">
-                    <div class="space-y-1">
+            <!-- VIEW 5: HELP & SUPPORT CHAT (Input Box Visible Without Scrolling on Mobile) -->
+            <main x-show="currentView === 'support-chat'" class="p-3 sm:p-6 lg:p-10 space-y-3 sm:space-y-6" style="display: none;">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 sm:pb-5">
+                    <div class="space-y-0.5">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">CUSTODIAN DESK</span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Help &amp; Support Chat</h2>
-                        <p class="text-xs text-[#505081]">Message the facility custodian directly and view automated equipment return logs.</p>
+                        <h2 class="text-xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Help &amp; Support Chat</h2>
+                        <p class="hidden sm:block text-xs text-[#505081]">Message the facility custodian directly and view automated equipment return logs.</p>
                     </div>
-                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">
                         Live Polling Active
                     </span>
                 </div>
 
-                <div class="bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden flex flex-col h-[520px]">
-                    <div id="user-chat-feed" class="flex-1 p-6 overflow-y-auto space-y-3 bg-[#F4F5F7]/50">
+                <div class="bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden flex flex-col h-[calc(100vh-12rem)] min-h-[340px] sm:h-[520px]">
+                    <div id="user-chat-feed" class="flex-1 min-h-0 p-3 sm:p-6 overflow-y-auto space-y-2.5 bg-[#F4F5F7]/50">
                         <template x-for="msg in chatMessages" :key="msg.id">
                             <div>
                                 <template x-if="msg.is_system">
-                                    <div class="mx-auto max-w-xl my-2 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs text-center font-medium">
+                                    <div class="mx-auto max-w-xl my-1.5 px-3.5 py-2 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs text-center font-medium">
                                         <span class="font-bold uppercase text-[10px] tracking-wider block mb-0.5">System Log</span>
                                         <span x-text="msg.message"></span>
                                     </div>
@@ -755,14 +755,14 @@
 
                                 <template x-if="!msg.is_system">
                                     <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
-                                        <div class="max-w-md px-4 py-3 rounded-2xl text-xs shadow-sm"
+                                        <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-3 rounded-2xl text-xs shadow-sm"
                                              :class="msg.sender_id === currentUserId
                                                  ? 'bg-[#0F0E47] text-white rounded-br-sm'
                                                  : 'bg-white text-[#272757] border border-[#8686AC]/30 rounded-bl-sm'">
-                                            <div class="text-[10px] font-bold opacity-75 mb-1" x-text="msg.sender?.name || 'User'"></div>
+                                            <div class="text-[10px] font-bold opacity-75 mb-0.5" x-text="msg.sender?.name || 'User'"></div>
                                             <p class="leading-relaxed whitespace-pre-line" x-text="msg.message"></p>
                                         </div>
-                                        <span class="text-[9px] text-[#505081] mt-1 px-1"
+                                        <span class="text-[9px] text-[#505081] mt-0.5 px-1"
                                               x-text="msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : ''"></span>
                                     </div>
                                 </template>
@@ -776,12 +776,12 @@
                         </template>
                     </div>
 
-                    <form @submit.prevent="sendMessage()" class="p-4 border-t border-[#8686AC]/30 bg-white flex items-center gap-3">
+                    <form @submit.prevent="sendMessage()" class="p-2.5 sm:p-4 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 shrink-0">
                         <input type="text" x-model="newChatMessage" :disabled="sendingMessage"
                                placeholder="Type your message to the custodian..."
-                               class="flex-1 bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47]" required>
+                               class="flex-1 min-w-0 bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-3.5 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47]" required>
                         <button type="submit" :disabled="sendingMessage || !newChatMessage.trim()"
-                                class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow">
+                                class="px-4 sm:px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow shrink-0">
                             Send
                         </button>
                     </form>

@@ -433,26 +433,26 @@
                 </div>
             </main>
 
-            <!-- VIEW 4: MESSAGES INBOX (Full-Screen Mobile + Desktop) -->
-            <main x-show="currentView === 'messages'" class="p-3 sm:p-6 lg:p-10 min-h-full flex flex-col gap-4 sm:gap-6" style="display: none;">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[#8686AC]/30 pb-4 shrink-0">
+            <!-- VIEW 4: MESSAGES INBOX (Input Box Visible Without Scrolling on Mobile) -->
+            <main x-show="currentView === 'messages'" class="p-3 sm:p-6 lg:p-10 space-y-3 sm:space-y-6" style="display: none;">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 sm:pb-5">
                     <div class="space-y-0.5">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">SUPPORT &amp; RETURN LOGS</span>
                         <h2 class="text-xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Messages Inbox</h2>
-                        <p class="text-xs text-[#505081]">Select a user thread to reply or review automated equipment return logs.</p>
+                        <p class="hidden sm:block text-xs text-[#505081]">Select a user thread to reply or review automated equipment return logs.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">
                         Live Polling Active
                     </span>
                 </div>
 
-                <div class="flex-1 min-h-[430px] sm:min-h-[540px] lg:h-[580px] grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden">
-                    <!-- User Threads List (Compact on Mobile so Chat Gets Full Height) -->
-                    <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#8686AC]/30 max-h-28 sm:max-h-40 lg:max-h-none overflow-y-auto divide-y divide-[#8686AC]/20 bg-[#F4F5F7]/40 shrink-0 lg:shrink">
+                <div class="h-[calc(100vh-14.5rem)] min-h-[340px] sm:min-h-[540px] lg:h-[580px] grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden">
+                    <!-- User Threads List -->
+                    <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#8686AC]/30 max-h-24 sm:max-h-36 lg:max-h-none overflow-y-auto divide-y divide-[#8686AC]/20 bg-[#F4F5F7]/40 shrink-0">
                         <template x-for="thread in threads" :key="thread.id">
                             <button type="button" @click="selectThread(thread.id)"
                                     :class="activeThreadUserId === thread.id ? 'bg-[#0F0E47] text-white' : 'hover:bg-white text-[#272757]'"
-                                    class="w-full px-3.5 py-2.5 sm:p-4 text-left transition flex flex-col gap-0.5">
+                                    class="w-full px-3.5 py-2 sm:p-4 text-left transition flex flex-col gap-0.5">
                                 <div class="flex items-center justify-between gap-2">
                                     <span class="text-xs font-bold truncate" x-text="thread.name"></span>
                                     <span class="text-[9px] opacity-75 shrink-0" x-text="thread.last_time || ''"></span>
@@ -462,24 +462,24 @@
                             </button>
                         </template>
                         <template x-if="threads.length === 0">
-                            <div class="p-4 text-xs text-center text-[#505081]">No user threads found.</div>
+                            <div class="p-3 text-xs text-center text-[#505081]">No user threads found.</div>
                         </template>
                     </div>
 
-                    <!-- Active Conversation (Fills Remaining Mobile Height) -->
+                    <!-- Active Conversation -->
                     <div class="lg:col-span-8 flex-1 flex flex-col min-h-0">
-                        <div class="px-4 py-2.5 sm:px-6 sm:py-4 border-b border-[#8686AC]/30 bg-white flex items-center justify-between shrink-0">
+                        <div class="px-4 py-2 sm:px-6 sm:py-3.5 border-b border-[#8686AC]/30 bg-white flex items-center justify-between shrink-0">
                             <div class="min-w-0">
                                 <h3 class="text-xs sm:text-sm font-extrabold text-[#0F0E47] truncate" x-text="selectedThread?.name || 'Select a User Thread'"></h3>
-                                <p class="text-[10px] text-[#505081] truncate" x-text="selectedThread?.email || ''"></p>
+                                <p class="hidden sm:block text-[10px] text-[#505081] truncate" x-text="selectedThread?.email || ''"></p>
                             </div>
                         </div>
 
-                        <div id="admin-chat-feed" class="flex-1 min-h-[160px] p-3.5 sm:p-6 overflow-y-auto space-y-3 bg-[#F4F5F7]/50">
+                        <div id="admin-chat-feed" class="flex-1 min-h-0 p-3 sm:p-6 overflow-y-auto space-y-2.5 bg-[#F4F5F7]/50">
                             <template x-for="msg in threadMessages" :key="msg.id">
                                 <div>
                                     <template x-if="msg.is_system">
-                                        <div class="mx-auto max-w-xl my-2 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs text-center font-medium">
+                                        <div class="mx-auto max-w-xl my-1.5 px-3.5 py-2 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs text-center font-medium">
                                             <span class="font-bold uppercase text-[10px] tracking-wider block mb-0.5">System Return Log</span>
                                             <span x-text="msg.message"></span>
                                         </div>
@@ -487,14 +487,14 @@
 
                                     <template x-if="!msg.is_system">
                                         <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
-                                            <div class="max-w-[85%] sm:max-w-md px-4 py-2.5 sm:py-3 rounded-2xl text-xs shadow-sm"
+                                            <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-3 rounded-2xl text-xs shadow-sm"
                                                  :class="msg.sender_id === currentUserId
                                                      ? 'bg-[#0F0E47] text-white rounded-br-sm'
                                                      : 'bg-white text-[#272757] border border-[#8686AC]/30 rounded-bl-sm'">
-                                                <div class="text-[10px] font-bold opacity-75 mb-1" x-text="msg.sender?.name || 'User'"></div>
+                                                <div class="text-[10px] font-bold opacity-75 mb-0.5" x-text="msg.sender?.name || 'User'"></div>
                                                 <p class="leading-relaxed whitespace-pre-line" x-text="msg.message"></p>
                                             </div>
-                                            <span class="text-[9px] text-[#505081] mt-1 px-1"
+                                            <span class="text-[9px] text-[#505081] mt-0.5 px-1"
                                                   x-text="msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : ''"></span>
                                         </div>
                                     </template>
@@ -508,12 +508,12 @@
                             </template>
                         </div>
 
-                        <form @submit.prevent="sendAdminMessage()" class="p-3 sm:p-4 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 sm:gap-3 shrink-0">
+                        <form @submit.prevent="sendAdminMessage()" class="p-2.5 sm:p-4 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 shrink-0">
                             <input type="text" x-model="newAdminMessage" :disabled="!activeThreadUserId || sendingMessage"
                                    placeholder="Reply to user..."
-                                   class="flex-1 min-w-0 bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47]">
+                                   class="flex-1 min-w-0 bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-3.5 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47]">
                             <button type="submit" :disabled="!activeThreadUserId || sendingMessage || !newAdminMessage.trim()"
-                                    class="px-4 sm:px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow shrink-0">
+                                    class="px-4 sm:px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow shrink-0">
                                 Send
                             </button>
                         </form>
