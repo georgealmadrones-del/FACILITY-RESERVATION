@@ -432,15 +432,19 @@
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">Room or Lab</label>
                                             <select x-model="selectedFacility" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
                                                 @foreach ($facilities ?? [] as $facility)
-                                                    <option value="{{ $facility->name }}">{{ $facility->name }} (Max {{ $facility->capacity ?? 'N/A' }} people &bull; {{ ucfirst($facility->status ?? 'available') }})</option>
+                                                    @php
+                                                        $cap = $facility->capacity ?? $facility->max_capacity ?? $facility->seats ?? $facility->pax ?? null;
+                                                    @endphp
+                                                    <option value="{{ $facility->name }}">{{ $facility->name }} ({{ $cap ? 'Max ' . $cap . ' people' : 'Capacity not set' }} &bull; {{ ucfirst($facility->status ?? 'available') }})</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">
-                                                How many people? (Limit: <span x-text="currentFacilityCapacity"></span>)
+                                                How many people? (Limit: <span x-text="currentFacilityCapacity || 'Not set'"></span>)
                                             </label>
-                                            <input type="number" x-model.number="expectedAttendees" min="1" :max="currentFacilityCapacity"
+                                            <input type="number" x-model.number="expectedAttendees" min="1"
+                                                   :max="currentFacilityCapacity > 0 ? currentFacilityCapacity : null"
                                                    class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
                                         </div>
                                     </div>
@@ -452,15 +456,16 @@
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">Equipment</label>
                                             <select x-model="selectedEquipment" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
                                                 @foreach ($equipment ?? [] as $item)
-                                                    <option value="{{ $item->name }}">{{ $item->name }} ({{ $item->total_stock }} left &bull; {{ ucfirst($item->status ?? 'available') }})</option>
+                                                    <option value="{{ $item->name }}">{{ $item->name }} ({{ $item->total_stock }} total &bull; {{ ucfirst($item->status ?? 'available') }})</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">
-                                                How many units? (<span x-text="currentEquipmentStock"></span> available)
+                                                How many units? (<span x-text="currentAvailableEquipmentStock"></span> left for this slot, <span x-text="currentEquipmentStock"></span> total)
                                             </label>
-                                            <input type="number" x-model.number="equipmentQuantity" min="1" :max="currentEquipmentStock"
+                                            <input type="number" x-model.number="equipmentQuantity" min="1"
+                                                   :max="Math.max(1, currentAvailableEquipmentStock)"
                                                    class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]">
                                         </div>
                                     </div>
@@ -560,8 +565,8 @@
                                 <p><strong>Time:</strong> <span x-text="startTime + ' to ' + endTime"></span></p>
                                 <p><strong>Count:</strong>
                                     <span x-text="resourceType === 'facility'
-                                        ? expectedAttendees + ' / ' + currentFacilityCapacity + ' people'
-                                        : equipmentQuantity + ' / ' + currentEquipmentStock + ' units'"></span>
+                                        ? expectedAttendees + (currentFacilityCapacity > 0 ? ' / ' + currentFacilityCapacity + ' people' : ' people')
+                                        : equipmentQuantity + ' / ' + currentAvailableEquipmentStock + ' left'"></span>
                                 </p>
                             </div>
                             <p class="text-[11px] text-[#505081]">Open until 8:00 PM (20:00). The custodian will review your request.</p>
@@ -950,6 +955,11 @@ document.addEventListener('alpine:init', () => {
                 day: d.getDate()
             };
         };
+        const getFacilityCap = (f) => {
+            const val = f?.capacity ?? f?.max_capacity ?? f?.seats ?? f?.pax ?? 0;
+            const num = Number(val);
+            return Number.isFinite(num) && num > 0 ? num : 0;
+        };
         const initialNow = getNowParts();
         const MAX_BOOKING_END = '20:00';
         const MAX_BOOKING_START = '19:59';
@@ -1010,7 +1020,7 @@ document.addEventListener('alpine:init', () => {
                         kind: 'facility',
                         category: String(facility.name || '').toLowerCase().includes('lab') ? 'labs' : 'rooms',
                         type: 'Room / Lab',
-                        capacityNumber: Number(facility.capacity ?? 0),
+                        capacityNumber: getFacilityCap(facility),
                         rawStatus: String(facility.status || 'available').toLowerCase(),
                         image: facility.image ? '/' + String(facility.image).replace(/^\/+/, '') : ''
                     })),
@@ -1081,10 +1091,20 @@ document.addEventListener('alpine:init', () => {
 
             async syncLiveDashboardData() {
                 try {
-                    const res = await fetch(window.location.href, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' }
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('live_sync', '1');
+                    const res = await fetch(url.toString(), {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/html' }
                     });
                     if (!res.ok) return;
+                    const ct = res.headers.get('content-type') || '';
+                    if (ct.includes('application/json')) {
+                        const payload = await res.json();
+                        if (Array.isArray(payload.reservations)) this.recentReservations = payload.reservations;
+                        if (Array.isArray(payload.facilities)) this.facilitiesData = payload.facilities;
+                        if (Array.isArray(payload.equipment)) this.equipmentData = payload.equipment;
+                        return;
+                    }
                     const html = await res.text();
                     const doc = new DOMParser().parseFromString(html, 'text/html');
                     const scripts = Array.from(doc.querySelectorAll('script'));
@@ -1131,7 +1151,7 @@ document.addEventListener('alpine:init', () => {
                         label: 'MAINTENANCE',
                         badgeClass: 'bg-amber-50 text-amber-800 border-amber-300',
                         detail: item.kind === 'facility'
-                            ? `Under maintenance • Max ${item.capacityNumber || 'N/A'} people`
+                            ? `Under maintenance • ${item.capacityNumber > 0 ? 'Max ' + item.capacityNumber + ' people' : 'Capacity not set'}`
                             : `Under maintenance • ${item.stockNumber} units`,
                         bookable: false,
                         disabledText: 'Under maintenance'
@@ -1144,12 +1164,13 @@ document.addEventListener('alpine:init', () => {
                 );
 
                 if (item.kind === 'facility') {
+                    const capText = item.capacityNumber > 0 ? `Up to ${item.capacityNumber} people` : 'Capacity not set';
                     if (overlapping.length > 0) {
                         const slotText = overlapping.map(b => `${this.extractTimeHHMM(b.start_time)}-${this.extractTimeHHMM(b.end_time)} (${b.status})`).join(', ');
                         return {
                             label: 'BOOKED',
                             badgeClass: 'bg-rose-50 text-rose-700 border-rose-300',
-                            detail: `Booked on ${dateStr}: ${slotText}`,
+                            detail: `Booked on ${dateStr}: ${slotText} • ${capText}`,
                             bookable: false,
                             disabledText: 'Already booked'
                         };
@@ -1157,7 +1178,7 @@ document.addEventListener('alpine:init', () => {
                     return {
                         label: 'AVAILABLE',
                         badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-300',
-                        detail: `Open on ${dateStr} (${startHHMM}-${endHHMM}) • Up to ${item.capacityNumber || 'N/A'} people`,
+                        detail: `Open on ${dateStr} (${startHHMM}-${endHHMM}) • ${capText}`,
                         bookable: true,
                         disabledText: 'Book this'
                     };
@@ -1170,7 +1191,7 @@ document.addEventListener('alpine:init', () => {
                     return {
                         label: 'BOOKED OUT',
                         badgeClass: 'bg-rose-50 text-rose-700 border-rose-300',
-                        detail: `0 left on ${dateStr} (${reservedUnits}/${item.stockNumber} taken)`,
+                        detail: `0 of ${item.stockNumber} left on ${dateStr} (${reservedUnits} taken)`,
                         bookable: false,
                         disabledText: 'None left'
                     };
@@ -1388,11 +1409,19 @@ document.addEventListener('alpine:init', () => {
             },
             get currentFacilityCapacity() {
                 const fac = this.facilitiesData.find(f => f.name === this.selectedFacility);
-                return fac && fac.capacity ? Number(fac.capacity) : 500;
+                return fac ? getFacilityCap(fac) : 0;
             },
             get currentEquipmentStock() {
                 const eq = this.equipmentData.find(e => e.name === this.selectedEquipment);
-                return eq && eq.total_stock ? Number(eq.total_stock) : 15;
+                return eq && eq.total_stock ? Number(eq.total_stock) : 0;
+            },
+            get currentAvailableEquipmentStock() {
+                const overlapping = (this.recentReservations || []).filter(r =>
+                    r.resource_name === this.selectedEquipment &&
+                    this.overlapsWindow(r, this.formattedDate, this.startTime, this.endTime)
+                );
+                const reserved = overlapping.reduce((sum, b) => sum + Number(b.quantity || 1), 0);
+                return Math.max(0, this.currentEquipmentStock - reserved);
             },
             get conflictingBookings() {
                 const targetName = this.resourceType === 'facility' ? this.selectedFacility : this.selectedEquipment;
@@ -1455,15 +1484,22 @@ document.addEventListener('alpine:init', () => {
                     return;
                 }
 
-                if (this.resourceType === 'facility' && Number(this.expectedAttendees) > this.currentFacilityCapacity) {
+                if (this.resourceType === 'facility' && this.currentFacilityCapacity > 0 && Number(this.expectedAttendees) > this.currentFacilityCapacity) {
                     event.preventDefault();
                     this.formError = `Too many people for this room (max ${this.currentFacilityCapacity}).`;
                     return;
                 }
 
-                if (this.resourceType === 'equipment' && Number(this.equipmentQuantity) > this.currentEquipmentStock) {
-                    event.preventDefault();
-                    this.formError = `Only ${this.currentEquipmentStock} unit(s) available.`;
+                if (this.resourceType === 'equipment') {
+                    if (this.currentAvailableEquipmentStock <= 0) {
+                        event.preventDefault();
+                        this.formError = 'No units left for this date and time slot.';
+                        return;
+                    }
+                    if (Number(this.equipmentQuantity) > this.currentAvailableEquipmentStock) {
+                        event.preventDefault();
+                        this.formError = `Only ${this.currentAvailableEquipmentStock} unit(s) available for this time slot.`;
+                    }
                 }
             },
             get quickSearchResults() {
