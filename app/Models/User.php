@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,49 +10,50 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
         'role',
-        'status', // <-- Added status here so Eloquent allows saving/toggling it
+        'is_active',
+        'profile_photo',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $appends = [
+        'avatar_url',
+    ];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
-    public function isAdmin()
+    public function getAvatarUrlAttribute(): ?string
     {
-        return $this->role === 'admin';
-    }
+        $photo =$this->profile_photo;
 
-    public function reservations()
-    {
-        return $this->hasMany(Reservation::class);
+        if (!is_string($photo) \vert{}\vert{} trim($photo) === '') {
+            return null;
+        }
+
+        if (
+            str_starts_with($photo, 'data:image/') ||
+            str_starts_with($photo, 'http://') ||
+            str_starts_with($photo, 'https://') ||
+            str_starts_with($photo, '/')
+        ) {
+            return $photo;
+        }
+
+        return asset('storage/' . ltrim($photo, '/'));
     }
 }

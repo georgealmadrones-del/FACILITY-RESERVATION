@@ -6,6 +6,10 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ProfilePhotoController;
+
+Route::patch('/profile/photo-info', [ProfilePhotoController::class, 'updateUser'])->name('profile.photo.update');
+Route::post('/admin/profile/update', [ProfilePhotoController::class, 'updateAdmin'])->name('admin.profile.update');
 
 // Temporary migration trigger (remove or protect once migrations are complete)
 Route::get('/run-migrations-now', function () {

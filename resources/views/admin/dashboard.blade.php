@@ -63,16 +63,24 @@
             </div>
         </div>
 
-        <div class="pt-6 border-t border-[#8686AC]/30 flex items-center justify-between">
-            <div class="flex items-center space-x-3 min-w-0">
-                <div class="w-8 h-8 shrink-0 rounded-xl bg-[#0F0E47] text-white flex items-center justify-center font-bold text-xs">
-                    {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 2)) }}
+        <!-- Admin Profile Footer -->
+        <div class="pt-6 border-t border-[#8686AC]/30 flex items-center justify-between gap-2">
+            <button type="button"
+                    @click="adminProfileModalOpen = true; mobileMenuOpen = false;"
+                    title="Change admin profile photo"
+                    class="flex items-center space-x-3 min-w-0 text-left group">
+                <div class="w-8 h-8 shrink-0 rounded-xl bg-[#0F0E47] text-white flex items-center justify-center font-bold text-xs overflow-hidden border border-[#8686AC]/40">
+                    @if(Auth::user()->avatar_url ?? false)
+                        <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name ?? 'Admin' }}" class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 2)) }}
+                    @endif
                 </div>
                 <div class="overflow-hidden">
-                    <span class="font-bold text-xs text-[#0F0E47] truncate block">{{ Auth::user()->name ?? 'Admin' }}</span>
-                    <span class="text-[10px] text-rose-600 truncate block font-bold">Office</span>
+                    <span class="font-bold text-xs text-[#0F0E47] group-hover:underline truncate block">{{ Auth::user()->name ?? 'Admin' }}</span>
+                    <span class="text-[10px] text-rose-600 truncate block font-bold">Edit photo</span>
                 </div>
-            </div>
+            </button>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" title="Log out" class="text-[#505081] hover:text-rose-600 transition shrink-0">
@@ -101,7 +109,18 @@
             </div>
 
             <div class="flex items-center space-x-3 sm:space-x-4 shrink-0">
-                <span class="hidden sm:inline text-xs font-bold text-[#505081]">Admin Desk</span>
+                <button type="button"
+                        @click="adminProfileModalOpen = true"
+                        class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F4F5F7] hover:bg-[#8686AC]/20 border border-[#8686AC]/30 text-xs font-bold text-[#0F0E47] transition">
+                    <span class="w-5 h-5 rounded-full overflow-hidden bg-[#0F0E47] text-white flex items-center justify-center text-[9px]">
+                        @if(Auth::user()->avatar_url ?? false)
+                            <img src="{{ Auth::user()->avatar_url }}" alt="Admin" class="w-full h-full object-cover">
+                        @else
+                            {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
+                        @endif
+                    </span>
+                    <span>Admin Desk</span>
+                </button>
 
                 <!-- Notification Bell -->
                 <div class="relative" @click.away="notificationsOpen = false">
@@ -229,8 +248,20 @@
                                 <template x-for="item in filteredReservations" :key="item.id">
                                     <tr class="hover:bg-[#F4F5F7]/80 transition">
                                         <td class="py-4 px-5">
-                                            <span class="font-bold text-[#0F0E47] block" x-text="item.user?.name || 'User'"></span>
-                                            <span class="text-[10px] text-[#505081]" x-text="item.purpose"></span>
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-8 h-8 rounded-full bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-bold text-[10px] text-[#0F0E47] overflow-hidden shrink-0">
+                                                    <template x-if="getUserAvatar(item.user)">
+                                                        <img :src="getUserAvatar(item.user)" :alt="item.user?.name || 'User'" class="w-full h-full object-cover">
+                                                    </template>
+                                                    <template x-if="!getUserAvatar(item.user)">
+                                                        <span x-text="initials(item.user?.name || 'U')"></span>
+                                                    </template>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <span class="font-bold text-[#0F0E47] block truncate" x-text="item.user?.name || 'User'"></span>
+                                                    <span class="text-[10px] text-[#505081] block truncate" x-text="item.purpose"></span>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="py-4 px-5">
                                             <span class="font-bold text-[#0F0E47] block" x-text="item.resource_name"></span>
@@ -286,7 +317,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                    <!-- Add Room -->
                     <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
                         <h3 class="text-sm font-extrabold text-[#0F0E47]">New room or lab</h3>
                         <form action="{{ route('admin.facilities.store') }}" method="POST" class="space-y-4">
@@ -310,7 +340,6 @@
                         </form>
                     </div>
 
-                    <!-- Add Gear -->
                     <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
                         <h3 class="text-sm font-extrabold text-[#0F0E47]">New equipment</h3>
                         <form action="{{ route('admin.equipment.store') }}" method="POST" class="space-y-4">
@@ -335,7 +364,6 @@
                     </div>
                 </div>
 
-                <!-- Rooms Table -->
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl p-5 sm:p-6 space-y-4">
                     <h3 class="text-base font-extrabold text-[#0F0E47]">Rooms &amp; Labs</h3>
                     <div class="overflow-x-auto">
@@ -372,7 +400,6 @@
                     </div>
                 </div>
 
-                <!-- Gear Table -->
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl p-5 sm:p-6 space-y-4">
                     <h3 class="text-base font-extrabold text-[#0F0E47]">Equipment</h3>
                     <div class="overflow-x-auto">
@@ -415,20 +442,33 @@
                 <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-6">
                     <div>
                         <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">People</h2>
-                        <p class="text-xs text-[#505081]">Enable or pause student and faculty accounts.</p>
+                        <p class="text-xs text-[#505081]">View user photos or enable and pause student and faculty accounts.</p>
                     </div>
 
                     <div class="divide-y divide-[#8686AC]/20">
                         <template x-for="user in users" :key="user.id">
                             <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div class="space-y-1 min-w-0">
-                                    <div class="flex items-center space-x-3">
-                                        <h4 class="text-sm font-bold text-[#0F0E47] truncate" x-text="user.name"></h4>
-                                        <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase shrink-0"
-                                              :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'"
-                                              x-text="user.is_active ? 'Active' : 'Paused'"></span>
+                                <div class="flex items-center space-x-3.5 min-w-0">
+                                    <button type="button"
+                                            @click="if (getUserAvatar(user)) { previewPhotoUrl = getUserAvatar(user); previewPhotoTitle = user.name; }"
+                                            class="w-11 h-11 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-xs text-[#0F0E47] overflow-hidden shrink-0">
+                                        <template x-if="getUserAvatar(user)">
+                                            <img :src="getUserAvatar(user)" :alt="user.name" class="w-full h-full object-cover">
+                                        </template>
+                                        <template x-if="!getUserAvatar(user)">
+                                            <span x-text="initials(user.name)"></span>
+                                        </template>
+                                    </button>
+
+                                    <div class="space-y-1 min-w-0">
+                                        <div class="flex items-center space-x-2.5 flex-wrap">
+                                            <h4 class="text-sm font-bold text-[#0F0E47] truncate" x-text="user.name"></h4>
+                                            <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase shrink-0"
+                                                  :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'"
+                                                  x-text="user.is_active ? 'Active' : 'Paused'"></span>
+                                        </div>
+                                        <p class="text-xs text-[#505081] truncate" x-text="user.email + ' • ' + (user.role || 'user')"></p>
                                     </div>
-                                    <p class="text-xs text-[#505081] truncate" x-text="user.email + ' • ' + (user.role || 'user')"></p>
                                 </div>
 
                                 <div class="flex items-center space-x-3 shrink-0">
@@ -446,7 +486,7 @@
                 </div>
             </main>
 
-            <!-- VIEW 4: MESSAGES (PC-VISIBLE CHAT BAR) -->
+            <!-- VIEW 4: MESSAGES -->
             <main x-show="currentView === 'messages'" class="p-3 sm:p-5 lg:px-8 lg:py-6 flex flex-col gap-3 sm:gap-4" style="display: none;">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 shrink-0">
                     <div class="space-y-0.5">
@@ -460,18 +500,27 @@
                 </div>
 
                 <div class="h-[calc(100vh-14.5rem)] min-h-[340px] grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden">
-                    <!-- Threads List -->
                     <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#8686AC]/30 max-h-28 sm:max-h-36 lg:max-h-full overflow-y-auto divide-y divide-[#8686AC]/20 bg-[#F4F5F7]/40 shrink-0">
                         <template x-for="thread in threads" :key="thread.id">
                             <button type="button"
                                     @click="selectThread(thread.id)"
                                     :class="activeThreadUserId === thread.id ? 'bg-[#0F0E47] text-white' : 'hover:bg-white text-[#272757]'"
-                                    class="w-full px-3.5 py-2 sm:p-4 text-left transition flex flex-col gap-0.5">
-                                <div class="flex items-center justify-between gap-2">
-                                    <span class="text-xs font-bold truncate" x-text="thread.name"></span>
-                                    <span class="text-[9px] opacity-75 shrink-0" x-text="thread.last_time || ''"></span>
+                                    class="w-full px-3.5 py-2 sm:p-4 text-left transition flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full border border-[#8686AC]/30 bg-white text-[#0F0E47] flex items-center justify-center font-bold text-[10px] overflow-hidden shrink-0">
+                                    <template x-if="getThreadAvatar(thread)">
+                                        <img :src="getThreadAvatar(thread)" :alt="thread.name" class="w-full h-full object-cover">
+                                    </template>
+                                    <template x-if="!getThreadAvatar(thread)">
+                                        <span x-text="initials(thread.name)"></span>
+                                    </template>
                                 </div>
-                                <p class="text-[11px] truncate opacity-80" x-text="thread.last_message || 'No messages yet'"></p>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-xs font-bold truncate" x-text="thread.name"></span>
+                                        <span class="text-[9px] opacity-75 shrink-0" x-text="thread.last_time || ''"></span>
+                                    </div>
+                                    <p class="text-[11px] truncate opacity-80" x-text="thread.last_message || 'No messages yet'"></p>
+                                </div>
                             </button>
                         </template>
                         <template x-if="threads.length === 0">
@@ -479,12 +528,23 @@
                         </template>
                     </div>
 
-                    <!-- Active Conversation -->
                     <div class="lg:col-span-8 flex-1 flex flex-col min-h-0">
                         <div class="px-4 py-2 sm:px-6 sm:py-3 border-b border-[#8686AC]/30 bg-white flex items-center justify-between shrink-0">
-                            <div class="min-w-0">
-                                <h3 class="text-xs sm:text-sm font-extrabold text-[#0F0E47] truncate" x-text="selectedThread?.name || 'Pick a chat'"></h3>
-                                <p class="hidden sm:block text-[10px] text-[#505081] truncate" x-text="selectedThread?.email || ''"></p>
+                            <div class="flex items-center gap-3 min-w-0">
+                                <template x-if="selectedThread">
+                                    <div class="w-8 h-8 rounded-full border border-[#8686AC]/30 bg-[#F4F5F7] text-[#0F0E47] flex items-center justify-center font-bold text-[10px] overflow-hidden shrink-0">
+                                        <template x-if="getThreadAvatar(selectedThread)">
+                                            <img :src="getThreadAvatar(selectedThread)" :alt="selectedThread.name" class="w-full h-full object-cover">
+                                        </template>
+                                        <template x-if="!getThreadAvatar(selectedThread)">
+                                            <span x-text="initials(selectedThread.name)"></span>
+                                        </template>
+                                    </div>
+                                </template>
+                                <div class="min-w-0">
+                                    <h3 class="text-xs sm:text-sm font-extrabold text-[#0F0E47] truncate" x-text="selectedThread?.name || 'Pick a chat'"></h3>
+                                    <p class="hidden sm:block text-[10px] text-[#505081] truncate" x-text="selectedThread?.email || ''"></p>
+                                </div>
                             </div>
                         </div>
 
@@ -499,16 +559,29 @@
                                     </template>
 
                                     <template x-if="!msg.is_system">
-                                        <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
-                                            <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-2.5 rounded-2xl text-xs shadow-sm"
-                                                 :class="msg.sender_id === currentUserId
-                                                     ? 'bg-[#0F0E47] text-white rounded-br-sm'
-                                                     : 'bg-white text-[#272757] border border-[#8686AC]/30 rounded-bl-sm'">
-                                                <div class="text-[10px] font-bold opacity-75 mb-0.5" x-text="msg.sender?.name || 'User'"></div>
-                                                <p class="leading-relaxed whitespace-pre-line" x-text="msg.message"></p>
+                                        <div class="flex items-end gap-2" :class="msg.sender_id === currentUserId ? 'justify-end' : 'justify-start'">
+                                            <template x-if="msg.sender_id !== currentUserId">
+                                                <div class="w-7 h-7 rounded-full border border-[#8686AC]/30 bg-white text-[#0F0E47] flex items-center justify-center font-bold text-[9px] overflow-hidden shrink-0">
+                                                    <template x-if="getUserAvatar(msg.sender) || getThreadAvatar(selectedThread)">
+                                                        <img :src="getUserAvatar(msg.sender) || getThreadAvatar(selectedThread)" :alt="msg.sender?.name || 'User'" class="w-full h-full object-cover">
+                                                    </template>
+                                                    <template x-if="!(getUserAvatar(msg.sender) || getThreadAvatar(selectedThread))">
+                                                        <span x-text="initials(msg.sender?.name || 'U')"></span>
+                                                    </template>
+                                                </div>
+                                            </template>
+
+                                            <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
+                                                <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-2.5 rounded-2xl text-xs shadow-sm"
+                                                     :class="msg.sender_id === currentUserId
+                                                         ? 'bg-[#0F0E47] text-white rounded-br-sm'
+                                                         : 'bg-white text-[#272757] border border-[#8686AC]/30 rounded-bl-sm'">
+                                                    <div class="text-[10px] font-bold opacity-75 mb-0.5" x-text="msg.sender?.name || 'User'"></div>
+                                                    <p class="leading-relaxed whitespace-pre-line" x-text="msg.message"></p>
+                                                </div>
+                                                <span class="text-[9px] text-[#505081] mt-0.5 px-1"
+                                                      x-text="msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : ''"></span>
                                             </div>
-                                            <span class="text-[9px] text-[#505081] mt-0.5 px-1"
-                                                  x-text="msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : ''"></span>
                                         </div>
                                     </template>
                                 </div>
@@ -557,6 +630,60 @@
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- ADMIN PROFILE MODAL -->
+    <div x-show="adminProfileModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
+        <div @click.away="adminProfileModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative">
+            <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
+                <h3 class="text-lg font-extrabold text-[#0F0E47]">Admin profile</h3>
+                <button type="button" @click="adminProfileModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
+            </div>
+            <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-base text-[#0F0E47] overflow-hidden shrink-0">
+                        <template x-if="adminPhotoPreview">
+                            <img :src="adminPhotoPreview" alt="Preview" class="w-full h-full object-cover">
+                        </template>
+                        <template x-if="!adminPhotoPreview">
+                            <span>{{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 2)) }}</span>
+                        </template>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-xs font-semibold text-[#505081] mb-1">Profile photo</label>
+                        <input type="file"
+                               name="profile_photo"
+                               accept="image/png,image/jpeg,image/webp"
+                               @change="previewAdminPhoto($event)"
+                               class="w-full text-xs text-[#505081] file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0F0E47] file:text-white hover:file:bg-[#272757]">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
+                    <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-[#505081] mb-1">Email</label>
+                    <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" @click="adminProfileModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PHOTO LIGHTBOX -->
+    <div x-show="previewPhotoUrl" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" style="display: none;">
+        <div @click.away="previewPhotoUrl = null" class="bg-white rounded-3xl p-4 max-w-sm w-full space-y-3 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-[#0F0E47]" x-text="previewPhotoTitle"></span>
+                <button type="button" @click="previewPhotoUrl = null" class="text-zinc-500 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
+            </div>
+            <img :src="previewPhotoUrl" :alt="previewPhotoTitle" class="w-full h-72 object-cover rounded-2xl border border-[#8686AC]/30">
         </div>
     </div>
 
@@ -657,6 +784,10 @@ document.addEventListener('alpine:init', () => {
         filterStatus: 'all',
         mobileMenuOpen: false,
         notificationsOpen: false,
+        adminProfileModalOpen: false,
+        previewPhotoUrl: null,
+        previewPhotoTitle: '',
+        adminPhotoPreview: @json(Auth::user()->avatar_url ?? null),
         rejectModalOpen: false,
         selectedReservationId: null,
         reservations: @json($reservations ?? []),
@@ -675,7 +806,6 @@ document.addEventListener('alpine:init', () => {
         sendingMessage: false,
         pollTimer: null,
         readAlertIds: [],
-        dismissedAlertIds: [],
         adminAlerts: [],
 
         init() {
@@ -693,6 +823,49 @@ document.addEventListener('alpine:init', () => {
                     this.fetchAdminMessages();
                 }
             }, 3000);
+        },
+
+        initials(name) {
+            const parts = String(name || 'U').trim().split(/\s+/);
+            return parts.length >= 2
+                ? (parts[0][0] + parts[1][0]).toUpperCase()
+                : String(name || 'U').slice(0, 2).toUpperCase();
+        },
+
+        resolvePhotoSrc(val) {
+            if (!val || typeof val !== 'string') return null;
+            const s = val.trim();
+            if (!s) return null;
+            if (s.startsWith('data:image/') || s.startsWith('http://') || s.startsWith('https://') || s.startsWith('/')) {
+                return s;
+            }
+            return '/storage/' + s.replace(/^\/+/, '');
+        },
+
+        getUserAvatar(userObj) {
+            if (!userObj) return null;
+            if (userObj.avatar_url) return this.resolvePhotoSrc(userObj.avatar_url);
+            if (userObj.profile_photo) return this.resolvePhotoSrc(userObj.profile_photo);
+            const matched = (this.users || []).find(u => Number(u.id) === Number(userObj.id));
+            return matched ? (this.resolvePhotoSrc(matched.avatar_url) || this.resolvePhotoSrc(matched.profile_photo)) : null;
+        },
+
+        getThreadAvatar(thread) {
+            if (!thread) return null;
+            if (thread.avatar_url) return this.resolvePhotoSrc(thread.avatar_url);
+            if (thread.profile_photo) return this.resolvePhotoSrc(thread.profile_photo);
+            const matched = (this.users || []).find(u => Number(u.id) === Number(thread.id));
+            return matched ? (this.resolvePhotoSrc(matched.avatar_url) || this.resolvePhotoSrc(matched.profile_photo)) : null;
+        },
+
+        previewAdminPhoto(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.adminPhotoPreview = e.target.result;
+            };
+            reader.readAsDataURL(file);
         },
 
         refreshAdminAlerts() {
