@@ -125,32 +125,45 @@
                     <span class="text-[#272757] font-bold">Live DB Mode</span>
                 </div>
 
-                <!-- Notification Bell -->
+                <!-- Working Student Notification Bell -->
                 <div class="relative" @click.away="notificationsOpen = false">
-                    <button type="button" @click="notificationsOpen = !notificationsOpen"
-                            class="w-10 h-10 rounded-xl bg-[#F4F5F7] hover:bg-[#8686AC]/20 border border-[#8686AC]/30 text-[#272757] flex items-center justify-center transition relative">
+                    <button type="button" @click="notificationsOpen = !notificationsOpen; refreshStudentAlerts();"
+                            class="w-10 h-10 rounded-xl bg-[#F4F5F7] hover:bg-[#8686AC]/20 border border-[#8686AC]/30 text-[#272757] flex items-center justify-center transition relative"
+                            aria-label="Notifications">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                        <template x-if="notifications.length > 0">
-                            <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <template x-if="unreadStudentAlertCount > 0">
+                            <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-extrabold flex items-center justify-center shadow"
+                                  x-text="unreadStudentAlertCount"></span>
                         </template>
                     </button>
 
-                    <div x-show="notificationsOpen" class="absolute right-0 mt-3 w-80 bg-white border border-[#8686AC]/40 rounded-2xl shadow-2xl p-4 space-y-3 z-50" style="display: none;">
+                    <div x-show="notificationsOpen"
+                         class="fixed sm:absolute right-3 sm:right-0 left-3 sm:left-auto top-20 sm:top-auto mt-1 sm:mt-3 sm:w-88 bg-white border border-[#8686AC]/40 rounded-2xl shadow-2xl p-4 space-y-3 z-50"
+                         style="display: none;">
                         <div class="flex items-center justify-between pb-2 border-b border-[#8686AC]/30">
                             <span class="text-xs font-bold text-[#0F0E47]">Notifications</span>
-                            <span class="text-[10px] text-[#505081]">Live Database Feed</span>
+                            <button type="button" @click="markAllStudentAlertsRead()" class="text-[10px] font-bold text-[#505081] hover:text-[#0F0E47] underline">
+                                Mark all read
+                            </button>
                         </div>
-                        <div class="space-y-2 max-h-64 overflow-y-auto rounded-xl bg-[#F4F5F7] p-1">
-                            <template x-for="n in notifications" :key="n.id">
-                                <div class="p-2.5 rounded-xl bg-white border border-[#8686AC]/30 space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-xs font-bold text-[#0F0E47]" x-text="n.data?.title || 'System Notification'"></span>
-                                        <span class="text-[9px] text-[#505081]" x-text="n.created_at ? new Date(n.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : ''"></span>
+                        <div class="space-y-2 max-h-72 overflow-y-auto rounded-xl bg-[#F4F5F7] p-1.5">
+                            <template x-for="alert in studentAlerts" :key="alert.id">
+                                <button type="button" @click="handleStudentAlertClick(alert)"
+                                        class="w-full text-left p-2.5 rounded-xl bg-white hover:bg-[#F4F5F7]/80 border border-[#8686AC]/30 transition space-y-1 block">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[11px] font-bold text-[#0F0E47] truncate" x-text="alert.title"></span>
+                                        <span class="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase shrink-0"
+                                              :class="alert.type === 'reminder'
+                                                  ? 'bg-rose-50 text-rose-700 border border-rose-300'
+                                                  : (alert.type === 'chat'
+                                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                                                      : 'bg-sky-50 text-sky-700 border border-sky-300')"
+                                              x-text="alert.badge"></span>
                                     </div>
-                                    <p class="text-[11px] text-[#505081] leading-tight" x-text="n.data?.message || n.message || 'New update regarding your request.'"></p>
-                                </div>
+                                    <p class="text-[11px] text-[#505081] leading-snug" x-text="alert.detail"></p>
+                                </button>
                             </template>
-                            <template x-if="notifications.length === 0">
+                            <template x-if="studentAlerts.length === 0">
                                 <p class="text-xs text-center text-[#505081] py-4">No new notifications.</p>
                             </template>
                         </div>
@@ -174,6 +187,25 @@
                     @endforeach
                 </div>
             @endif
+
+            <!-- Post-Schedule Equipment Return Reminder Banner -->
+            <template x-if="overdueEquipmentReservations.length > 0">
+                <div class="mx-6 lg:mx-10 mt-6 bg-amber-50 border border-amber-300 text-amber-950 px-5 py-4 rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="space-y-0.5 text-xs">
+                        <p class="font-extrabold text-amber-900">
+                            Return Reminder: <span x-text="overdueEquipmentReservations.length"></span> approved equipment booking(s) past scheduled return time.
+                        </p>
+                        <p class="text-[11px] text-amber-800">
+                            Click an item below to open its details and mark it as returned:
+                            <template x-for="(item, idx) in overdueEquipmentReservations" :key="item.id">
+                                <span>
+                                    <button type="button" @click="selectedReservation = item; detailsModalOpen = true;" class="underline font-bold hover:text-amber-950" x-text="item.resource_name"></button><span x-show="idx < overdueEquipmentReservations.length - 1">, </span>
+                                </span>
+                            </template>
+                        </p>
+                    </div>
+                </div>
+            </template>
 
             <!-- VIEW 1: OVERVIEW DASHBOARD -->
             <main x-show="currentView === 'overview'" class="p-6 lg:p-10 space-y-10">
@@ -279,7 +311,12 @@
                                                         <svg class="w-4 h-4 text-[#505081]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                                                     </div>
                                                     <div>
-                                                        <span class="font-bold text-[#0F0E47] block" x-text="item.resource_name"></span>
+                                                        <div class="flex items-center gap-2 flex-wrap">
+                                                            <span class="font-bold text-[#0F0E47]" x-text="item.resource_name"></span>
+                                                            <template x-if="isOverdueEquipment(item)">
+                                                                <span class="px-2 py-0.5 text-[9px] font-extrabold rounded-full bg-rose-50 text-rose-700 border border-rose-300 uppercase">Return Due</span>
+                                                            </template>
+                                                        </div>
                                                         <span class="text-[10px] text-[#505081] capitalize" x-text="item.resource_type"></span>
                                                         <template x-if="item.rejection_reason">
                                                             <p class="text-[10px] text-rose-600 mt-0.5 italic" x-text="'Reason: ' + item.rejection_reason"></p>
@@ -661,7 +698,12 @@
                             <template x-for="item in recentReservations" :key="item.id">
                                 <div @click="selectedReservation = item; detailsModalOpen = true;" class="p-5 flex items-center justify-between hover:bg-[#F4F5F7] transition cursor-pointer">
                                     <div>
-                                        <h4 class="text-sm font-bold text-[#0F0E47]" x-text="item.resource_name"></h4>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <h4 class="text-sm font-bold text-[#0F0E47]" x-text="item.resource_name"></h4>
+                                            <template x-if="isOverdueEquipment(item)">
+                                                <span class="px-2 py-0.5 text-[9px] font-extrabold rounded-full bg-rose-50 text-rose-700 border border-rose-300 uppercase">Return Due</span>
+                                            </template>
+                                        </div>
                                         <p class="text-xs text-[#505081] mt-0.5" x-text="item.resource_type + ' | Purpose: ' + item.purpose"></p>
                                         <template x-if="item.rejection_reason">
                                             <p class="text-[11px] text-rose-600 mt-1 italic" x-text="'Rejection Reason: ' + item.rejection_reason"></p>
@@ -701,11 +743,9 @@
                 </div>
 
                 <div class="bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden flex flex-col h-[520px]">
-                    <!-- Message Feed -->
                     <div id="user-chat-feed" class="flex-1 p-6 overflow-y-auto space-y-3 bg-[#F4F5F7]/50">
                         <template x-for="msg in chatMessages" :key="msg.id">
                             <div>
-                                <!-- System Message (Auto-Return Logs) -->
                                 <template x-if="msg.is_system">
                                     <div class="mx-auto max-w-xl my-2 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs text-center font-medium">
                                         <span class="font-bold uppercase text-[10px] tracking-wider block mb-0.5">System Log</span>
@@ -713,7 +753,6 @@
                                     </div>
                                 </template>
 
-                                <!-- Normal User / Admin Message -->
                                 <template x-if="!msg.is_system">
                                     <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
                                         <div class="max-w-md px-4 py-3 rounded-2xl text-xs shadow-sm"
@@ -737,7 +776,6 @@
                         </template>
                     </div>
 
-                    <!-- Composer -->
                     <form @submit.prevent="sendMessage()" class="p-4 border-t border-[#8686AC]/30 bg-white flex items-center gap-3">
                         <input type="text" x-model="newChatMessage" :disabled="sendingMessage"
                                placeholder="Type your message to the custodian..."
@@ -786,6 +824,12 @@
                     <p class="text-[#272757] font-medium" x-text="(selectedReservation?.start_time || '') + ' to ' + (selectedReservation?.end_time || '')"></p>
                 </div>
 
+                <template x-if="selectedReservation && isOverdueEquipment(selectedReservation)">
+                    <div class="bg-rose-50 border border-rose-300 text-rose-900 p-3.5 rounded-2xl text-[11px] font-semibold">
+                        Your scheduled return time for this equipment has passed. Please return it using the button on the bottom left.
+                    </div>
+                </template>
+
                 <div>
                     <span class="text-[10px] font-bold text-[#505081] uppercase">PURPOSE</span>
                     <p class="text-[#272757] bg-[#F4F5F7] p-3 rounded-xl border border-[#8686AC]/30 mt-0.5" x-text="selectedReservation?.purpose"></p>
@@ -799,6 +843,7 @@
                 </template>
             </div>
 
+            <!-- Bottom-Left Action Area + Close on Bottom-Right -->
             <div class="pt-4 border-t border-[#8686AC]/30 flex items-center justify-between gap-3">
                 <div class="flex items-center space-x-2">
                     <template x-if="selectedReservation && (selectedReservation.status || '').toLowerCase() === 'pending'">
@@ -810,7 +855,7 @@
                     <template x-if="selectedReservation && (selectedReservation.status || '').toLowerCase() === 'approved' && (selectedReservation.resource_type || '').toLowerCase() === 'equipment'">
                         <form :action="'/reservations/' + selectedReservation.id + '/return'" method="POST">
                             @csrf
-                            <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition">Return Equipment</button>
+                            <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow">Return Equipment</button>
                         </form>
                     </template>
                 </div>
@@ -860,51 +905,140 @@ document.addEventListener('alpine:init', () => {
             detailsModalOpen: false,
             selectedReservation: null,
             recentReservations: @json($reservations ?? []),
-            notifications: @json($notifications ?? []),
+            rawNotifications: @json($notifications ?? []),
             facilitiesData: facilitiesList,
             equipmentData: equipmentList,
 
-            // Chat state & polling
+            // Chat, reminders & student alerts
             currentUserId: {{ Auth::id() ?? 'null' }},
             chatMessages: [],
             newChatMessage: '',
             sendingMessage: false,
             pollTimer: null,
-
-            resources: [
-                @foreach ($facilities ?? [] as $facility)
-                {
-                    id: 'f-{{ $facility->id }}',
-                    name: '{{ addslashes($facility->name) }}',
-                    category: '{{ str_contains(strtolower($facility->name), "lab") ? "labs" : "rooms" }}',
-                    type: 'Facility',
-                    capacity: 'Capacity: {{ $facility->capacity ?? "N/A" }} Persons',
-                    status: '{{ strtoupper($facility->status) }}',
-                    statusClass: '{{ strtolower($facility->status) === "available" ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-rose-50 text-rose-700 border-rose-300" }}',
-                    image: '/{{ $facility->image }}'
-                },
-                @endforeach
-                @foreach ($equipment ?? [] as $item)
-                {
-                    id: 'e-{{ $item->id }}',
-                    name: '{{ addslashes($item->name) }}',
-                    category: 'equipment',
-                    type: 'Equipment',
-                    capacity: 'Stock Available: {{ $item->total_stock }} Units',
-                    status: '{{ $item->total_stock > 0 ? "AVAILABLE" : "OUT OF STOCK" }}',
-                    statusClass: '{{ $item->total_stock > 0 ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-rose-50 text-rose-700 border-rose-300" }}',
-                    image: '/{{ $item->image }}'
-                },
-                @endforeach
-            ],
+            readStudentAlertIds: [],
+            studentAlerts: [],
 
             init() {
+                try {
+                    this.readStudentAlertIds = JSON.parse(localStorage.getItem('student_read_alerts') || '[]');
+                } catch (e) {
+                    this.readStudentAlertIds = [];
+                }
+
+                this.refreshStudentAlerts();
                 this.fetchMessages();
+
                 this.pollTimer = setInterval(() => {
-                    if (this.currentView === 'support-chat') {
+                    this.fetchMessages();
+                    this.refreshStudentAlerts();
+                }, 3000);
+            },
+
+            parseScheduleDate(dateTimeStr) {
+                if (!dateTimeStr) return null;
+                const normalized = String(dateTimeStr).trim().replace(' ', 'T');
+                const parsed = new Date(normalized);
+                return Number.isNaN(parsed.getTime()) ? null : parsed;
+            },
+
+            isOverdueEquipment(item) {
+                if (!item) return false;
+                const isEq = (item.resource_type || '').toLowerCase() === 'equipment';
+                const isApproved = (item.status || '').toLowerCase() === 'approved';
+                if (!isEq || !isApproved) return false;
+
+                const endDt = this.parseScheduleDate(item.end_time) || this.parseScheduleDate(item.start_time);
+                if (!endDt) return false;
+                return Date.now() > endDt.getTime();
+            },
+
+            get overdueEquipmentReservations() {
+                return (this.recentReservations || []).filter(r => this.isOverdueEquipment(r));
+            },
+
+            refreshStudentAlerts() {
+                const alerts = [];
+
+                // 1. Overdue equipment return reminders
+                this.overdueEquipmentReservations.forEach(item => {
+                    alerts.push({
+                        id: 'return-reminder-' + item.id,
+                        type: 'reminder',
+                        badge: 'Return Due',
+                        title: 'Return Reminder: ' + item.resource_name,
+                        detail: 'Scheduled window ended at ' + (item.end_time || item.start_time) + '. Tap to return equipment.',
+                        reservationId: item.id
+                    });
+                });
+
+                // 2. Database notifications
+                (this.rawNotifications || []).forEach(n => {
+                    alerts.push({
+                        id: 'db-notif-' + n.id,
+                        type: 'status',
+                        badge: 'Update',
+                        title: n.data?.title || 'Reservation Update',
+                        detail: n.data?.message || n.message || 'Your reservation status was updated.',
+                        targetView: 'overview'
+                    });
+                });
+
+                // 3. Latest incoming chat reply from admin/custodian
+                const latestOtherMsg = [...(this.chatMessages || [])]
+                    .reverse()
+                    .find(m => !m.is_system && Number(m.sender_id) !== Number(this.currentUserId));
+
+                if (latestOtherMsg) {
+                    alerts.push({
+                        id: 'chat-reply-' + latestOtherMsg.id,
+                        type: 'chat',
+                        badge: 'Reply',
+                        title: (latestOtherMsg.sender?.name || 'Custodian') + ' replied',
+                        detail: latestOtherMsg.message,
+                        targetView: 'support-chat'
+                    });
+                }
+
+                this.studentAlerts = alerts.slice(0, 12);
+            },
+
+            get unreadStudentAlertCount() {
+                return this.studentAlerts.filter(a => !this.readStudentAlertIds.includes(a.id)).length;
+            },
+
+            markAllStudentAlertsRead() {
+                const ids = this.studentAlerts.map(a => a.id);
+                this.readStudentAlertIds = Array.from(new Set([...this.readStudentAlertIds, ...ids]));
+                try {
+                    localStorage.setItem('student_read_alerts', JSON.stringify(this.readStudentAlertIds));
+                } catch (e) {}
+            },
+
+            handleStudentAlertClick(alert) {
+                if (!this.readStudentAlertIds.includes(alert.id)) {
+                    this.readStudentAlertIds.push(alert.id);
+                    try {
+                        localStorage.setItem('student_read_alerts', JSON.stringify(this.readStudentAlertIds));
+                    } catch (e) {}
+                }
+
+                this.notificationsOpen = false;
+
+                if (alert.reservationId) {
+                    const match = (this.recentReservations || []).find(r => r.id === alert.reservationId);
+                    if (match) {
+                        this.selectedReservation = match;
+                        this.detailsModalOpen = true;
+                        return;
+                    }
+                }
+
+                if (alert.targetView) {
+                    this.currentView = alert.targetView;
+                    if (alert.targetView === 'support-chat') {
                         this.fetchMessages();
                     }
-                }, 3000);
+                }
             },
 
             async fetchMessages() {
@@ -916,6 +1050,7 @@ document.addEventListener('alpine:init', () => {
                     const data = await res.json();
                     const prevLen = this.chatMessages.length;
                     this.chatMessages = Array.isArray(data) ? data : [];
+                    this.refreshStudentAlerts();
                     if (this.chatMessages.length !== prevLen) {
                         this.$nextTick(() => {
                             const feed = document.getElementById('user-chat-feed');
