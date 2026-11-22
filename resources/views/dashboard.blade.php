@@ -918,6 +918,33 @@ document.addEventListener('alpine:init', () => {
             readStudentAlertIds: [],
             studentAlerts: [],
 
+            resources: [
+                ...facilitiesList.map(facility => ({
+                    id: 'f-' + facility.id,
+                    name: facility.name || '',
+                    category: String(facility.name || '').toLowerCase().includes('lab') ? 'labs' : 'rooms',
+                    type: 'Facility',
+                    capacity: 'Capacity: ' + (facility.capacity ?? 'N/A') + ' Persons',
+                    status: String(facility.status || 'AVAILABLE').toUpperCase(),
+                    statusClass: String(facility.status || '').toLowerCase() === 'available'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                        : 'bg-rose-50 text-rose-700 border-rose-300',
+                    image: facility.image ? '/' + String(facility.image).replace(/^\/+/, '') : ''
+                })),
+                ...equipmentList.map(item => ({
+                    id: 'e-' + item.id,
+                    name: item.name || '',
+                    category: 'equipment',
+                    type: 'Equipment',
+                    capacity: 'Stock Available: ' + (item.total_stock ?? 0) + ' Units',
+                    status: Number(item.total_stock ?? 0) > 0 ? 'AVAILABLE' : 'OUT OF STOCK',
+                    statusClass: Number(item.total_stock ?? 0) > 0
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                        : 'bg-rose-50 text-rose-700 border-rose-300',
+                    image: item.image ? '/' + String(item.image).replace(/^\/+/, '') : ''
+                }))
+            ],
+
             init() {
                 try {
                     this.readStudentAlertIds = JSON.parse(localStorage.getItem('student_read_alerts') || '[]');
