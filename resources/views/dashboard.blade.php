@@ -370,17 +370,13 @@
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-6">
                         <div class="lg:col-span-8 bg-white backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-2xl space-y-8">
                             <div class="space-y-6">
-                                <h3 class="text-base font-extrabold text-[#0F0E47]">What do you need?</h3>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <button type="button" @click="resourceType = 'facility'"
-                                            :class="resourceType === 'facility' ? 'border-[#0F0E47] bg-[#F4F5F7] ring-1 ring-[#0F0E47]/40' : 'border-[#8686AC]/30 bg-white'"
-                                            class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
-                                        <span class="text-xs font-bold text-[#0F0E47]">Facility &amp; Rooms</span>
-                                    </button>
-                                    <button type="button" @click="resourceType = 'equipment'"
-                                            :class="resourceType === 'equipment' ? 'border-[#0F0E47] bg-[#F4F5F7] ring-1 ring-[#0F0E47]/40' : 'border-[#8686AC]/30 bg-white'"
-                                            class="p-4 rounded-2xl border text-left transition flex items-center justify-between">
-                                        <span class="text-xs font-bold text-[#0F0E47]">Equipment &amp; Gear</span>
+                                <div class="flex items-center justify-between gap-3">
+                                    <h3 class="text-base font-extrabold text-[#0F0E47]">What do you need?</h3>
+                                    <button type="button"
+                                            @click="resourceType = resourceType === 'facility' ? 'equipment' : 'facility'"
+                                            class="px-4 py-2 rounded-xl border border-[#8686AC]/40 bg-[#F4F5F7] hover:bg-[#0F0E47] text-[#0F0E47] hover:text-white text-xs font-bold transition shadow-sm flex items-center gap-2">
+                                        <span x-text="resourceType === 'facility' ? 'Mode: Facility & Rooms' : 'Mode: Equipment & Gear'"></span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-md bg-white/80 text-[#0F0E47] font-extrabold">Switch</span>
                                     </button>
                                 </div>
 
