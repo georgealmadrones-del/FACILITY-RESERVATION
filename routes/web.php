@@ -1,12 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\ChatController;
 
-// Temporary migration trigger to create your missing tables on Render
+// Temporary migration trigger (remove or protect once migrations are complete)
 Route::get('/run-migrations-now', function () {
     $exitCode = Artisan::call('migrate', ['--force' => true]);
     return "Migration executed with exit code: " . $exitCode . "<br>Output: <pre>" . Artisan::output() . "</pre>";
@@ -21,6 +22,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     Route::post('/reservations/{id}/return', [ReservationController::class, 'returnUnit'])->name('reservations.return');
+
+    // Help & Support Chat + Admin Threads
+    Route::get('/chat/messages', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/messages', [ChatController::class, 'store'])->name('chat.store');
+    Route::get('/chat/threads', [ChatController::class, 'threads'])->name('chat.threads');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
