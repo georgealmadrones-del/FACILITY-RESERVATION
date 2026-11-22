@@ -109,7 +109,7 @@
                     </svg>
                 </button>
 
-                <!-- Search Bar with Live Dropdown -->
+                <!-- Search Bar with Live Dropdown & Real-Time Availability -->
                 <div class="relative w-full" @click.away="searchDropdownOpen = false">
                     <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-[#505081] pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     <input type="text"
@@ -134,8 +134,13 @@
                                         @click="pickSearchResult(item)"
                                         class="w-full px-4 py-3 text-left hover:bg-[#F4F5F7] transition flex items-center justify-between gap-3">
                                     <div class="min-w-0">
-                                        <p class="text-xs font-bold text-[#0F0E47] truncate" x-text="item.name"></p>
-                                        <p class="text-[10px] text-[#505081] truncate" x-text="item.type + ' • ' + item.capacity"></p>
+                                        <div class="flex items-center gap-2">
+                                            <p class="text-xs font-bold text-[#0F0E47] truncate" x-text="item.name"></p>
+                                            <span class="px-1.5 py-0.5 text-[9px] font-bold rounded border shrink-0"
+                                                  :class="getLiveAvailability(item).badgeClass"
+                                                  x-text="getLiveAvailability(item).label"></span>
+                                        </div>
+                                        <p class="text-[10px] text-[#505081] truncate" x-text="getLiveAvailability(item).detail"></p>
                                     </div>
                                     <span class="text-[10px] font-bold text-[#0F0E47] bg-[#F4F5F7] border border-[#8686AC]/30 px-2.5 py-1 rounded-lg shrink-0">
                                         Select &rarr;
@@ -552,25 +557,30 @@
                 </form>
             </main>
 
-            <!-- VIEW 3: SCHEDULE & ROOMS -->
+            <!-- VIEW 3: SCHEDULE & ROOMS (LIVE AVAILABILITY) -->
             <main x-show="currentView === 'availability-calendar'" class="p-6 lg:p-10 space-y-8" style="display: none;">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#8686AC]/30 pb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#8686AC]/30 pb-6">
                     <div class="space-y-1">
-                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Campus List</span>
+                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Live Check</span>
                         <h2 class="text-3xl font-extrabold text-[#0F0E47] tracking-tight">Schedule &amp; Rooms</h2>
-                        <p class="text-xs text-[#505081]">See what is already taken on a given day or pick an item below.</p>
+                        <p class="text-xs text-[#505081]">Check live status—available, under maintenance, or already booked for your time slot.</p>
                     </div>
-                    <div class="flex items-center space-x-2">
+                    <div class="flex flex-wrap items-center gap-2">
                         <label class="text-xs font-bold text-[#505081]">Date:</label>
                         <input type="date" x-model="availabilityFilterDate" :min="todayISO"
-                               class="bg-white border border-[#8686AC]/40 rounded-xl px-3.5 py-2 text-xs font-bold text-[#0F0E47]">
+                               class="bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs font-bold text-[#0F0E47]">
+                        <input type="time" x-model="availabilityFilterStart"
+                               class="bg-white border border-[#8686AC]/40 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0F0E47]">
+                        <span class="text-xs text-[#505081] font-bold">-</span>
+                        <input type="time" x-model="availabilityFilterEnd"
+                               class="bg-white border border-[#8686AC]/40 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0F0E47]">
                     </div>
                 </div>
 
                 <div class="bg-white rounded-3xl border border-[#8686AC]/30 p-6 shadow-xl space-y-4">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Taken on <span x-text="availabilityFilterDate"></span></h3>
-                        <span class="text-[11px] font-bold text-[#505081]" x-text="bookedSlotsForDate.length + ' booking(s)'"></span>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Taken on <span x-text="availabilityFilterDate"></span> (<span x-text="availabilityFilterStart + ' - ' + availabilityFilterEnd"></span>)</h3>
+                        <span class="text-[11px] font-bold text-[#505081]" x-text="bookedSlotsForDate.length + ' overlapping booking(s)'"></span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
@@ -601,7 +611,7 @@
                                 </template>
                                 <template x-if="bookedSlotsForDate.length === 0">
                                     <tr>
-                                        <td colspan="4" class="py-6 text-center text-[#505081]">Nothing booked on this date yet.</td>
+                                        <td colspan="4" class="py-6 text-center text-[#505081]">No overlapping bookings in this time slot.</td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -624,21 +634,27 @@
                                      class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90"
                                      onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80'">
                                 <div class="absolute top-3 right-3">
-                                    <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border shadow-sm backdrop-blur-md" :class="item.statusClass" x-text="item.status"></span>
+                                    <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border shadow-sm backdrop-blur-md"
+                                          :class="getLiveAvailability(item).badgeClass"
+                                          x-text="getLiveAvailability(item).label"></span>
                                 </div>
                             </div>
                             <div class="p-6 space-y-4">
                                 <div>
                                     <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block" x-text="item.type"></span>
                                     <h3 class="text-base font-bold text-[#0F0E47] mt-0.5 group-hover:text-[#505081] transition" x-text="item.name"></h3>
-                                    <p class="text-xs text-[#505081] mt-1 font-semibold" x-text="item.capacity"></p>
+                                    <p class="text-xs text-[#505081] mt-1 font-semibold" x-text="getLiveAvailability(item).detail"></p>
                                 </div>
                             </div>
                             <div class="p-6 pt-0 space-y-4">
-                                <button type="button" @click="selectResourceForBooking(item); currentView = 'new-reservation'; bookingStep = 1;"
-                                        class="w-full py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition block text-center shadow-lg">
-                                    Book this &rarr;
-                                </button>
+                                <button type="button"
+                                        :disabled="!getLiveAvailability(item).bookable"
+                                        @click="if (getLiveAvailability(item).bookable) { selectResourceForBooking(item); currentView = 'new-reservation'; bookingStep = 1; }"
+                                        :class="getLiveAvailability(item).bookable
+                                            ? 'bg-[#0F0E47] hover:bg-[#272757] text-white cursor-pointer'
+                                            : 'bg-zinc-200 text-zinc-500 cursor-not-allowed'"
+                                        class="w-full py-2.5 text-xs font-bold rounded-xl transition block text-center shadow-lg"
+                                        x-text="getLiveAvailability(item).bookable ? 'Book this &rarr;' : getLiveAvailability(item).disabledText"></button>
                             </div>
                         </div>
                     </template>
@@ -925,6 +941,8 @@ document.addEventListener('alpine:init', () => {
             formError: '',
             todayISO,
             availabilityFilterDate: todayISO,
+            availabilityFilterStart: '08:00',
+            availabilityFilterEnd: '10:00',
             resourceType: 'facility',
             selectedFacility: facilitiesList[0]?.name || '',
             selectedEquipment: equipmentList[0]?.name || '',
@@ -954,32 +972,30 @@ document.addEventListener('alpine:init', () => {
             readStudentAlertIds: [],
             studentAlerts: [],
 
-            resources: [
-                ...facilitiesList.map(facility => ({
-                    id: 'f-' + facility.id,
-                    name: facility.name || '',
-                    category: String(facility.name || '').toLowerCase().includes('lab') ? 'labs' : 'rooms',
-                    type: 'Room / Lab',
-                    capacity: 'Up to ' + (facility.capacity ?? 'N/A') + ' people',
-                    status: String(facility.status || 'AVAILABLE').toUpperCase(),
-                    statusClass: String(facility.status || '').toLowerCase() === 'available'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                        : 'bg-rose-50 text-rose-700 border-rose-300',
-                    image: facility.image ? '/' + String(facility.image).replace(/^\/+/, '') : ''
-                })),
-                ...equipmentList.map(item => ({
-                    id: 'e-' + item.id,
-                    name: item.name || '',
-                    category: 'equipment',
-                    type: 'Equipment',
-                    capacity: (item.total_stock ?? 0) + ' left',
-                    status: Number(item.total_stock ?? 0) > 0 ? 'AVAILABLE' : 'NONE LEFT',
-                    statusClass: Number(item.total_stock ?? 0) > 0
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                        : 'bg-rose-50 text-rose-700 border-rose-300',
-                    image: item.image ? '/' + String(item.image).replace(/^\/+/, '') : ''
-                }))
-            ],
+            get resources() {
+                return [
+                    ...this.facilitiesData.map(facility => ({
+                        id: 'f-' + facility.id,
+                        name: facility.name || '',
+                        kind: 'facility',
+                        category: String(facility.name || '').toLowerCase().includes('lab') ? 'labs' : 'rooms',
+                        type: 'Room / Lab',
+                        capacityNumber: Number(facility.capacity ?? 0),
+                        rawStatus: String(facility.status || 'available').toLowerCase(),
+                        image: facility.image ? '/' + String(facility.image).replace(/^\/+/, '') : ''
+                    })),
+                    ...this.equipmentData.map(item => ({
+                        id: 'e-' + item.id,
+                        name: item.name || '',
+                        kind: 'equipment',
+                        category: 'equipment',
+                        type: 'Equipment',
+                        stockNumber: Number(item.total_stock ?? 0),
+                        rawStatus: String(item.status || 'available').toLowerCase(),
+                        image: item.image ? '/' + String(item.image).replace(/^\/+/, '') : ''
+                    }))
+                ];
+            },
 
             init() {
                 try {
@@ -990,11 +1006,121 @@ document.addEventListener('alpine:init', () => {
 
                 this.refreshStudentAlerts();
                 this.fetchMessages();
+                this.syncLiveDashboardData();
 
                 this.pollTimer = setInterval(() => {
                     this.fetchMessages();
                     this.refreshStudentAlerts();
-                }, 3000);
+                    this.syncLiveDashboardData();
+                }, 4000);
+            },
+
+            async syncLiveDashboardData() {
+                try {
+                    const res = await fetch(window.location.href, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' }
+                    });
+                    if (!res.ok) return;
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const scripts = Array.from(doc.querySelectorAll('script'));
+                    for (const s of scripts) {
+                        const txt = s.textContent || '';
+                        if (txt.includes('recentReservations:') && txt.includes('facilitiesData:')) {
+                            const resMatch = txt.match(/recentReservations:\s*(\[[\s\S]*?\]),\s*rawNotifications:/);
+                            const facMatch = txt.match(/facilitiesData:\s*(\[[\s\S]*?\]),\s*equipmentData:/);
+                            const eqMatch = txt.match(/equipmentData:\s*(\[[\s\S]*?\]),\s*currentUserId:/);
+                            if (resMatch) this.recentReservations = JSON.parse(resMatch[1]);
+                            if (facMatch) this.facilitiesData = JSON.parse(facMatch[1]);
+                            if (eqMatch) this.equipmentData = JSON.parse(eqMatch[1]);
+                            break;
+                        }
+                    }
+                } catch (e) {}
+            },
+
+            extractTimeHHMM(dtStr) {
+                if (!dtStr) return '';
+                const m = String(dtStr).match(/(\d{2}:\d{2})/);
+                return m ? m[1] : '';
+            },
+
+            overlapsWindow(booking, dateStr, startHHMM, endHHMM) {
+                if (!booking) return false;
+                const status = (booking.status || '').toLowerCase();
+                if (['rejected', 'cancelled', 'returned'].includes(status)) return false;
+                if (!String(booking.start_time || '').startsWith(dateStr)) return false;
+
+                const bStart = this.extractTimeHHMM(booking.start_time);
+                const bEnd = this.extractTimeHHMM(booking.end_time) || bStart;
+                if (!bStart || !startHHMM || !endHHMM) return true;
+                return bStart < endHHMM && bEnd > startHHMM;
+            },
+
+            getLiveAvailability(item) {
+                const dateStr = this.currentView === 'new-reservation' ? this.formattedDate : this.availabilityFilterDate;
+                const startHHMM = this.currentView === 'new-reservation' ? this.startTime : this.availabilityFilterStart;
+                const endHHMM = this.currentView === 'new-reservation' ? this.endTime : this.availabilityFilterEnd;
+
+                if (['maintenance', 'unavailable'].includes(item.rawStatus)) {
+                    return {
+                        label: 'MAINTENANCE',
+                        badgeClass: 'bg-amber-50 text-amber-800 border-amber-300',
+                        detail: item.kind === 'facility'
+                            ? `Under maintenance • Max ${item.capacityNumber || 'N/A'} people`
+                            : `Under maintenance • ${item.stockNumber} units`,
+                        bookable: false,
+                        disabledText: 'Under maintenance'
+                    };
+                }
+
+                const overlapping = (this.recentReservations || []).filter(r =>
+                    r.resource_name === item.name &&
+                    this.overlapsWindow(r, dateStr, startHHMM, endHHMM)
+                );
+
+                if (item.kind === 'facility') {
+                    if (overlapping.length > 0) {
+                        const slotText = overlapping.map(b => `${this.extractTimeHHMM(b.start_time)}-${this.extractTimeHHMM(b.end_time)} (${b.status})`).join(', ');
+                        return {
+                            label: 'BOOKED',
+                            badgeClass: 'bg-rose-50 text-rose-700 border-rose-300',
+                            detail: `Booked on ${dateStr}: ${slotText}`,
+                            bookable: false,
+                            disabledText: 'Already booked'
+                        };
+                    }
+                    return {
+                        label: 'AVAILABLE',
+                        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-300',
+                        detail: `Open on ${dateStr} (${startHHMM}-${endHHMM}) • Up to ${item.capacityNumber || 'N/A'} people`,
+                        bookable: true,
+                        disabledText: 'Book this'
+                    };
+                }
+
+                const reservedUnits = overlapping.reduce((sum, b) => sum + Number(b.quantity || 1), 0);
+                const leftUnits = Math.max(0, Number(item.stockNumber || 0) - reservedUnits);
+
+                if (leftUnits <= 0) {
+                    return {
+                        label: 'BOOKED OUT',
+                        badgeClass: 'bg-rose-50 text-rose-700 border-rose-300',
+                        detail: `0 left on ${dateStr} (${reservedUnits}/${item.stockNumber} taken)`,
+                        bookable: false,
+                        disabledText: 'None left'
+                    };
+                }
+
+                return {
+                    label: reservedUnits > 0 ? 'LIMITED' : 'AVAILABLE',
+                    badgeClass: reservedUnits > 0
+                        ? 'bg-sky-50 text-sky-800 border-sky-300'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-300',
+                    detail: `${leftUnits} of ${item.stockNumber} left on ${dateStr} (${startHHMM}-${endHHMM})`,
+                    bookable: true,
+                    disabledText: 'Book this'
+                };
             },
 
             parseScheduleDate(dateTimeStr) {
@@ -1206,15 +1332,14 @@ document.addEventListener('alpine:init', () => {
             get conflictingBookings() {
                 const targetName = this.resourceType === 'facility' ? this.selectedFacility : this.selectedEquipment;
                 return this.recentReservations.filter(r =>
-                    !['rejected', 'cancelled'].includes((r.status || '').toLowerCase()) &&
+                    !['rejected', 'cancelled', 'returned'].includes((r.status || '').toLowerCase()) &&
                     r.resource_name === targetName &&
                     String(r.start_time || '').startsWith(this.formattedDate)
                 );
             },
             get bookedSlotsForDate() {
                 return this.recentReservations.filter(r =>
-                    !['rejected', 'cancelled'].includes((r.status || '').toLowerCase()) &&
-                    String(r.start_time || '').startsWith(this.availabilityFilterDate)
+                    this.overlapsWindow(r, this.availabilityFilterDate, this.availabilityFilterStart, this.availabilityFilterEnd)
                 );
             },
             get approvalRateText() {
@@ -1223,7 +1348,7 @@ document.addEventListener('alpine:init', () => {
                 return Math.round((approvedCount / this.recentReservations.length) * 100) + '%';
             },
             selectResourceForBooking(item) {
-                if (String(item.type || '').toLowerCase().includes('room') || String(item.type || '').toLowerCase().includes('facility')) {
+                if (item.kind === 'facility') {
                     this.resourceType = 'facility';
                     this.selectedFacility = item.name;
                 } else {
@@ -1259,8 +1384,7 @@ document.addEventListener('alpine:init', () => {
                 return this.resources
                     .filter(item =>
                         item.name.toLowerCase().includes(q) ||
-                        item.type.toLowerCase().includes(q) ||
-                        item.capacity.toLowerCase().includes(q)
+                        item.type.toLowerCase().includes(q)
                     )
                     .slice(0, 6);
             },
@@ -1282,7 +1406,7 @@ document.addEventListener('alpine:init', () => {
                     const matchesCategory = (this.activeTab === 'all' || item.category === this.activeTab);
                     const matchesSearch = this.searchQuery === '' ||
                         item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                        item.capacity.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        item.type.toLowerCase().includes(this.searchQuery.toLowerCase());
                     return matchesCategory && matchesSearch;
                 });
             }
