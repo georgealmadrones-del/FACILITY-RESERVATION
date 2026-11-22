@@ -26,7 +26,7 @@
                             <span>Home</span>
                         </button>
 
-                        <button type="button" @click="currentView = 'new-reservation'; bookingStep = 1; mobileMenuOpen = false;"
+                        <button type="button" @click="currentView = 'new-reservation'; bookingStep = 1; syncTimeToNowIfToday(); mobileMenuOpen = false;"
                                 :class="currentView === 'new-reservation' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                                 class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition text-xs font-semibold">
                             <div class="flex items-center space-x-3">
@@ -168,7 +168,7 @@
             <div class="flex items-center space-x-4">
                 <div class="hidden md:flex items-center space-x-2 rounded-full bg-[#F4F5F7] border border-[#8686AC]/30 text-xs px-3.5 py-1.5 text-[#272757] shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="font-medium">Online</span>
+                    <span class="font-medium">Online &bull; <span x-text="currentTimeHHMM"></span></span>
                 </div>
 
                 <!-- Notification Bell -->
@@ -263,7 +263,7 @@
                         </h1>
                         <p class="text-xs text-[#505081]">Check your room and equipment requests below.</p>
                     </div>
-                    <button type="button" @click="currentView = 'new-reservation'; bookingStep = 1;"
+                    <button type="button" @click="currentView = 'new-reservation'; bookingStep = 1; syncTimeToNowIfToday();"
                             class="px-6 py-3 bg-[#0F0E47] hover:bg-[#505081] text-white font-bold text-xs rounded-xl transition shadow-lg flex items-center space-x-2 shrink-0">
                         <span class="text-base font-extrabold leading-none">+</span>
                         <span>Book a room or item</span>
@@ -409,7 +409,7 @@
                         <div class="space-y-1">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Booking Form</span>
                             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Book a room or item</h2>
-                            <p class="text-xs text-[#505081]">Pick your date, time, and count before sending your request.</p>
+                            <p class="text-xs text-[#505081]">Pick your date, time (up to 8:00 PM), and count before sending your request.</p>
                         </div>
                     </div>
 
@@ -468,7 +468,10 @@
                             </div>
 
                             <div class="space-y-6 pt-6 border-t border-[#8686AC]/30">
-                                <h3 class="text-base font-extrabold text-[#0F0E47]">Date &amp; Time</h3>
+                                <div class="flex items-center justify-between gap-2 flex-wrap">
+                                    <h3 class="text-base font-extrabold text-[#0F0E47]">Date &amp; Time</h3>
+                                    <span class="text-[11px] font-bold text-[#505081]">Now: <span x-text="currentTimeHHMM"></span> &bull; Latest end: 20:00 (8:00 PM)</span>
+                                </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                     <div class="bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30">
                                         <div class="flex items-center justify-between mb-4">
@@ -499,14 +502,24 @@
 
                                     <div class="space-y-4 bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30 h-full flex flex-col justify-between">
                                         <div class="space-y-3">
-                                            <span class="text-[10px] font-bold text-[#0F0E47] uppercase tracking-widest block mb-3">Time</span>
+                                            <span class="text-[10px] font-bold text-[#0F0E47] uppercase tracking-widest block mb-3">Time (Max 20:00)</span>
                                             <div>
                                                 <label class="block text-[11px] font-semibold text-[#505081] mb-1">Start</label>
-                                                <input type="time" x-model="startTime" class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
+                                                <input type="time"
+                                                       x-model="startTime"
+                                                       @change="formError = ''"
+                                                       :min="formattedDate === todayISO ? currentTimeHHMM : '00:00'"
+                                                       max="19:59"
+                                                       class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
                                             </div>
                                             <div>
-                                                <label class="block text-[11px] font-semibold text-[#505081] mb-1">End</label>
-                                                <input type="time" x-model="endTime" class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
+                                                <label class="block text-[11px] font-semibold text-[#505081] mb-1">End (up to 8:00 PM)</label>
+                                                <input type="time"
+                                                       x-model="endTime"
+                                                       @change="formError = ''"
+                                                       :min="startTime || '00:00'"
+                                                       max="20:00"
+                                                       class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
                                             </div>
                                         </div>
                                         <p class="text-[11px] text-[#505081] pt-2">Picked date: <strong class="text-[#0F0E47]" x-text="selectedDate"></strong></p>
@@ -551,7 +564,7 @@
                                         : equipmentQuantity + ' / ' + currentEquipmentStock + ' units'"></span>
                                 </p>
                             </div>
-                            <p class="text-[11px] text-[#505081]">The custodian will review and approve your request.</p>
+                            <p class="text-[11px] text-[#505081]">Open until 8:00 PM (20:00). The custodian will review your request.</p>
                         </div>
                     </div>
                 </form>
@@ -570,9 +583,13 @@
                         <input type="date" x-model="availabilityFilterDate" :min="todayISO"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs font-bold text-[#0F0E47]">
                         <input type="time" x-model="availabilityFilterStart"
+                               :min="availabilityFilterDate === todayISO ? currentTimeHHMM : '00:00'"
+                               max="19:59"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0F0E47]">
                         <span class="text-xs text-[#505081] font-bold">-</span>
                         <input type="time" x-model="availabilityFilterEnd"
+                               :min="availabilityFilterStart || '00:00'"
+                               max="20:00"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0F0E47]">
                     </div>
                 </div>
@@ -649,12 +666,12 @@
                             <div class="p-6 pt-0 space-y-4">
                                 <button type="button"
                                         :disabled="!getLiveAvailability(item).bookable"
-                                        @click="if (getLiveAvailability(item).bookable) { selectResourceForBooking(item); currentView = 'new-reservation'; bookingStep = 1; }"
+                                        @click="if (getLiveAvailability(item).bookable) { selectResourceForBooking(item); currentView = 'new-reservation'; bookingStep = 1; syncTimeToNowIfToday(); }"
                                         :class="getLiveAvailability(item).bookable
                                             ? 'bg-[#0F0E47] hover:bg-[#272757] text-white cursor-pointer'
                                             : 'bg-zinc-200 text-zinc-500 cursor-not-allowed'"
                                         class="w-full py-2.5 text-xs font-bold rounded-xl transition block text-center shadow-lg"
-                                        x-text="getLiveAvailability(item).bookable ? 'Book this &rarr;' : getLiveAvailability(item).disabledText"></button>
+                                        x-text="getLiveAvailability(item).bookable ? 'Book this →' : getLiveAvailability(item).disabledText"></button>
                             </div>
                         </div>
                     </template>
@@ -922,9 +939,20 @@
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('reservationDashboard', () => {
-        const now = new Date();
         const pad = n => String(n).padStart(2, '0');
-        const todayISO = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+        const getNowParts = () => {
+            const d = new Date();
+            return {
+                dateISO: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+                timeHHMM: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+                month: d.getMonth(),
+                year: d.getFullYear(),
+                day: d.getDate()
+            };
+        };
+        const initialNow = getNowParts();
+        const MAX_BOOKING_END = '20:00';
+        const MAX_BOOKING_START = '19:59';
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         const facilitiesList = @json($facilities ?? []);
         const equipmentList = @json($equipment ?? []);
@@ -939,23 +967,24 @@ document.addEventListener('alpine:init', () => {
             mobileMenuOpen: false,
             bookingStep: 1,
             formError: '',
-            todayISO,
-            availabilityFilterDate: todayISO,
-            availabilityFilterStart: '08:00',
-            availabilityFilterEnd: '10:00',
+            todayISO: initialNow.dateISO,
+            currentTimeHHMM: initialNow.timeHHMM,
+            availabilityFilterDate: initialNow.dateISO,
+            availabilityFilterStart: initialNow.timeHHMM < MAX_BOOKING_START ? initialNow.timeHHMM : '08:00',
+            availabilityFilterEnd: MAX_BOOKING_END,
             resourceType: 'facility',
             selectedFacility: facilitiesList[0]?.name || '',
             selectedEquipment: equipmentList[0]?.name || '',
             expectedAttendees: 1,
             equipmentQuantity: 1,
-            activeCalendarMonth: now.getMonth(),
-            activeCalendarYear: now.getFullYear(),
-            currentMonth: now.getMonth(),
-            currentYear: now.getFullYear(),
-            selectedDay: now.getDate(),
-            selectedDate: `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`,
-            startTime: '08:00',
-            endTime: '10:00',
+            activeCalendarMonth: initialNow.month,
+            activeCalendarYear: initialNow.year,
+            currentMonth: initialNow.month,
+            currentYear: initialNow.year,
+            selectedDay: initialNow.day,
+            selectedDate: `${months[initialNow.month]} ${initialNow.day}, ${initialNow.year}`,
+            startTime: initialNow.timeHHMM < MAX_BOOKING_START ? initialNow.timeHHMM : '08:00',
+            endTime: MAX_BOOKING_END,
             purposeReason: '',
             detailsModalOpen: false,
             selectedReservation: null,
@@ -969,6 +998,7 @@ document.addEventListener('alpine:init', () => {
             newChatMessage: '',
             sendingMessage: false,
             pollTimer: null,
+            clockTimer: null,
             readStudentAlertIds: [],
             studentAlerts: [],
 
@@ -1004,15 +1034,49 @@ document.addEventListener('alpine:init', () => {
                     this.readStudentAlertIds = [];
                 }
 
+                this.refreshClock();
+                this.syncTimeToNowIfToday();
                 this.refreshStudentAlerts();
                 this.fetchMessages();
                 this.syncLiveDashboardData();
+
+                this.clockTimer = setInterval(() => {
+                    this.refreshClock();
+                }, 15000);
 
                 this.pollTimer = setInterval(() => {
                     this.fetchMessages();
                     this.refreshStudentAlerts();
                     this.syncLiveDashboardData();
                 }, 4000);
+            },
+
+            refreshClock() {
+                const p = getNowParts();
+                this.todayISO = p.dateISO;
+                this.currentTimeHHMM = p.timeHHMM;
+                this.activeCalendarMonth = p.month;
+                this.activeCalendarYear = p.year;
+            },
+
+            addMinutesToHHMM(hhmm, minsToAdd) {
+                const [h, m] = String(hhmm || '08:00').split(':').map(Number);
+                const total = Math.min(20 * 60, (h || 0) * 60 + (m || 0) + minsToAdd);
+                return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+            },
+
+            syncTimeToNowIfToday() {
+                this.refreshClock();
+                if (this.formattedDate === this.todayISO && this.startTime < this.currentTimeHHMM) {
+                    if (this.currentTimeHHMM < MAX_BOOKING_END) {
+                        this.startTime = this.currentTimeHHMM;
+                        const suggestedEnd = this.addMinutesToHHMM(this.startTime, 120);
+                        this.endTime = suggestedEnd <= MAX_BOOKING_END ? suggestedEnd : MAX_BOOKING_END;
+                    }
+                }
+                if (this.endTime > MAX_BOOKING_END) {
+                    this.endTime = MAX_BOOKING_END;
+                }
             },
 
             async syncLiveDashboardData() {
@@ -1320,6 +1384,7 @@ document.addEventListener('alpine:init', () => {
                 this.selectedDay = day;
                 this.selectedDate = `${months[this.currentMonth]} ${day}, ${this.currentYear}`;
                 this.formError = '';
+                this.syncTimeToNowIfToday();
             },
             get currentFacilityCapacity() {
                 const fac = this.facilitiesData.find(f => f.name === this.selectedFacility);
@@ -1357,22 +1422,45 @@ document.addEventListener('alpine:init', () => {
                 }
             },
             validateBeforeSubmit(event) {
+                this.refreshClock();
                 this.formError = '';
+
                 if (this.formattedDate < this.todayISO) {
                     event.preventDefault();
                     this.formError = 'Pick today or a future date.';
                     return;
                 }
+
+                if (this.formattedDate === this.todayISO && this.startTime < this.currentTimeHHMM) {
+                    event.preventDefault();
+                    this.formError = `Start time (${this.startTime}) has already passed today. Current time is ${this.currentTimeHHMM}.`;
+                    return;
+                }
+
+                if (this.startTime >= MAX_BOOKING_END) {
+                    event.preventDefault();
+                    this.formError = 'Cannot book starting at or past 8:00 PM (20:00).';
+                    return;
+                }
+
+                if (this.endTime > MAX_BOOKING_END) {
+                    event.preventDefault();
+                    this.formError = 'Bookings cannot go past 8:00 PM (20:00).';
+                    return;
+                }
+
                 if (this.endTime <= this.startTime) {
                     event.preventDefault();
                     this.formError = 'End time needs to be after start time.';
                     return;
                 }
+
                 if (this.resourceType === 'facility' && Number(this.expectedAttendees) > this.currentFacilityCapacity) {
                     event.preventDefault();
                     this.formError = `Too many people for this room (max ${this.currentFacilityCapacity}).`;
                     return;
                 }
+
                 if (this.resourceType === 'equipment' && Number(this.equipmentQuantity) > this.currentEquipmentStock) {
                     event.preventDefault();
                     this.formError = `Only ${this.currentEquipmentStock} unit(s) available.`;
@@ -1394,6 +1482,7 @@ document.addEventListener('alpine:init', () => {
                 this.mobileMenuOpen = false;
                 this.currentView = 'new-reservation';
                 this.bookingStep = 1;
+                this.syncTimeToNowIfToday();
             },
             submitTopSearch() {
                 this.searchDropdownOpen = false;
