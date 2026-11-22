@@ -6,12 +6,12 @@
          class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
          style="display: none;"></div>
 
-    <!-- Admin Sidebar (Slide-over on Mobile, Fixed on Desktop) -->
+    <!-- Admin Sidebar -->
     <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
            class="fixed inset-y-0 left-0 z-50 w-64 shrink-0 border-r border-[#8686AC]/30 bg-white h-full p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out md:static md:z-40 shadow-2xl md:shadow-sm overflow-y-auto">
         <div class="space-y-8">
             <div class="flex items-center justify-between px-2 pt-2">
-                <span class="text-[10px] font-bold text-rose-600 uppercase tracking-widest block">Admin Portal</span>
+                <span class="text-[10px] font-bold text-rose-600 uppercase tracking-widest block">Custodian</span>
                 <button type="button"
                         @click="mobileMenuOpen = false"
                         class="md:hidden text-[#505081] hover:text-[#0F0E47] font-bold text-lg leading-none"
@@ -31,14 +31,14 @@
                             :class="currentView === 'inventory' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                             class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                        <span>Inventory &amp; Stocks</span>
+                        <span>Rooms &amp; Gear</span>
                     </button>
 
                     <button type="button" @click.prevent="currentView = 'users'; mobileMenuOpen = false;"
                             :class="currentView === 'users' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                             class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        <span>Users</span>
+                        <span>People</span>
                     </button>
 
                     <button type="button" @click.prevent="currentView = 'messages'; mobileMenuOpen = false; fetchThreads(); fetchAdminMessages();"
@@ -57,7 +57,7 @@
                             :class="currentView === 'reports' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                             class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        <span>Reports</span>
+                        <span>Logs &amp; PDF</span>
                     </button>
                 </nav>
             </div>
@@ -70,19 +70,19 @@
                 </div>
                 <div class="overflow-hidden">
                     <span class="font-bold text-xs text-[#0F0E47] truncate block">{{ Auth::user()->name ?? 'Admin' }}</span>
-                    <span class="text-[10px] text-rose-600 truncate block font-bold">Custodian</span>
+                    <span class="text-[10px] text-rose-600 truncate block font-bold">Office</span>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" title="Sign out" class="text-[#505081] hover:text-rose-600 transition shrink-0">
+                <button type="submit" title="Log out" class="text-[#505081] hover:text-rose-600 transition shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 </button>
             </form>
         </div>
     </aside>
 
-    <!-- Main Content Area (Only this scrolls) -->
+    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
         <header class="h-20 shrink-0 border-b border-[#8686AC]/30 bg-white/80 backdrop-blur-md px-4 sm:px-6 lg:px-10 flex items-center justify-between gap-3 z-30 shadow-sm">
             <div class="flex items-center space-x-3 min-w-0">
@@ -101,9 +101,9 @@
             </div>
 
             <div class="flex items-center space-x-3 sm:space-x-4 shrink-0">
-                <span class="hidden sm:inline text-xs font-bold text-[#505081]">Master Custodian</span>
+                <span class="hidden sm:inline text-xs font-bold text-[#505081]">Custodian Desk</span>
 
-                <!-- Working Admin Notification Bell -->
+                <!-- Notification Bell -->
                 <div class="relative" @click.away="notificationsOpen = false">
                     <button type="button"
                             @click="notificationsOpen = !notificationsOpen; if (notificationsOpen) refreshAdminAlerts();"
@@ -118,16 +118,15 @@
                         </template>
                     </button>
 
-                    <!-- Responsive Dropdown (Fits Mobile Screens Cleanly) -->
                     <div x-show="notificationsOpen"
                          class="fixed sm:absolute right-3 sm:right-0 left-3 sm:left-auto top-20 sm:top-auto mt-1 sm:mt-3 sm:w-88 bg-white border border-[#8686AC]/40 rounded-2xl shadow-2xl p-4 space-y-3 z-50"
                          style="display: none;">
                         <div class="flex items-center justify-between pb-2 border-b border-[#8686AC]/30">
-                            <span class="text-xs font-bold text-[#0F0E47]">Admin Alerts</span>
+                            <span class="text-xs font-bold text-[#0F0E47]">Alerts</span>
                             <button type="button"
                                     @click="markAllAlertsRead()"
                                     class="text-[10px] font-bold text-[#505081] hover:text-[#0F0E47] underline">
-                                Mark all read
+                                Clear unread
                             </button>
                         </div>
 
@@ -151,7 +150,7 @@
                             </template>
 
                             <template x-if="adminAlerts.length === 0">
-                                <p class="text-xs text-center text-[#505081] py-5">No active alerts right now.</p>
+                                <p class="text-xs text-center text-[#505081] py-5">Nothing new right now.</p>
                             </template>
                         </div>
                     </div>
@@ -177,19 +176,19 @@
             <!-- VIEW 1: BOOKINGS -->
             <main x-show="currentView === 'bookings'" class="p-4 sm:p-6 lg:p-10 space-y-8">
                 <div class="bg-white backdrop-blur-xl p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
-                    <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Requests &amp; Bookings</h2>
-                    <p class="text-xs text-[#505081]">Click cards to filter requests.</p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Bookings</h2>
+                    <p class="text-xs text-[#505081]">Tap a box to filter requests.</p>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-2">
                         <div @click="filterStatus = 'all'"
                              :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
-                            <span class="text-[10px] font-bold text-[#505081] uppercase">Total</span>
+                            <span class="text-[10px] font-bold text-[#505081] uppercase">All</span>
                             <p class="text-2xl font-extrabold text-[#0F0E47] mt-1" x-text="reservations.length">0</p>
                         </div>
                         <div @click="filterStatus = 'pending'"
                              :class="filterStatus === 'pending' ? 'border-amber-500 bg-amber-50/50' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
-                            <span class="text-[10px] font-bold text-amber-600 uppercase">Pending</span>
+                            <span class="text-[10px] font-bold text-amber-600 uppercase">Waiting</span>
                             <p class="text-2xl font-extrabold text-amber-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'pending').length">0</p>
                         </div>
                         <div @click="filterStatus = 'approved'"
@@ -201,7 +200,7 @@
                         <div @click="filterStatus = 'rejected'"
                              :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
-                            <span class="text-[10px] font-bold text-rose-600 uppercase">Rejected / Cancelled</span>
+                            <span class="text-[10px] font-bold text-rose-600 uppercase">Declined / Cancelled</span>
                             <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => ['rejected', 'cancelled'].includes((r.status || '').toLowerCase())).length">0</p>
                         </div>
                     </div>
@@ -209,16 +208,16 @@
 
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                     <div class="p-5 sm:p-6 border-b border-[#8686AC]/30 flex justify-between items-center">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Reservation List</h3>
-                        <span class="text-xs font-bold text-[#505081]" x-text="'Filter: ' + filterStatus.toUpperCase()"></span>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Requests</h3>
+                        <span class="text-xs font-bold text-[#505081]" x-text="filterStatus.toUpperCase()"></span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[640px]">
                             <thead>
                                 <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase tracking-wider bg-[#F4F5F7]">
-                                    <th class="py-4 px-5">User &amp; Purpose</th>
-                                    <th class="py-4 px-5">Resource &amp; Qty</th>
-                                    <th class="py-4 px-5">Schedule</th>
+                                    <th class="py-4 px-5">Student / Faculty</th>
+                                    <th class="py-4 px-5">Item / Room</th>
+                                    <th class="py-4 px-5">When</th>
                                     <th class="py-4 px-5">Status</th>
                                     <th class="py-4 px-5 text-right">Action</th>
                                 </tr>
@@ -244,7 +243,7 @@
                                                   }"
                                                   x-text="item.status"></span>
                                             <template x-if="item.rejection_reason">
-                                                <p class="text-[10px] text-rose-600 mt-1 italic" x-text="'Reason: ' + item.rejection_reason"></p>
+                                                <p class="text-[10px] text-rose-600 mt-1 italic" x-text="'Note: ' + item.rejection_reason"></p>
                                             </template>
                                         </td>
                                         <td class="py-4 px-5 text-right">
@@ -254,7 +253,7 @@
                                                         @csrf
                                                         <button type="submit" class="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold text-[11px] hover:bg-emerald-800 transition">Approve</button>
                                                     </form>
-                                                    <button type="button" @click="openRejectModal(item.id)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Reject</button>
+                                                    <button type="button" @click="openRejectModal(item.id)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Decline</button>
                                                 </div>
                                             </template>
                                             <template x-if="(item.status || '').toLowerCase() !== 'pending'">
@@ -265,7 +264,7 @@
                                 </template>
                                 <template x-if="filteredReservations.length === 0">
                                     <tr>
-                                        <td colspan="5" class="py-8 text-center text-[#505081] text-xs">No reservations found.</td>
+                                        <td colspan="5" class="py-8 text-center text-[#505081] text-xs">Nothing here yet.</td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -274,25 +273,25 @@
                 </div>
             </main>
 
-            <!-- VIEW 2: INVENTORY -->
+            <!-- VIEW 2: ROOMS & GEAR -->
             <main x-show="currentView === 'inventory'" class="p-4 sm:p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-2">
-                    <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Facility &amp; Stock Inventory</h2>
-                    <p class="text-xs text-[#505081]">Add, edit, or remove rooms and equipment stocks.</p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Rooms &amp; Gear</h2>
+                    <p class="text-xs text-[#505081]">Add, edit, or remove rooms and equipment counts.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                    <!-- Add Facility -->
+                    <!-- Add Room -->
                     <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Add Facility</h3>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">New room or lab</h3>
                         <form action="{{ route('admin.facilities.store') }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Room name</label>
                                 <input type="text" name="name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Max people</label>
                                 <input type="number" name="capacity" min="1" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
@@ -302,21 +301,21 @@
                                     <option value="maintenance">Maintenance</option>
                                 </select>
                             </div>
-                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Facility</button>
+                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Add room</button>
                         </form>
                     </div>
 
-                    <!-- Add Equipment -->
+                    <!-- Add Gear -->
                     <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Add Equipment Stock</h3>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">New equipment</h3>
                         <form action="{{ route('admin.equipment.store') }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">Item name</label>
                                 <input type="text" name="name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-[#505081] mb-1">Quantity</label>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1">How many units</label>
                                 <input type="number" name="total_stock" min="1" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                             </div>
                             <div>
@@ -326,20 +325,20 @@
                                     <option value="unavailable">Unavailable</option>
                                 </select>
                             </div>
-                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Save Equipment</button>
+                            <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">Add item</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Facilities Table -->
+                <!-- Rooms Table -->
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl p-5 sm:p-6 space-y-4">
-                    <h3 class="text-base font-extrabold text-[#0F0E47]">Facilities List</h3>
+                    <h3 class="text-base font-extrabold text-[#0F0E47]">Rooms &amp; Labs</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs min-w-[480px]">
                             <thead>
                                 <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase bg-[#F4F5F7]">
                                     <th class="py-3 px-4">Name</th>
-                                    <th class="py-3 px-4">Capacity</th>
+                                    <th class="py-3 px-4">Limit</th>
                                     <th class="py-3 px-4">Status</th>
                                     <th class="py-3 px-4 text-right">Actions</th>
                                 </tr>
@@ -348,14 +347,14 @@
                                 <template x-for="fac in facilities" :key="fac.id">
                                     <tr class="hover:bg-[#F4F5F7]/50">
                                         <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="fac.name"></td>
-                                        <td class="py-3 px-4" x-text="fac.capacity + ' Persons'"></td>
+                                        <td class="py-3 px-4" x-text="fac.capacity + ' people'"></td>
                                         <td class="py-3 px-4 uppercase font-semibold" x-text="fac.status"></td>
                                         <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
                                             <button type="button" @click="openEditFacility(fac)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
                                             <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Delete facility?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Delete</button>
+                                                <button type="submit" onclick="return confirm('Remove this room?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Remove</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -365,15 +364,15 @@
                     </div>
                 </div>
 
-                <!-- Equipment Table -->
+                <!-- Gear Table -->
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl p-5 sm:p-6 space-y-4">
-                    <h3 class="text-base font-extrabold text-[#0F0E47]">Equipment List</h3>
+                    <h3 class="text-base font-extrabold text-[#0F0E47]">Equipment</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs min-w-[480px]">
                             <thead>
                                 <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase bg-[#F4F5F7]">
                                     <th class="py-3 px-4">Name</th>
-                                    <th class="py-3 px-4">Total Stock</th>
+                                    <th class="py-3 px-4">Count</th>
                                     <th class="py-3 px-4">Status</th>
                                     <th class="py-3 px-4 text-right">Actions</th>
                                 </tr>
@@ -382,14 +381,14 @@
                                 <template x-for="eq in equipment" :key="eq.id">
                                     <tr class="hover:bg-[#F4F5F7]/50">
                                         <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="eq.name"></td>
-                                        <td class="py-3 px-4" x-text="eq.total_stock + ' Units'"></td>
+                                        <td class="py-3 px-4" x-text="eq.total_stock + ' units'"></td>
                                         <td class="py-3 px-4 uppercase font-semibold" x-text="eq.status"></td>
                                         <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
                                             <button type="button" @click="openEditEquipment(eq)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
                                             <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Delete equipment?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Delete</button>
+                                                <button type="submit" onclick="return confirm('Remove this item?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Remove</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -400,12 +399,12 @@
                 </div>
             </main>
 
-            <!-- VIEW 3: USERS -->
+            <!-- VIEW 3: PEOPLE -->
             <main x-show="currentView === 'users'" class="p-4 sm:p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-6">
                     <div>
-                        <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">User Accounts</h2>
-                        <p class="text-xs text-[#505081]">Manage activation status for student and faculty accounts.</p>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">People</h2>
+                        <p class="text-xs text-[#505081]">Enable or pause student and faculty accounts.</p>
                     </div>
                     <div class="divide-y divide-[#8686AC]/20">
                         <template x-for="user in users" :key="user.id">
@@ -415,16 +414,16 @@
                                         <h4 class="text-sm font-bold text-[#0F0E47] truncate" x-text="user.name"></h4>
                                         <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase shrink-0"
                                               :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'"
-                                              x-text="user.is_active ? 'Active' : 'Deactivated'"></span>
+                                              x-text="user.is_active ? 'Active' : 'Paused'"></span>
                                     </div>
-                                    <p class="text-xs text-[#505081] truncate" x-text="user.email + ' | Role: ' + (user.role || 'user')"></p>
+                                    <p class="text-xs text-[#505081] truncate" x-text="user.email + ' • ' + (user.role || 'user')"></p>
                                 </div>
                                 <div class="flex items-center space-x-3 shrink-0">
                                     <form :action="'/admin/users/' + user.id + '/toggle-status'" method="POST">
                                         @csrf
                                         <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition border shadow-sm"
                                                 :class="user.is_active ? 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'"
-                                                x-text="user.is_active ? 'Deactivate' : 'Reactivate'"></button>
+                                                x-text="user.is_active ? 'Pause account' : 'Re-enable'"></button>
                                     </form>
                                 </div>
                             </div>
@@ -433,21 +432,21 @@
                 </div>
             </main>
 
-            <!-- VIEW 4: MESSAGES INBOX (Input Box Visible Without Scrolling on Mobile) -->
+            <!-- VIEW 4: MESSAGES -->
             <main x-show="currentView === 'messages'" class="p-3 sm:p-6 lg:p-10 space-y-3 sm:space-y-6" style="display: none;">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 sm:pb-5">
                     <div class="space-y-0.5">
-                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">SUPPORT &amp; RETURN LOGS</span>
-                        <h2 class="text-xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Messages Inbox</h2>
-                        <p class="hidden sm:block text-xs text-[#505081]">Select a user thread to reply or review automated equipment return logs.</p>
+                        <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Chats</span>
+                        <h2 class="text-xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Messages</h2>
+                        <p class="hidden sm:block text-xs text-[#505081]">Reply to students or check return notes.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">
-                        Live Polling Active
+                        Live
                     </span>
                 </div>
 
                 <div class="h-[calc(100vh-14.5rem)] min-h-[340px] sm:min-h-[540px] lg:h-[580px] grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden">
-                    <!-- User Threads List -->
+                    <!-- Threads List -->
                     <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#8686AC]/30 max-h-24 sm:max-h-36 lg:max-h-none overflow-y-auto divide-y divide-[#8686AC]/20 bg-[#F4F5F7]/40 shrink-0">
                         <template x-for="thread in threads" :key="thread.id">
                             <button type="button" @click="selectThread(thread.id)"
@@ -462,7 +461,7 @@
                             </button>
                         </template>
                         <template x-if="threads.length === 0">
-                            <div class="p-3 text-xs text-center text-[#505081]">No user threads found.</div>
+                            <div class="p-3 text-xs text-center text-[#505081]">No chats yet.</div>
                         </template>
                     </div>
 
@@ -470,7 +469,7 @@
                     <div class="lg:col-span-8 flex-1 flex flex-col min-h-0">
                         <div class="px-4 py-2 sm:px-6 sm:py-3.5 border-b border-[#8686AC]/30 bg-white flex items-center justify-between shrink-0">
                             <div class="min-w-0">
-                                <h3 class="text-xs sm:text-sm font-extrabold text-[#0F0E47] truncate" x-text="selectedThread?.name || 'Select a User Thread'"></h3>
+                                <h3 class="text-xs sm:text-sm font-extrabold text-[#0F0E47] truncate" x-text="selectedThread?.name || 'Pick a chat'"></h3>
                                 <p class="hidden sm:block text-[10px] text-[#505081] truncate" x-text="selectedThread?.email || ''"></p>
                             </div>
                         </div>
@@ -480,7 +479,7 @@
                                 <div>
                                     <template x-if="msg.is_system">
                                         <div class="mx-auto max-w-xl my-1.5 px-3.5 py-2 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs text-center font-medium">
-                                            <span class="font-bold uppercase text-[10px] tracking-wider block mb-0.5">System Return Log</span>
+                                            <span class="font-bold uppercase text-[10px] tracking-wider block mb-0.5">Return Notice</span>
                                             <span x-text="msg.message"></span>
                                         </div>
                                     </template>
@@ -503,14 +502,14 @@
 
                             <template x-if="!activeThreadUserId">
                                 <div class="h-full flex items-center justify-center text-xs text-[#505081]">
-                                    Choose a user on the left to view messages.
+                                    Pick someone on the left to open their chat.
                                 </div>
                             </template>
                         </div>
 
                         <form @submit.prevent="sendAdminMessage()" class="p-2.5 sm:p-4 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 shrink-0">
                             <input type="text" x-model="newAdminMessage" :disabled="!activeThreadUserId || sendingMessage"
-                                   placeholder="Reply to user..."
+                                   placeholder="Write a reply..."
                                    class="flex-1 min-w-0 bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-3.5 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47]">
                             <button type="submit" :disabled="!activeThreadUserId || sendingMessage || !newAdminMessage.trim()"
                                     class="px-4 sm:px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow shrink-0">
@@ -521,19 +520,19 @@
                 </div>
             </main>
 
-            <!-- VIEW 5: REPORTS -->
+            <!-- VIEW 5: LOGS & PDF -->
             <main x-show="currentView === 'reports'" class="p-4 sm:p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <div>
-                            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Reports</h2>
-                            <p class="text-xs text-[#505081]">Export reservation logs and records.</p>
+                            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Logs &amp; PDF</h2>
+                            <p class="text-xs text-[#505081]">Download a PDF copy of all booking records.</p>
                         </div>
-                        <a href="{{ route('admin.reports.pdf') }}" class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Export PDF</a>
+                        <a href="{{ route('admin.reports.pdf') }}" class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Download PDF</a>
                     </div>
                     <div class="bg-[#F4F5F7] p-4 rounded-2xl border border-[#8686AC]/30 flex items-center justify-between">
                         <div>
-                            <span class="text-[10px] font-bold text-[#505081] uppercase">Total Logs</span>
+                            <span class="text-[10px] font-bold text-[#505081] uppercase">Total records</span>
                             <p class="text-xl font-extrabold text-[#0F0E47]" x-text="reservations.length"></p>
                         </div>
                     </div>
@@ -542,44 +541,44 @@
         </div>
     </div>
 
-    <!-- REJECT MODAL -->
+    <!-- DECLINE MODAL -->
     <div x-show="rejectModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
         <div @click.away="rejectModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative">
             <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
-                <h3 class="text-lg font-extrabold text-[#0F0E47]">Rejection Reason Required</h3>
+                <h3 class="text-lg font-extrabold text-[#0F0E47]">Why decline?</h3>
                 <button type="button" @click="rejectModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
             <form :action="'/admin/reservations/' + selectedReservationId + '/reject'" method="POST" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-xs font-semibold text-[#505081] mb-1.5">Reason for Rejection</label>
-                    <textarea name="rejection_reason" rows="4" placeholder="e.g. Schedule conflict / Equipment unavailable..."
+                    <label class="block text-xs font-semibold text-[#505081] mb-1.5">Note for the requester</label>
+                    <textarea name="rejection_reason" rows="4" placeholder="e.g. Room already taken at that hour..."
                               class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" @click="rejectModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
-                    <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition">Confirm Rejection</button>
+                    <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition">Decline request</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- EDIT FACILITY MODAL -->
+    <!-- EDIT ROOM MODAL -->
     <div x-show="editFacilityModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
         <div @click.away="editFacilityModal = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative">
             <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
-                <h3 class="text-lg font-extrabold text-[#0F0E47]">Edit Facility</h3>
+                <h3 class="text-lg font-extrabold text-[#0F0E47]">Edit room</h3>
                 <button type="button" @click="editFacilityModal = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
             <form :action="'/admin/facilities/' + formFacility.id" method="POST" class="space-y-4">
                 @csrf
                 @method('PUT')
                 <div>
-                    <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
+                    <label class="block text-xs font-semibold text-[#505081] mb-1">Room name</label>
                     <input type="text" name="name" x-model="formFacility.name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-[#505081] mb-1">Capacity</label>
+                    <label class="block text-xs font-semibold text-[#505081] mb-1">Max people</label>
                     <input type="number" name="capacity" min="1" x-model="formFacility.capacity" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                 </div>
                 <div>
@@ -597,22 +596,22 @@
         </div>
     </div>
 
-    <!-- EDIT EQUIPMENT MODAL -->
+    <!-- EDIT GEAR MODAL -->
     <div x-show="editEquipmentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
         <div @click.away="editEquipmentModal = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative">
             <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
-                <h3 class="text-lg font-extrabold text-[#0F0E47]">Edit Equipment Stock</h3>
+                <h3 class="text-lg font-extrabold text-[#0F0E47]">Edit equipment</h3>
                 <button type="button" @click="editEquipmentModal = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
             <form :action="'/admin/equipment/' + formEquipment.id" method="POST" class="space-y-4">
                 @csrf
                 @method('PUT')
                 <div>
-                    <label class="block text-xs font-semibold text-[#505081] mb-1">Name</label>
+                    <label class="block text-xs font-semibold text-[#505081] mb-1">Item name</label>
                     <input type="text" name="name" x-model="formEquipment.name" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-[#505081] mb-1">Total Stock</label>
+                    <label class="block text-xs font-semibold text-[#505081] mb-1">How many units</label>
                     <input type="number" name="total_stock" min="1" x-model="formEquipment.total_stock" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-2.5 text-xs text-[#272757]" required>
                 </div>
                 <div>
@@ -649,7 +648,6 @@ document.addEventListener('alpine:init', () => {
         editEquipmentModal: false,
         formEquipment: {},
 
-        // Admin chat & polling state
         currentUserId: {{ Auth::id() ?? 'null' }},
         threads: [],
         activeThreadUserId: null,
@@ -658,7 +656,6 @@ document.addEventListener('alpine:init', () => {
         sendingMessage: false,
         pollTimer: null,
 
-        // Admin notification bell state
         readAlertIds: [],
         dismissedAlertIds: [],
         adminAlerts: [],
@@ -685,29 +682,27 @@ document.addEventListener('alpine:init', () => {
         refreshAdminAlerts() {
             const alerts = [];
 
-            // 1. Pending booking requests
             (this.reservations || [])
                 .filter(r => (r.status || '').toLowerCase() === 'pending')
                 .forEach(r => {
                     alerts.push({
                         id: 'booking-' + r.id,
                         type: 'booking',
-                        badge: 'Pending',
-                        title: (r.user?.name || 'User') + ' • ' + (r.resource_name || 'Resource'),
-                        detail: 'Requesting ' + (r.quantity || 1) + ' unit(s)/slot for ' + (r.start_time || 'scheduled time') + '.',
+                        badge: 'Waiting',
+                        title: (r.user?.name || 'User') + ' • ' + (r.resource_name || 'Item'),
+                        detail: (r.quantity || 1) + ' for ' + (r.start_time || 'selected time'),
                         targetView: 'bookings',
                         filter: 'pending'
                     });
                 });
 
-            // 2. Latest chat / return log messages from threads
             (this.threads || []).forEach(t => {
                 if (!t.last_message) return;
                 const isReturn = Boolean(t.last_is_system);
                 alerts.push({
                     id: 'thread-' + t.id + '-' + encodeURIComponent(t.last_message).slice(-24),
                     type: isReturn ? 'return' : 'chat',
-                    badge: isReturn ? 'Return Log' : 'Message',
+                    badge: isReturn ? 'Returned' : 'Chat',
                     title: t.name + (t.last_time ? ' • ' + t.last_time : ''),
                     detail: t.last_message,
                     targetView: 'messages',
