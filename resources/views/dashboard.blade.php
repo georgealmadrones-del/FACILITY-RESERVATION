@@ -66,7 +66,7 @@
                                 :class="currentView === 'support-chat' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                                 class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border transition text-xs font-semibold">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-                            <span>Ask custodian</span>
+                            <span>Ask admin</span>
                         </button>
                     </nav>
                 </div>
@@ -75,16 +75,17 @@
 
         <!-- Sidebar Footer -->
         <div class="pt-6 border-t border-[#8686AC]/30 flex items-center justify-between">
-            <div class="flex items-center space-x-3 min-w-0">
+            <div @click="currentView = 'profile'; profileTab = 'overview'; mobileMenuOpen = false;"
+                 class="flex items-center space-x-3 min-w-0 cursor-pointer group">
                 <div class="w-8 h-8 shrink-0 rounded-xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-bold text-xs text-[#0F0E47] overflow-hidden">
                     @if(Auth::user()->profile_photo ?? false)
-                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="w-full h-full object-cover">
+                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                     @else
                         {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
                     @endif
                 </div>
                 <div class="overflow-hidden">
-                    <span class="font-bold text-xs text-[#0F0E47] truncate block">{{ Auth::user()->name ?? 'User' }}</span>
+                    <span class="font-bold text-xs text-[#0F0E47] group-hover:underline truncate block">{{ Auth::user()->name ?? 'User' }}</span>
                     <span class="text-[10px] text-[#505081] truncate block capitalize">{{ Auth::user()->role ?? 'Student' }}</span>
                 </div>
             </div>
@@ -278,7 +279,7 @@
                         <div class="flex items-center space-x-4 relative z-10">
                             <div class="w-14 h-14 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-lg text-[#0F0E47] shadow-inner overflow-hidden">
                                 @if(Auth::user()->profile_photo ?? false)
-                                    <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                                 @else
                                     {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
                                 @endif
@@ -319,7 +320,7 @@
                                     Edit profile
                                 </button>
                                 <button type="button" @click="currentView = 'support-chat'; fetchMessages();" class="w-full py-1.5 px-3 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-[11px] font-semibold rounded-xl border border-[#8686AC]/30 transition block text-center">
-                                    Message custodian
+                                    Message admin
                                 </button>
                             </div>
                         </div>
@@ -409,7 +410,7 @@
                         <div class="space-y-1">
                             <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Booking Form</span>
                             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Book a room or item</h2>
-                            <p class="text-xs text-[#505081]">Pick your date, time (up to 8:00 PM), and count before sending your request.</p>
+                            <p class="text-xs text-[#505081]">Pick your date, time, and count before sending your request.</p>
                         </div>
                     </div>
 
@@ -475,7 +476,7 @@
                             <div class="space-y-6 pt-6 border-t border-[#8686AC]/30">
                                 <div class="flex items-center justify-between gap-2 flex-wrap">
                                     <h3 class="text-base font-extrabold text-[#0F0E47]">Date &amp; Time</h3>
-                                    <span class="text-[11px] font-bold text-[#505081]">Now: <span x-text="currentTimeHHMM"></span> &bull; Latest end: 20:00 (8:00 PM)</span>
+                                    <span class="text-[11px] font-bold text-[#505081]">Now: <span x-text="currentTimeHHMM"></span></span>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                     <div class="bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30">
@@ -507,7 +508,7 @@
 
                                     <div class="space-y-4 bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30 h-full flex flex-col justify-between">
                                         <div class="space-y-3">
-                                            <span class="text-[10px] font-bold text-[#0F0E47] uppercase tracking-widest block mb-3">Time (Max 20:00)</span>
+                                            <span class="text-[10px] font-bold text-[#0F0E47] uppercase tracking-widest block mb-3">Time</span>
                                             <div>
                                                 <label class="block text-[11px] font-semibold text-[#505081] mb-1">Start</label>
                                                 <input type="time"
@@ -518,7 +519,7 @@
                                                        class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
                                             </div>
                                             <div>
-                                                <label class="block text-[11px] font-semibold text-[#505081] mb-1">End (up to 8:00 PM)</label>
+                                                <label class="block text-[11px] font-semibold text-[#505081] mb-1">End</label>
                                                 <input type="time"
                                                        x-model="endTime"
                                                        @change="formError = ''"
@@ -569,7 +570,7 @@
                                         : equipmentQuantity + ' / ' + currentAvailableEquipmentStock + ' left'"></span>
                                 </p>
                             </div>
-                            <p class="text-[11px] text-[#505081]">Open until 8:00 PM (20:00). The custodian will review your request.</p>
+                            <p class="text-[11px] text-[#505081]">The admin will review your request.</p>
                         </div>
                     </div>
                 </form>
@@ -689,7 +690,7 @@
                     <div class="flex items-center space-x-5">
                         <div class="w-16 h-16 rounded-2xl bg-[#F4F5F7] flex items-center justify-center font-extrabold border border-[#8686AC]/40 text-xl text-[#0F0E47] overflow-hidden shadow-inner">
                             @if(Auth::user()->profile_photo ?? false)
-                                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="w-full h-full object-cover">
+                                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                             @else
                                 {{ strtoupper(substr(Auth::user()->name ?? 'JD', 0, 2)) }}
                             @endif
@@ -723,7 +724,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-[#505081] mb-1">Photo</label>
-                                    <input type="file" name="profile_photo" class="w-full text-xs text-[#505081] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0F0E47] file:text-white hover:file:bg-[#272757]">
+                                    <input type="file" name="profile_photo" accept="image/*" class="w-full text-xs text-[#505081] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0F0E47] file:text-white hover:file:bg-[#272757]">
                                 </div>
                                 <button type="submit" class="px-5 py-2.5 bg-[#0F0E47] hover:bg-[#272757] text-white text-xs font-bold rounded-xl transition shadow">
                                     Save changes
@@ -804,13 +805,13 @@
                 </div>
             </main>
 
-            <!-- VIEW 5: ASK CUSTODIAN -->
+            <!-- VIEW 5: ASK ADMIN -->
             <main x-show="currentView === 'support-chat'" class="p-3 sm:p-6 lg:p-10 space-y-3 sm:space-y-6" style="display: none;">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 sm:pb-5">
                     <div class="space-y-0.5">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Office Chat</span>
-                        <h2 class="text-xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Ask custodian</h2>
-                        <p class="hidden sm:block text-xs text-[#505081]">Send a note to the custodian or check return updates.</p>
+                        <h2 class="text-xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Ask admin</h2>
+                        <p class="hidden sm:block text-xs text-[#505081]">Send a note to the admin or check return updates.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">
                         Live
@@ -1264,7 +1265,7 @@ document.addEventListener('alpine:init', () => {
                         id: 'chat-reply-' + latestOtherMsg.id,
                         type: 'chat',
                         badge: 'Reply',
-                        title: (latestOtherMsg.sender?.name || 'Custodian') + ' messaged you',
+                        title: (latestOtherMsg.sender?.name || 'Admin') + ' messaged you',
                         detail: latestOtherMsg.message,
                         targetView: 'support-chat'
                     });

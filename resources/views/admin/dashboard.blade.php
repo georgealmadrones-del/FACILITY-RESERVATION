@@ -11,7 +11,7 @@
            class="fixed inset-y-0 left-0 z-50 w-64 shrink-0 border-r border-[#8686AC]/30 bg-white h-full p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out md:static md:z-40 shadow-2xl md:shadow-sm overflow-y-auto">
         <div class="space-y-8">
             <div class="flex items-center justify-between px-2 pt-2">
-                <span class="text-[10px] font-bold text-rose-600 uppercase tracking-widest block">Custodian</span>
+                <span class="text-[10px] font-bold text-rose-600 uppercase tracking-widest block">Admin</span>
                 <button type="button"
                         @click="mobileMenuOpen = false"
                         class="md:hidden text-[#505081] hover:text-[#0F0E47] font-bold text-lg leading-none"
@@ -101,7 +101,7 @@
             </div>
 
             <div class="flex items-center space-x-3 sm:space-x-4 shrink-0">
-                <span class="hidden sm:inline text-xs font-bold text-[#505081]">Custodian Desk</span>
+                <span class="hidden sm:inline text-xs font-bold text-[#505081]">Admin Desk</span>
 
                 <!-- Notification Bell -->
                 <div class="relative" @click.away="notificationsOpen = false">
