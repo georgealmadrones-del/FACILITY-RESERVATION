@@ -108,12 +108,56 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
                 </button>
-                <div class="relative w-full">
-                    <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-[#505081]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" x-model="searchQuery"
+
+                <!-- Functional Search Bar with Live Dropdown -->
+                <div class="relative w-full" @click.away="searchDropdownOpen = false">
+                    <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-[#505081] pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text"
+                           x-model="searchQuery"
+                           @focus="searchDropdownOpen = true"
+                           @input="searchDropdownOpen = true"
+                           @keydown.enter.prevent="submitTopSearch()"
                            placeholder="Search rooms, labs, or equipment..."
-                           class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl pl-10 pr-12 py-2.5 text-xs text-[#272757] focus:outline-none focus:border-[#505081] transition placeholder-[#505081]/60">
+                           class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl pl-10 pr-14 py-2.5 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47] transition placeholder-[#505081]/60">
+                    <button type="button"
+                            x-show="searchQuery.trim().length > 0"
+                            @click="searchQuery = ''; searchDropdownOpen = false;"
+                            class="absolute right-10 top-2.5 text-xs font-bold text-[#505081] hover:text-[#0F0E47] px-1.5"
+                            aria-label="Clear search">&times;</button>
                     <span class="hidden sm:inline absolute right-3 top-2.5 text-[10px] font-mono text-[#505081] bg-white px-1.5 py-0.5 rounded border border-[#8686AC]/30">HK</span>
+
+                    <div x-show="searchDropdownOpen && searchQuery.trim().length > 0"
+                         class="fixed sm:absolute left-3 right-3 sm:left-0 sm:right-0 top-20 sm:top-full mt-1 sm:mt-2 bg-white border border-[#8686AC]/40 rounded-2xl shadow-2xl overflow-hidden z-50"
+                         style="display: none;">
+                        <div class="max-h-72 overflow-y-auto divide-y divide-[#8686AC]/20">
+                            <template x-for="item in quickSearchResults" :key="item.id">
+                                <button type="button"
+                                        @click="pickSearchResult(item)"
+                                        class="w-full px-4 py-3 text-left hover:bg-[#F4F5F7] transition flex items-center justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-bold text-[#0F0E47] truncate" x-text="item.name"></p>
+                                        <p class="text-[10px] text-[#505081] truncate" x-text="item.type + ' • ' + item.capacity"></p>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-[#0F0E47] bg-[#F4F5F7] border border-[#8686AC]/30 px-2.5 py-1 rounded-lg shrink-0">
+                                        Book &rarr;
+                                    </span>
+                                </button>
+                            </template>
+
+                            <template x-if="quickSearchResults.length === 0">
+                                <div class="px-4 py-5 text-center text-xs text-[#505081]">
+                                    No matching rooms, labs, or equipment for "<span class="font-bold text-[#0F0E47]" x-text="searchQuery"></span>".
+                                </div>
+                            </template>
+                        </div>
+
+                        <button type="button"
+                                @click="submitTopSearch()"
+                                class="w-full px-4 py-2.5 bg-[#F4F5F7] hover:bg-[#8686AC]/20 border-t border-[#8686AC]/30 text-[11px] font-bold text-[#0F0E47] flex items-center justify-between">
+                            <span>View all matches in Availability Calendar</span>
+                            <span>&rarr;</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -876,6 +920,7 @@ document.addEventListener('alpine:init', () => {
         return {
             activeTab: 'all',
             searchQuery: '',
+            searchDropdownOpen: false,
             currentView: 'overview',
             profileTab: 'overview',
             notificationsOpen: false,
@@ -1215,6 +1260,30 @@ document.addEventListener('alpine:init', () => {
                     event.preventDefault();
                     this.formError = `Quantity exceeds available equipment stock (${this.currentEquipmentStock}).`;
                 }
+            },
+            get quickSearchResults() {
+                const q = this.searchQuery.trim().toLowerCase();
+                if (!q) return [];
+                return this.resources
+                    .filter(item =>
+                        item.name.toLowerCase().includes(q) ||
+                        item.type.toLowerCase().includes(q) ||
+                        item.capacity.toLowerCase().includes(q)
+                    )
+                    .slice(0, 6);
+            },
+            pickSearchResult(item) {
+                this.selectResourceForBooking(item);
+                this.searchDropdownOpen = false;
+                this.mobileMenuOpen = false;
+                this.currentView = 'new-reservation';
+                this.bookingStep = 1;
+            },
+            submitTopSearch() {
+                this.searchDropdownOpen = false;
+                this.mobileMenuOpen = false;
+                this.activeTab = 'all';
+                this.currentView = 'availability-calendar';
             },
             get filteredResources() {
                 return this.resources.filter(item => {
