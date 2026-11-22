@@ -39,9 +39,9 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute(): ?string
     {
-        $photo =$this->profile_photo;
+        $photo = $this->profile_photo;
 
-        if (!is_string($photo) \vert{}\vert{} trim($photo) === '') {
+        if (!is_string($photo) || trim($photo) === '') {
             return null;
         }
 
