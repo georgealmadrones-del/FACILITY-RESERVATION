@@ -81,6 +81,7 @@
                     <span class="text-[10px] text-rose-600 truncate block font-bold">Edit photo</span>
                 </div>
             </button>
+
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" title="Log out" class="text-[#505081] hover:text-rose-600 transition shrink-0">
@@ -195,7 +196,6 @@
                 <div class="bg-white backdrop-blur-xl p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
                     <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Bookings</h2>
                     <p class="text-xs text-[#505081]">Tap a box to filter requests.</p>
-
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-2">
                         <div @click="filterStatus = 'all'"
                              :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'"
@@ -232,7 +232,6 @@
                         <h3 class="text-sm font-extrabold text-[#0F0E47]">Requests</h3>
                         <span class="text-xs font-bold text-[#505081]" x-text="filterStatus.toUpperCase()"></span>
                     </div>
-
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[640px]">
                             <thead>
@@ -442,7 +441,7 @@
                 <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-6">
                     <div>
                         <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">People</h2>
-                        <p class="text-xs text-[#505081]">View user photos or enable and pause student and faculty accounts.</p>
+                        <p class="text-xs text-[#505081]">View user photos or deactivate and reactivate student and faculty accounts.</p>
                     </div>
 
                     <div class="divide-y divide-[#8686AC]/20">
@@ -459,13 +458,12 @@
                                             <span x-text="initials(user.name)"></span>
                                         </template>
                                     </button>
-
                                     <div class="space-y-1 min-w-0">
                                         <div class="flex items-center space-x-2.5 flex-wrap">
                                             <h4 class="text-sm font-bold text-[#0F0E47] truncate" x-text="user.name"></h4>
                                             <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase shrink-0"
                                                   :class="user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'"
-                                                  x-text="user.is_active ? 'Active' : 'Paused'"></span>
+                                                  x-text="user.is_active ? 'Active' : 'Inactive'"></span>
                                         </div>
                                         <p class="text-xs text-[#505081] truncate" x-text="user.email + ' • ' + (user.role || 'user')"></p>
                                     </div>
@@ -477,7 +475,7 @@
                                         <button type="submit"
                                                 class="px-4 py-2 rounded-xl text-xs font-bold transition border shadow-sm"
                                                 :class="user.is_active ? 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'"
-                                                x-text="user.is_active ? 'Pause account' : 'Re-enable'"></button>
+                                                x-text="user.is_active ? 'Deactivate' : 'Reactivate'"></button>
                                     </form>
                                 </div>
                             </div>
@@ -557,7 +555,6 @@
                                             <span x-text="msg.message"></span>
                                         </div>
                                     </template>
-
                                     <template x-if="!msg.is_system">
                                         <div class="flex items-end gap-2" :class="msg.sender_id === currentUserId ? 'justify-end' : 'justify-start'">
                                             <template x-if="msg.sender_id !== currentUserId">
@@ -570,7 +567,6 @@
                                                     </template>
                                                 </div>
                                             </template>
-
                                             <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
                                                 <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-2.5 rounded-2xl text-xs shadow-sm"
                                                      :class="msg.sender_id === currentUserId
@@ -586,7 +582,6 @@
                                     </template>
                                 </div>
                             </template>
-
                             <template x-if="!activeThreadUserId">
                                 <div class="h-full flex items-center justify-center text-xs text-[#505081]">
                                     Pick someone on the left to open their chat.
@@ -619,9 +614,8 @@
                             <p class="text-xs text-[#505081]">Download a PDF copy of all booking records.</p>
                         </div>
                         <a href="{{ route('admin.reports.pdf') }}"
-                           class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Download PDF</a>
+                           class="px-5 py-2.5 bg-[#0F0E47] text-white shadow-lg hover:bg-[#272757] text-xs font-bold rounded-xl transition">Download PDF</a>
                     </div>
-
                     <div class="bg-[#F4F5F7] p-4 rounded-2xl border border-[#8686AC]/30 flex items-center justify-between">
                         <div>
                             <span class="text-[10px] font-bold text-[#505081] uppercase">Total records</span>
@@ -640,6 +634,7 @@
                 <h3 class="text-lg font-extrabold text-[#0F0E47]">Admin profile</h3>
                 <button type="button" @click="adminProfileModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
+
             <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div class="flex items-center gap-4">
