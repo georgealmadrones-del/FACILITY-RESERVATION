@@ -78,8 +78,8 @@
             <div @click="currentView = 'profile'; profileTab = 'overview'; mobileMenuOpen = false;"
                  class="flex items-center space-x-3 min-w-0 cursor-pointer group">
                 <div class="w-8 h-8 shrink-0 rounded-xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-bold text-xs text-[#0F0E47] overflow-hidden">
-                    @if(Auth::user()->profile_photo ?? false)
-                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
+                    @if(Auth::user()->avatar_url ?? false)
+                        <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                     @else
                         {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
                     @endif
@@ -279,8 +279,8 @@
                         <div class="absolute top-0 right-0 w-32 h-32 bg-[#8686AC]/10 rounded-full blur-2xl pointer-events-none"></div>
                         <div class="flex items-center space-x-4 relative z-10">
                             <div class="w-14 h-14 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-lg text-[#0F0E47] shadow-inner overflow-hidden">
-                                @if(Auth::user()->profile_photo ?? false)
-                                    <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
+                                @if(Auth::user()->avatar_url ?? false)
+                                    <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                                 @else
                                     {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
                                 @endif
@@ -486,14 +486,11 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                     <div class="bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30">
                                         <div class="flex items-center justify-between mb-4">
-                                            <button type="button"
-                                                    @click="prevMonth()"
-                                                    :disabled="!canGoPrevMonth"
+                                            <button type="button" @click="prevMonth()" :disabled="!canGoPrevMonth"
                                                     :class="!canGoPrevMonth ? 'opacity-40 cursor-not-allowed' : 'hover:text-[#0F0E47]'"
                                                     class="text-[#505081] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&larr;</button>
                                             <span class="text-xs font-extrabold text-[#0F0E47]" x-text="monthName + ' ' + currentYear"></span>
-                                            <button type="button"
-                                                    @click="nextMonth()"
+                                            <button type="button" @click="nextMonth()"
                                                     class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&rarr;</button>
                                         </div>
 
@@ -506,14 +503,14 @@
                                                 <div></div>
                                             </template>
                                             <template x-for="day in daysInMonth" :key="day">
-                                                <button type="button"
-                                                        @click="selectDate(day)" :disabled="isPastDay(day)"
+                                                <button type="button" @click="selectDate(day)" :disabled="isPastDay(day)"
                                                         :class="isPastDay(day)
                                                             ? 'bg-zinc-200/60 text-zinc-400 cursor-not-allowed line-through'
                                                             : (selectedDay === day && currentMonth === activeCalendarMonth && currentYear === activeCalendarYear
                                                                 ? 'bg-[#0F0E47] text-white font-extrabold shadow-md'
                                                                 : 'bg-white text-[#272757] hover:bg-[#8686AC]/20 border border-[#8686AC]/30')"
-                                                        class="h-8 rounded-lg flex items-center justify-center transition" x-text="day"></button>
+                                                        class="h-8 rounded-lg flex items-center justify-center transition"
+                                                        x-text="day"></button>
                                             </template>
                                         </div>
                                     </div>
@@ -523,20 +520,14 @@
                                             <span class="text-[10px] font-bold text-[#0F0E47] uppercase tracking-widest block mb-3">Time</span>
                                             <div>
                                                 <label class="block text-[11px] font-semibold text-[#505081] mb-1">Start</label>
-                                                <input type="time"
-                                                       x-model="startTime"
-                                                       @change="formError = ''"
-                                                       :min="formattedDate === todayISO ? currentTimeHHMM : '00:00'"
-                                                       max="19:59"
+                                                <input type="time" x-model="startTime" @change="formError = ''"
+                                                       :min="formattedDate === todayISO ? currentTimeHHMM : '00:00'" max="19:59"
                                                        class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
                                             </div>
                                             <div>
                                                 <label class="block text-[11px] font-semibold text-[#505081] mb-1">End</label>
-                                                <input type="time"
-                                                       x-model="endTime"
-                                                       @change="formError = ''"
-                                                       :min="startTime || '00:00'"
-                                                       max="20:00"
+                                                <input type="time" x-model="endTime" @change="formError = ''"
+                                                       :min="startTime || '00:00'" max="20:00"
                                                        class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
                                             </div>
                                         </div>
@@ -548,7 +539,7 @@
                                     <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-900 space-y-1">
                                         <p class="font-bold">Other bookings on <span x-text="formattedDate"></span>:</p>
                                         <template x-for="b in conflictingBookings" :key="b.id">
-                                            <p class="text-[11px]" x-text="b.resource_name + ' (' + extractTimeHHMM(b.start_time) + ' - ' + extractTimeHHMM(b.end_time) + ') [' + b.status + '] • Qty: ' + (b.quantity || 1)"></p>
+                                            <p class="text-[11px]" x-text="b.resource_name + ' (' + extractTimeHHMM(b.start_time) + '-' + extractTimeHHMM(b.end_time) + ') (' + b.status + ') • Qty: ' + (b.quantity || 1)"></p>
                                         </template>
                                     </div>
                                 </template>
@@ -557,10 +548,8 @@
 
                                 <div>
                                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">What is it for?</label>
-                                    <textarea name="purpose"
-                                              placeholder="e.g. Group study, class film shoot, org meeting..." x-model="purposeReason" rows="3"
-                                              class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]"
-                                              required></textarea>
+                                    <textarea name="purpose" placeholder="e.g. Group study, class film shoot, org meeting..." x-model="purposeReason" rows="3"
+                                              class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                                 </div>
                             </div>
 
@@ -580,7 +569,7 @@
                                 <p><strong>Time:</strong> <span x-text="startTime + ' to ' + endTime"></span></p>
                                 <p><strong>Count:</strong>
                                     <span x-text="resourceType === 'facility'
-                                        ? expectedAttendees + (currentFacilityCapacity > 0 ? ' / ' + currentFacilityCapacity + ' people' : ' people')
+                                        ? expectedAttendees + ' / ' + (currentFacilityCapacity > 0 ? currentFacilityCapacity + ' people' : 'people')
                                         : equipmentQuantity + ' / ' + currentAvailableEquipmentStock + ' left'"></span>
                                 </p>
                             </div>
@@ -591,27 +580,23 @@
             </main>
 
             <!-- VIEW 3: SCHEDULE & ROOMS (LIVE AVAILABILITY) -->
-            <main x-show="currentView === 'availability-calendar'"
-                  class="p-6 lg:p-10 space-y-8" style="display: none;">
+            <main x-show="currentView === 'availability-calendar'" class="p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#8686AC]/30 pb-6">
                     <div class="space-y-1">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Live Check</span>
                         <h2 class="text-3xl font-extrabold text-[#0F0E47] tracking-tight">Schedule &amp; Rooms</h2>
                         <p class="text-xs text-[#505081]">Check live status—available, under maintenance, or already booked for your time slot.</p>
                     </div>
-
                     <div class="flex flex-wrap items-center gap-2">
                         <label class="text-xs font-bold text-[#505081]">Date:</label>
                         <input type="date" x-model="availabilityFilterDate" :min="todayISO"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs font-bold text-[#0F0E47]">
                         <input type="time" x-model="availabilityFilterStart"
-                               :min="availabilityFilterDate === todayISO ? currentTimeHHMM : '00:00'"
-                               max="19:59"
+                               :min="availabilityFilterDate === todayISO ? currentTimeHHMM : '00:00'" max="19:59"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0F0E47]">
                         <span class="text-xs text-[#505081] font-bold">-</span>
                         <input type="time" x-model="availabilityFilterEnd"
-                               :min="availabilityFilterStart || '00:00'"
-                               max="20:00"
+                               :min="availabilityFilterStart || '00:00'" max="20:00"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0F0E47]">
                     </div>
                 </div>
@@ -703,7 +688,7 @@
                                             ? 'bg-[#0F0E47] hover:bg-[#272757] text-white cursor-pointer'
                                             : 'bg-zinc-200 text-zinc-500 cursor-not-allowed'"
                                         class="w-full py-2.5 text-xs font-bold rounded-xl transition block text-center shadow-lg"
-                                        x-text="getLiveAvailability(item).bookable ? 'Book this →' : getLiveAvailability(item).disabledText"></button>
+                                        x-text="getLiveAvailability(item).bookable ? 'Book this' : getLiveAvailability(item).disabledText"></button>
                             </div>
                         </div>
                     </template>
@@ -715,8 +700,8 @@
                 <div class="bg-white backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div class="flex items-center space-x-5">
                         <div class="w-16 h-16 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-xl text-[#0F0E47] overflow-hidden shadow-inner">
-                            @if(Auth::user()->profile_photo ?? false)
-                                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
+                            @if(Auth::user()->avatar_url ?? false)
+                                <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                             @else
                                 {{ strtoupper(substr(Auth::user()->name ?? 'JD', 0, 2)) }}
                             @endif
@@ -729,15 +714,19 @@
                 </div>
 
                 <div class="flex space-x-6 border-b border-[#8686AC]/30 text-xs font-bold">
-                    <button type="button" @click="profileTab = 'overview'" :class="profileTab === 'overview' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Account &amp; Password</button>
-                    <button type="button" @click="profileTab = 'history'" :class="profileTab === 'history' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'" class="transition">Past bookings &amp; Returns</button>
+                    <button type="button" @click="profileTab = 'overview'"
+                            :class="profileTab === 'overview' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'"
+                            class="transition">Account &amp; Password</button>
+                    <button type="button" @click="profileTab = 'history'"
+                            :class="profileTab === 'history' ? 'text-[#0F0E47] border-b-2 border-[#0F0E47] pb-3 -mb-px' : 'text-[#505081] hover:text-[#0F0E47] pb-3'"
+                            class="transition">Past bookings &amp; Returns</button>
                 </div>
 
                 <div x-show="profileTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <div class="lg:col-span-6 space-y-6">
                         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 space-y-6 shadow-sm">
                             <h3 class="text-sm font-extrabold text-[#0F0E47]">Profile details</h3>
-                            <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                            <form action="{{ route('profile.photo.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                                 @csrf
                                 @method('patch')
                                 <div>
@@ -795,19 +784,18 @@
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
                     <h3 class="text-lg font-extrabold text-[#0F0E47]">All bookings</h3>
                     <p class="text-xs text-[#505081]">Click a booking to cancel a pending request or return borrowed equipment.</p>
-
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
                                 <div @click="selectedReservation = item; detailsModalOpen = true;" class="p-5 flex items-center justify-between hover:bg-[#F4F5F7] transition cursor-pointer">
-                                    <div>
+                                    <div class="gap-2 flex-wrap">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <h4 class="text-sm font-bold text-[#0F0E47]" x-text="item.resource_name"></h4>
                                             <template x-if="isOverdueEquipment(item)">
                                                 <span class="px-2 py-0.5 text-[9px] font-extrabold rounded-full bg-rose-50 text-rose-700 border border-rose-300 uppercase">Return Due</span>
                                             </template>
                                         </div>
-                                        <p class="text-xs text-[#505081] mt-0.5" x-text="(item.resource_type || '') + ' • ' + (item.purpose || '')"></p>
+                                        <p class="text-xs text-[#505081] mt-0.5" x-text="(item.resource_type || '') + (item.purpose ? ' • ' + item.purpose : '')"></p>
                                         <template x-if="item.rejection_reason">
                                             <p class="text-[11px] text-rose-600 mt-1 italic" x-text="'Note: ' + item.rejection_reason"></p>
                                         </template>
@@ -855,7 +843,6 @@
                                         <span x-text="msg.message"></span>
                                     </div>
                                 </template>
-
                                 <template x-if="!msg.is_system">
                                     <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
                                         <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-2.5 rounded-2xl text-xs shadow-sm"
@@ -871,7 +858,6 @@
                                 </template>
                             </div>
                         </template>
-
                         <template x-if="chatMessages.length === 0">
                             <div class="h-full flex items-center justify-center text-xs text-[#505081]">
                                 No messages yet. Write below to start.
@@ -962,8 +948,7 @@
                     </template>
                 </div>
 
-                <button type="button" @click="detailsModalOpen = false"
-                        class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
+                <button type="button" @click="detailsModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
                     Done
                 </button>
             </div>
@@ -985,13 +970,11 @@ document.addEventListener('alpine:init', () => {
                 day: d.getDate()
             };
         };
-
         const getFacilityCap = (f) => {
             const val = f?.capacity ?? f?.max_capacity ?? f?.seats ?? f?.pax ?? 0;
             const num = Number(val);
             return Number.isFinite(num) && num > 0 ? num : 0;
         };
-
         const initialNow = getNowParts();
         const MAX_BOOKING_END = '20:00';
         const MAX_BOOKING_START = '19:59';
@@ -1079,11 +1062,9 @@ document.addEventListener('alpine:init', () => {
                 this.refreshStudentAlerts();
                 this.fetchMessages();
                 this.syncLiveDashboardData();
-
                 this.clockTimer = setInterval(() => {
                     this.refreshClock();
                 }, 15000);
-
                 this.pollTimer = setInterval(() => {
                     this.fetchMessages();
                     this.refreshStudentAlerts();
@@ -1188,10 +1169,8 @@ document.addEventListener('alpine:init', () => {
                 if (!booking || !dateStr) return false;
                 const status = String(booking.status || '').trim().toLowerCase();
                 if (['rejected', 'cancelled', 'returned'].includes(status)) return false;
-
                 const bookingDate = this.extractDateISO(booking.start_time) || this.extractDateISO(booking.end_time);
                 if (bookingDate !== dateStr) return false;
-
                 const bStart = this.extractTimeHHMM(booking.start_time);
                 const bEnd = this.extractTimeHHMM(booking.end_time) || bStart;
                 if (!bStart || !startHHMM || !endHHMM) return true;
@@ -1239,13 +1218,12 @@ document.addEventListener('alpine:init', () => {
                         badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-300',
                         detail: `Open on ${dateStr} (${startHHMM}-${endHHMM}) • ${capText}`,
                         bookable: true,
-                        disabledText: 'Book this →'
+                        disabledText: 'Book this'
                     };
                 }
 
                 const reservedUnits = overlapping.reduce((sum, b) => sum + Number(b.quantity || 1), 0);
                 const leftUnits = Math.max(0, Number(item.stockNumber || 0) - reservedUnits);
-
                 if (leftUnits <= 0) {
                     return {
                         label: 'BOOKED OUT',
@@ -1255,7 +1233,6 @@ document.addEventListener('alpine:init', () => {
                         disabledText: 'None left'
                     };
                 }
-
                 return {
                     label: reservedUnits > 0 ? 'LIMITED' : 'AVAILABLE',
                     badgeClass: reservedUnits > 0
@@ -1263,7 +1240,7 @@ document.addEventListener('alpine:init', () => {
                         : 'bg-emerald-50 text-emerald-700 border-emerald-300',
                     detail: `${leftUnits} of ${item.stockNumber} left on ${dateStr} (${startHHMM}-${endHHMM})` + (reservedUnits > 0 ? ` • ${reservedUnits} booked` : ''),
                     bookable: true,
-                    disabledText: 'Book this →'
+                    disabledText: 'Book this'
                 };
             },
 
@@ -1300,7 +1277,6 @@ document.addEventListener('alpine:init', () => {
                         reservationId: item.id
                     });
                 });
-
                 (this.rawNotifications || []).forEach(n => {
                     alerts.push({
                         id: 'db-notif-' + n.id,
@@ -1311,11 +1287,9 @@ document.addEventListener('alpine:init', () => {
                         targetView: 'overview'
                     });
                 });
-
                 const latestOtherMsg = [...(this.chatMessages || [])]
                     .reverse()
                     .find(m => !m.is_system && Number(m.sender_id) !== Number(this.currentUserId));
-
                 if (latestOtherMsg) {
                     alerts.push({
                         id: 'chat-reply-' + latestOtherMsg.id,
@@ -1326,7 +1300,6 @@ document.addEventListener('alpine:init', () => {
                         targetView: 'support-chat'
                     });
                 }
-
                 this.studentAlerts = alerts.slice(0, 12);
             },
 
@@ -1505,7 +1478,9 @@ document.addEventListener('alpine:init', () => {
 
             get approvalRateText() {
                 if (!this.recentReservations.length) return '0%';
-                const approvedCount = this.recentReservations.filter(r => ['approved', 'returned'].includes((r.status || '').toLowerCase())).length;
+                const approvedCount = this.recentReservations.filter(r =>
+                    ['approved', 'returned'].includes((r.status || '').toLowerCase())
+                ).length;
                 return Math.round((approvedCount / this.recentReservations.length) * 100) + '%';
             },
 
@@ -1522,43 +1497,36 @@ document.addEventListener('alpine:init', () => {
             validateBeforeSubmit(event) {
                 this.refreshClock();
                 this.formError = '';
-
                 if (this.formattedDate < this.todayISO) {
                     event.preventDefault();
                     this.formError = 'Pick today or a future date.';
                     return;
                 }
-
                 if (this.formattedDate === this.todayISO && this.startTime < this.currentTimeHHMM) {
                     event.preventDefault();
                     this.formError = `Start time (${this.startTime}) has already passed today. Current time is ${this.currentTimeHHMM}.`;
                     return;
                 }
-
                 if (this.startTime >= MAX_BOOKING_END) {
                     event.preventDefault();
                     this.formError = 'Cannot book starting at or past 8:00 PM (20:00).';
                     return;
                 }
-
                 if (this.endTime > MAX_BOOKING_END) {
                     event.preventDefault();
                     this.formError = 'Bookings cannot go past 8:00 PM (20:00).';
                     return;
                 }
-
                 if (this.endTime <= this.startTime) {
                     event.preventDefault();
                     this.formError = 'End time needs to be after start time.';
                     return;
                 }
-
                 if (this.resourceType === 'facility' && this.currentFacilityCapacity > 0 && Number(this.expectedAttendees) > this.currentFacilityCapacity) {
                     event.preventDefault();
                     this.formError = `Too many people for this room (max ${this.currentFacilityCapacity}).`;
                     return;
                 }
-
                 if (this.resourceType === 'equipment') {
                     if (this.currentAvailableEquipmentStock <= 0) {
                         event.preventDefault();
@@ -1577,10 +1545,7 @@ document.addEventListener('alpine:init', () => {
                 const q = this.searchQuery.trim().toLowerCase();
                 if (!q) return [];
                 return this.resources
-                    .filter(item =>
-                        item.name.toLowerCase().includes(q) ||
-                        item.type.toLowerCase().includes(q)
-                    )
+                    .filter(item => item.name.toLowerCase().includes(q) || item.type.toLowerCase().includes(q))
                     .slice(0, 6);
             },
 
@@ -1602,7 +1567,7 @@ document.addEventListener('alpine:init', () => {
 
             get filteredResources() {
                 return this.resources.filter(item => {
-                    const matchesCategory = (this.activeTab === 'all' || item.category === this.activeTab);
+                    const matchesCategory = this.activeTab === 'all' || item.category === this.activeTab;
                     const matchesSearch = this.searchQuery === '' ||
                         item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                         item.type.toLowerCase().includes(this.searchQuery.toLowerCase());
