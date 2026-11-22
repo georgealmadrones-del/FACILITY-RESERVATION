@@ -57,11 +57,12 @@ class ReservationController extends Controller
 
         $qtyText = $reservation->quantity ? " (Qty: {$reservation->quantity})" : '';
         $itemName = $reservation->resource_name ?? 'unit';
+        $userName = auth()->user()->name ?? 'User';
 
         Message::create([
             'user_id'   => $reservation->user_id,
             'sender_id' => auth()->id(),
-            'message'   => "System Log: {$authUserName = auth()->user()->name} returned {$itemName}{$qtyText} for Reservation #{$reservation->id}.",
+            'message'   => "System Log: {$userName} returned {$itemName}{$qtyText} for Reservation #{$reservation->id}.",
             'is_system' => true,
         ]);
 
