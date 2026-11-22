@@ -129,7 +129,6 @@
                                 Clear unread
                             </button>
                         </div>
-
                         <div class="space-y-2 max-h-72 overflow-y-auto rounded-xl bg-[#F4F5F7] p-1.5">
                             <template x-for="alert in adminAlerts" :key="alert.id">
                                 <button type="button"
@@ -148,7 +147,6 @@
                                     <p class="text-[11px] text-[#505081] leading-snug" x-text="alert.detail"></p>
                                 </button>
                             </template>
-
                             <template x-if="adminAlerts.length === 0">
                                 <p class="text-xs text-center text-[#505081] py-5">Nothing new right now.</p>
                             </template>
@@ -178,6 +176,7 @@
                 <div class="bg-white backdrop-blur-xl p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
                     <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Bookings</h2>
                     <p class="text-xs text-[#505081]">Tap a box to filter requests.</p>
+
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-2">
                         <div @click="filterStatus = 'all'"
                              :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'"
@@ -185,18 +184,21 @@
                             <span class="text-[10px] font-bold text-[#505081] uppercase">All</span>
                             <p class="text-2xl font-extrabold text-[#0F0E47] mt-1" x-text="reservations.length">0</p>
                         </div>
+
                         <div @click="filterStatus = 'pending'"
                              :class="filterStatus === 'pending' ? 'border-amber-500 bg-amber-50/50' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                             <span class="text-[10px] font-bold text-amber-600 uppercase">Waiting</span>
                             <p class="text-2xl font-extrabold text-amber-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'pending').length">0</p>
                         </div>
+
                         <div @click="filterStatus = 'approved'"
                              :class="filterStatus === 'approved' ? 'border-emerald-500 bg-emerald-50/50' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                             <span class="text-[10px] font-bold text-emerald-600 uppercase">Approved</span>
                             <p class="text-2xl font-extrabold text-emerald-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'approved').length">0</p>
                         </div>
+
                         <div @click="filterStatus = 'rejected'"
                              :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
@@ -211,6 +213,7 @@
                         <h3 class="text-sm font-extrabold text-[#0F0E47]">Requests</h3>
                         <span class="text-xs font-bold text-[#505081]" x-text="filterStatus.toUpperCase()"></span>
                     </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[640px]">
                             <thead>
@@ -231,9 +234,9 @@
                                         </td>
                                         <td class="py-4 px-5">
                                             <span class="font-bold text-[#0F0E47] block" x-text="item.resource_name"></span>
-                                            <span class="text-[10px] text-[#505081]" x-text="item.resource_type + ' (' + item.quantity + ')'"></span>
+                                            <span class="text-[10px] text-[#505081]" x-text="item.resource_type + ' (' + (item.quantity || 1) + ')'"></span>
                                         </td>
-                                        <td class="py-4 px-5 text-[#272757] font-medium" x-text="(item.start_time || '') + ' - ' + (item.end_time || '')"></td>
+                                        <td class="py-4 px-5 text-[#272757] font-medium" x-text="(item.start_time || '') + ' to ' + (item.end_time || '')"></td>
                                         <td class="py-4 px-5">
                                             <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border uppercase inline-block"
                                                   :class="{
@@ -253,7 +256,9 @@
                                                         @csrf
                                                         <button type="submit" class="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold text-[11px] hover:bg-emerald-800 transition">Approve</button>
                                                     </form>
-                                                    <button type="button" @click="openRejectModal(item.id)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Decline</button>
+                                                    <button type="button"
+                                                            @click="openRejectModal(item.id)"
+                                                            class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Decline</button>
                                                 </div>
                                             </template>
                                             <template x-if="(item.status || '').toLowerCase() !== 'pending'">
@@ -347,14 +352,17 @@
                                 <template x-for="fac in facilities" :key="fac.id">
                                     <tr class="hover:bg-[#F4F5F7]/50">
                                         <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="fac.name"></td>
-                                        <td class="py-3 px-4" x-text="fac.capacity + ' people'"></td>
+                                        <td class="py-3 px-4" x-text="(fac.capacity ?? 0) + ' people'"></td>
                                         <td class="py-3 px-4 uppercase font-semibold" x-text="fac.status"></td>
                                         <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
-                                            <button type="button" @click="openEditFacility(fac)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
-                                            <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline">
+                                            <button type="button"
+                                                    @click="openEditFacility(fac)"
+                                                    class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
+                                            <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline"
+                                                  onsubmit="return confirm('Remove this room?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Remove this room?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Remove</button>
+                                                <button type="submit" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Remove</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -381,14 +389,17 @@
                                 <template x-for="eq in equipment" :key="eq.id">
                                     <tr class="hover:bg-[#F4F5F7]/50">
                                         <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="eq.name"></td>
-                                        <td class="py-3 px-4" x-text="eq.total_stock + ' units'"></td>
+                                        <td class="py-3 px-4" x-text="(eq.total_stock ?? 0) + ' units'"></td>
                                         <td class="py-3 px-4 uppercase font-semibold" x-text="eq.status"></td>
                                         <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
-                                            <button type="button" @click="openEditEquipment(eq)" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
-                                            <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline">
+                                            <button type="button"
+                                                    @click="openEditEquipment(eq)"
+                                                    class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
+                                            <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline"
+                                                  onsubmit="return confirm('Remove this item?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Remove this item?')" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Remove</button>
+                                                <button type="submit" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Remove</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -406,6 +417,7 @@
                         <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">People</h2>
                         <p class="text-xs text-[#505081]">Enable or pause student and faculty accounts.</p>
                     </div>
+
                     <div class="divide-y divide-[#8686AC]/20">
                         <template x-for="user in users" :key="user.id">
                             <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -418,10 +430,12 @@
                                     </div>
                                     <p class="text-xs text-[#505081] truncate" x-text="user.email + ' • ' + (user.role || 'user')"></p>
                                 </div>
+
                                 <div class="flex items-center space-x-3 shrink-0">
                                     <form :action="'/admin/users/' + user.id + '/toggle-status'" method="POST">
                                         @csrf
-                                        <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition border shadow-sm"
+                                        <button type="submit"
+                                                class="px-4 py-2 rounded-xl text-xs font-bold transition border shadow-sm"
                                                 :class="user.is_active ? 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'"
                                                 x-text="user.is_active ? 'Pause account' : 'Re-enable'"></button>
                                     </form>
@@ -432,12 +446,12 @@
                 </div>
             </main>
 
-            <!-- VIEW 4: MESSAGES -->
-            <main x-show="currentView === 'messages'" class="p-3 sm:p-6 lg:p-10 space-y-3 sm:space-y-6" style="display: none;">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 sm:pb-5">
+            <!-- VIEW 4: MESSAGES (PC-VISIBLE CHAT BAR) -->
+            <main x-show="currentView === 'messages'" class="p-3 sm:p-5 lg:px-8 lg:py-6 flex flex-col gap-3 sm:gap-4" style="display: none;">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 shrink-0">
                     <div class="space-y-0.5">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Chats</span>
-                        <h2 class="text-xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Messages</h2>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47] tracking-tight">Messages</h2>
                         <p class="hidden sm:block text-xs text-[#505081]">Reply to students or check return notes.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">
@@ -445,19 +459,19 @@
                     </span>
                 </div>
 
-                <div class="h-[calc(100vh-14.5rem)] min-h-[340px] sm:min-h-[540px] lg:h-[580px] grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden">
+                <div class="h-[calc(100vh-14.5rem)] min-h-[340px] grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden">
                     <!-- Threads List -->
-                    <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#8686AC]/30 max-h-24 sm:max-h-36 lg:max-h-none overflow-y-auto divide-y divide-[#8686AC]/20 bg-[#F4F5F7]/40 shrink-0">
+                    <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#8686AC]/30 max-h-28 sm:max-h-36 lg:max-h-full overflow-y-auto divide-y divide-[#8686AC]/20 bg-[#F4F5F7]/40 shrink-0">
                         <template x-for="thread in threads" :key="thread.id">
-                            <button type="button" @click="selectThread(thread.id)"
+                            <button type="button"
+                                    @click="selectThread(thread.id)"
                                     :class="activeThreadUserId === thread.id ? 'bg-[#0F0E47] text-white' : 'hover:bg-white text-[#272757]'"
                                     class="w-full px-3.5 py-2 sm:p-4 text-left transition flex flex-col gap-0.5">
                                 <div class="flex items-center justify-between gap-2">
                                     <span class="text-xs font-bold truncate" x-text="thread.name"></span>
                                     <span class="text-[9px] opacity-75 shrink-0" x-text="thread.last_time || ''"></span>
                                 </div>
-                                <p class="text-[11px] truncate opacity-80"
-                                   x-text="thread.last_message || 'No messages yet'"></p>
+                                <p class="text-[11px] truncate opacity-80" x-text="thread.last_message || 'No messages yet'"></p>
                             </button>
                         </template>
                         <template x-if="threads.length === 0">
@@ -467,14 +481,14 @@
 
                     <!-- Active Conversation -->
                     <div class="lg:col-span-8 flex-1 flex flex-col min-h-0">
-                        <div class="px-4 py-2 sm:px-6 sm:py-3.5 border-b border-[#8686AC]/30 bg-white flex items-center justify-between shrink-0">
+                        <div class="px-4 py-2 sm:px-6 sm:py-3 border-b border-[#8686AC]/30 bg-white flex items-center justify-between shrink-0">
                             <div class="min-w-0">
                                 <h3 class="text-xs sm:text-sm font-extrabold text-[#0F0E47] truncate" x-text="selectedThread?.name || 'Pick a chat'"></h3>
                                 <p class="hidden sm:block text-[10px] text-[#505081] truncate" x-text="selectedThread?.email || ''"></p>
                             </div>
                         </div>
 
-                        <div id="admin-chat-feed" class="flex-1 min-h-0 p-3 sm:p-6 overflow-y-auto space-y-2.5 bg-[#F4F5F7]/50">
+                        <div id="admin-chat-feed" class="flex-1 min-h-0 p-3 sm:p-5 overflow-y-auto space-y-2.5 bg-[#F4F5F7]/50">
                             <template x-for="msg in threadMessages" :key="msg.id">
                                 <div>
                                     <template x-if="msg.is_system">
@@ -486,7 +500,7 @@
 
                                     <template x-if="!msg.is_system">
                                         <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
-                                            <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-3 rounded-2xl text-xs shadow-sm"
+                                            <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-2.5 rounded-2xl text-xs shadow-sm"
                                                  :class="msg.sender_id === currentUserId
                                                      ? 'bg-[#0F0E47] text-white rounded-br-sm'
                                                      : 'bg-white text-[#272757] border border-[#8686AC]/30 rounded-bl-sm'">
@@ -507,11 +521,14 @@
                             </template>
                         </div>
 
-                        <form @submit.prevent="sendAdminMessage()" class="p-2.5 sm:p-4 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 shrink-0">
-                            <input type="text" x-model="newAdminMessage" :disabled="!activeThreadUserId || sendingMessage"
+                        <form @submit.prevent="sendAdminMessage()" class="p-2.5 sm:p-3.5 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 shrink-0">
+                            <input type="text"
+                                   x-model="newAdminMessage"
+                                   :disabled="!activeThreadUserId || sendingMessage"
                                    placeholder="Write a reply..."
                                    class="flex-1 min-w-0 bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-3.5 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47]">
-                            <button type="submit" :disabled="!activeThreadUserId || sendingMessage || !newAdminMessage.trim()"
+                            <button type="submit"
+                                    :disabled="!activeThreadUserId || sendingMessage || !newAdminMessage.trim()"
                                     class="px-4 sm:px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow shrink-0">
                                 Send
                             </button>
@@ -528,8 +545,10 @@
                             <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Logs &amp; PDF</h2>
                             <p class="text-xs text-[#505081]">Download a PDF copy of all booking records.</p>
                         </div>
-                        <a href="{{ route('admin.reports.pdf') }}" class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Download PDF</a>
+                        <a href="{{ route('admin.reports.pdf') }}"
+                           class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Download PDF</a>
                     </div>
+
                     <div class="bg-[#F4F5F7] p-4 rounded-2xl border border-[#8686AC]/30 flex items-center justify-between">
                         <div>
                             <span class="text-[10px] font-bold text-[#505081] uppercase">Total records</span>
@@ -552,7 +571,8 @@
                 @csrf
                 <div>
                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">Note for the requester</label>
-                    <textarea name="rejection_reason" rows="4" placeholder="e.g. Room already taken at that hour..."
+                    <textarea name="rejection_reason" rows="4"
+                              placeholder="e.g. Room already taken at that hour..."
                               class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
@@ -647,7 +667,6 @@ document.addEventListener('alpine:init', () => {
         formFacility: {},
         editEquipmentModal: false,
         formEquipment: {},
-
         currentUserId: {{ Auth::id() ?? 'null' }},
         threads: [],
         activeThreadUserId: null,
@@ -655,7 +674,6 @@ document.addEventListener('alpine:init', () => {
         newAdminMessage: '',
         sendingMessage: false,
         pollTimer: null,
-
         readAlertIds: [],
         dismissedAlertIds: [],
         adminAlerts: [],
@@ -666,10 +684,8 @@ document.addEventListener('alpine:init', () => {
             } catch (e) {
                 this.readAlertIds = [];
             }
-
             this.refreshAdminAlerts();
             this.fetchThreads();
-
             this.pollTimer = setInterval(() => {
                 this.fetchThreads();
                 this.refreshAdminAlerts();
@@ -681,7 +697,6 @@ document.addEventListener('alpine:init', () => {
 
         refreshAdminAlerts() {
             const alerts = [];
-
             (this.reservations || [])
                 .filter(r => (r.status || '').toLowerCase() === 'pending')
                 .forEach(r => {
@@ -736,10 +751,8 @@ document.addEventListener('alpine:init', () => {
                     localStorage.setItem('admin_read_alerts', JSON.stringify(this.readAlertIds));
                 } catch (e) {}
             }
-
             this.notificationsOpen = false;
             this.mobileMenuOpen = false;
-
             if (alert.targetView === 'bookings') {
                 this.currentView = 'bookings';
                 if (alert.filter) this.filterStatus = alert.filter;
@@ -806,7 +819,6 @@ document.addEventListener('alpine:init', () => {
             const text = this.newAdminMessage.trim();
             if (!text || !this.activeThreadUserId || this.sendingMessage) return;
             this.sendingMessage = true;
-
             try {
                 const res = await fetch('{{ route('chat.store') }}', {
                     method: 'POST',

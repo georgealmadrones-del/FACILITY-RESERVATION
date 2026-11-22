@@ -36,7 +36,7 @@
                             <span class="text-[10px] bg-[#8686AC]/20 px-1.5 py-0.5 rounded font-mono">+</span>
                         </button>
 
-                        <button type="button" @click="currentView = 'availability-calendar'; mobileMenuOpen = false;"
+                        <button type="button" @click="currentView = 'availability-calendar'; syncLiveDashboardData(); mobileMenuOpen = false;"
                                 :class="currentView === 'availability-calendar' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                                 class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border transition text-xs font-semibold">
                             <svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -148,14 +148,12 @@
                                     </span>
                                 </button>
                             </template>
-
                             <template x-if="quickSearchResults.length === 0">
                                 <div class="px-4 py-5 text-center text-xs text-[#505081]">
                                     Nothing matched "<span class="font-bold text-[#0F0E47]" x-text="searchQuery"></span>".
                                 </div>
                             </template>
                         </div>
-
                         <button type="button"
                                 @click="submitTopSearch()"
                                 class="w-full px-4 py-2.5 bg-[#F4F5F7] hover:bg-[#8686AC]/20 border-t border-[#8686AC]/30 text-[11px] font-bold text-[#0F0E47] flex items-center justify-between">
@@ -195,7 +193,8 @@
                         </div>
                         <div class="space-y-2 max-h-72 overflow-y-auto rounded-xl bg-[#F4F5F7] p-1.5">
                             <template x-for="alert in studentAlerts" :key="alert.id">
-                                <button type="button" @click="handleStudentAlertClick(alert)"
+                                <button type="button"
+                                        @click="handleStudentAlertClick(alert)"
                                         class="w-full text-left p-2.5 rounded-xl bg-white hover:bg-[#F4F5F7]/80 border border-[#8686AC]/30 transition space-y-1 block">
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="text-[11px] font-bold text-[#0F0E47] truncate" x-text="alert.title"></span>
@@ -246,7 +245,9 @@
                             Tap an item to open and return it:
                             <template x-for="(item, idx) in overdueEquipmentReservations" :key="item.id">
                                 <span>
-                                    <button type="button" @click="selectedReservation = item; detailsModalOpen = true;" class="underline font-bold hover:text-amber-950" x-text="item.resource_name"></button><span x-show="idx < overdueEquipmentReservations.length - 1">, </span>
+                                    <button type="button"
+                                            @click="selectedReservation = item; detailsModalOpen = true;"
+                                            class="underline font-bold hover:text-amber-950" x-text="item.resource_name"></button><span x-show="idx < overdueEquipmentReservations.length - 1">, </span>
                                 </span>
                             </template>
                         </p>
@@ -339,6 +340,7 @@
                             <span>&rarr;</span>
                         </button>
                     </div>
+
                     <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
@@ -440,6 +442,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">
                                                 How many people? (Limit: <span x-text="currentFacilityCapacity || 'Not set'"></span>)
@@ -461,6 +464,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">
                                                 How many units? (<span x-text="currentAvailableEquipmentStock"></span> left for this slot, <span x-text="currentEquipmentStock"></span> total)
@@ -478,24 +482,32 @@
                                     <h3 class="text-base font-extrabold text-[#0F0E47]">Date &amp; Time</h3>
                                     <span class="text-[11px] font-bold text-[#505081]">Now: <span x-text="currentTimeHHMM"></span></span>
                                 </div>
+
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                     <div class="bg-[#F4F5F7] p-5 rounded-2xl border border-[#8686AC]/30">
                                         <div class="flex items-center justify-between mb-4">
-                                            <button type="button" @click="prevMonth()" :disabled="!canGoPrevMonth"
+                                            <button type="button"
+                                                    @click="prevMonth()"
+                                                    :disabled="!canGoPrevMonth"
                                                     :class="!canGoPrevMonth ? 'opacity-40 cursor-not-allowed' : 'hover:text-[#0F0E47]'"
                                                     class="text-[#505081] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&larr;</button>
                                             <span class="text-xs font-extrabold text-[#0F0E47]" x-text="monthName + ' ' + currentYear"></span>
-                                            <button type="button" @click="nextMonth()" class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&rarr;</button>
+                                            <button type="button"
+                                                    @click="nextMonth()"
+                                                    class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&rarr;</button>
                                         </div>
+
                                         <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-[#505081] font-semibold mb-2">
                                             <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
                                         </div>
+
                                         <div class="grid grid-cols-7 gap-1 text-center text-xs">
                                             <template x-for="i in firstDayIndex" :key="'empty-' + i">
                                                 <div></div>
                                             </template>
                                             <template x-for="day in daysInMonth" :key="day">
-                                                <button type="button" @click="selectDate(day)" :disabled="isPastDay(day)"
+                                                <button type="button"
+                                                        @click="selectDate(day)" :disabled="isPastDay(day)"
                                                         :class="isPastDay(day)
                                                             ? 'bg-zinc-200/60 text-zinc-400 cursor-not-allowed line-through'
                                                             : (selectedDay === day && currentMonth === activeCalendarMonth && currentYear === activeCalendarYear
@@ -536,7 +548,7 @@
                                     <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-900 space-y-1">
                                         <p class="font-bold">Other bookings on <span x-text="formattedDate"></span>:</p>
                                         <template x-for="b in conflictingBookings" :key="b.id">
-                                            <p class="text-[11px]" x-text="b.resource_name + ' (' + b.start_time + ' - ' + b.end_time + ') [' + b.status + ']'"></p>
+                                            <p class="text-[11px]" x-text="b.resource_name + ' (' + extractTimeHHMM(b.start_time) + ' - ' + extractTimeHHMM(b.end_time) + ') [' + b.status + '] • Qty: ' + (b.quantity || 1)"></p>
                                         </template>
                                     </div>
                                 </template>
@@ -545,8 +557,10 @@
 
                                 <div>
                                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">What is it for?</label>
-                                    <textarea name="purpose" placeholder="e.g. Group study, class film shoot, org meeting..." x-model="purposeReason" rows="3"
-                                              class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
+                                    <textarea name="purpose"
+                                              placeholder="e.g. Group study, class film shoot, org meeting..." x-model="purposeReason" rows="3"
+                                              class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]"
+                                              required></textarea>
                                 </div>
                             </div>
 
@@ -577,13 +591,15 @@
             </main>
 
             <!-- VIEW 3: SCHEDULE & ROOMS (LIVE AVAILABILITY) -->
-            <main x-show="currentView === 'availability-calendar'" class="p-6 lg:p-10 space-y-8" style="display: none;">
+            <main x-show="currentView === 'availability-calendar'"
+                  class="p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#8686AC]/30 pb-6">
                     <div class="space-y-1">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Live Check</span>
                         <h2 class="text-3xl font-extrabold text-[#0F0E47] tracking-tight">Schedule &amp; Rooms</h2>
                         <p class="text-xs text-[#505081]">Check live status—available, under maintenance, or already booked for your time slot.</p>
                     </div>
+
                     <div class="flex flex-wrap items-center gap-2">
                         <label class="text-xs font-bold text-[#505081]">Date:</label>
                         <input type="date" x-model="availabilityFilterDate" :min="todayISO"
@@ -619,8 +635,8 @@
                                 <template x-for="slot in bookedSlotsForDate" :key="slot.id">
                                     <tr>
                                         <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="slot.resource_name"></td>
-                                        <td class="py-3 px-4" x-text="slot.start_time + ' - ' + slot.end_time"></td>
-                                        <td class="py-3 px-4" x-text="slot.quantity"></td>
+                                        <td class="py-3 px-4" x-text="extractTimeHHMM(slot.start_time) + ' - ' + extractTimeHHMM(slot.end_time)"></td>
+                                        <td class="py-3 px-4" x-text="(slot.quantity || 1) + ((slot.resource_type || '').toLowerCase() === 'equipment' ? ' unit(s)' : ' people')"></td>
                                         <td class="py-3 px-4">
                                             <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border uppercase"
                                                   :class="{
@@ -643,10 +659,18 @@
                 </div>
 
                 <div class="flex space-x-2 border-b border-[#8686AC]/30 pb-3 overflow-x-auto text-xs font-bold">
-                    <button type="button" @click="activeTab = 'all'" :class="activeTab === 'all' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'" class="px-4 py-2 rounded-xl transition">Everything</button>
-                    <button type="button" @click="activeTab = 'rooms'" :class="activeTab === 'rooms' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'" class="px-4 py-2 rounded-xl transition">Rooms</button>
-                    <button type="button" @click="activeTab = 'labs'" :class="activeTab === 'labs' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'" class="px-4 py-2 rounded-xl transition">Labs</button>
-                    <button type="button" @click="activeTab = 'equipment'" :class="activeTab === 'equipment' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'" class="px-4 py-2 rounded-xl transition">Equipment</button>
+                    <button type="button" @click="activeTab = 'all'"
+                            :class="activeTab === 'all' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'"
+                            class="px-4 py-2 rounded-xl transition">Everything</button>
+                    <button type="button" @click="activeTab = 'rooms'"
+                            :class="activeTab === 'rooms' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'"
+                            class="px-4 py-2 rounded-xl transition">Rooms</button>
+                    <button type="button" @click="activeTab = 'labs'"
+                            :class="activeTab === 'labs' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'"
+                            class="px-4 py-2 rounded-xl transition">Labs</button>
+                    <button type="button" @click="activeTab = 'equipment'"
+                            :class="activeTab === 'equipment' ? 'bg-[#0F0E47] text-white border border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] bg-white border border-[#8686AC]/30'"
+                            class="px-4 py-2 rounded-xl transition">Equipment</button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -662,6 +686,7 @@
                                           x-text="getLiveAvailability(item).label"></span>
                                 </div>
                             </div>
+
                             <div class="p-6 space-y-4">
                                 <div>
                                     <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block" x-text="item.type"></span>
@@ -669,6 +694,7 @@
                                     <p class="text-xs text-[#505081] mt-1 font-semibold" x-text="getLiveAvailability(item).detail"></p>
                                 </div>
                             </div>
+
                             <div class="p-6 pt-0 space-y-4">
                                 <button type="button"
                                         :disabled="!getLiveAvailability(item).bookable"
@@ -688,7 +714,7 @@
             <main x-show="currentView === 'profile'" class="p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div class="flex items-center space-x-5">
-                        <div class="w-16 h-16 rounded-2xl bg-[#F4F5F7] flex items-center justify-center font-extrabold border border-[#8686AC]/40 text-xl text-[#0F0E47] overflow-hidden shadow-inner">
+                        <div class="w-16 h-16 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-xl text-[#0F0E47] overflow-hidden shadow-inner">
                             @if(Auth::user()->profile_photo ?? false)
                                 <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                             @else
@@ -769,6 +795,7 @@
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
                     <h3 class="text-lg font-extrabold text-[#0F0E47]">All bookings</h3>
                     <p class="text-xs text-[#505081]">Click a booking to cancel a pending request or return borrowed equipment.</p>
+
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
@@ -780,7 +807,7 @@
                                                 <span class="px-2 py-0.5 text-[9px] font-extrabold rounded-full bg-rose-50 text-rose-700 border border-rose-300 uppercase">Return Due</span>
                                             </template>
                                         </div>
-                                        <p class="text-xs text-[#505081] mt-0.5" x-text="item.resource_type + ' • ' + item.purpose"></p>
+                                        <p class="text-xs text-[#505081] mt-0.5" x-text="(item.resource_type || '') + ' • ' + (item.purpose || '')"></p>
                                         <template x-if="item.rejection_reason">
                                             <p class="text-[11px] text-rose-600 mt-1 italic" x-text="'Note: ' + item.rejection_reason"></p>
                                         </template>
@@ -805,12 +832,12 @@
                 </div>
             </main>
 
-            <!-- VIEW 5: ASK ADMIN -->
-            <main x-show="currentView === 'support-chat'" class="p-3 sm:p-6 lg:p-10 space-y-3 sm:space-y-6" style="display: none;">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 sm:pb-5">
+            <!-- VIEW 5: ASK ADMIN (PC-VISIBLE CHAT BAR) -->
+            <main x-show="currentView === 'support-chat'" class="p-3 sm:p-5 lg:px-8 lg:py-6 flex flex-col gap-3 sm:gap-4" style="display: none;">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 shrink-0">
                     <div class="space-y-0.5">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Office Chat</span>
-                        <h2 class="text-xl sm:text-3xl font-extrabold text-[#0F0E47] tracking-tight">Ask admin</h2>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47] tracking-tight">Ask admin</h2>
                         <p class="hidden sm:block text-xs text-[#505081]">Send a note to the admin or check return updates.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">
@@ -818,8 +845,8 @@
                     </span>
                 </div>
 
-                <div class="bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden flex flex-col h-[calc(100vh-12rem)] min-h-[340px] sm:h-[520px]">
-                    <div id="user-chat-feed" class="flex-1 min-h-0 p-3 sm:p-6 overflow-y-auto space-y-2.5 bg-[#F4F5F7]/50">
+                <div class="bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden flex flex-col h-[calc(100vh-14.5rem)] min-h-[340px]">
+                    <div id="user-chat-feed" class="flex-1 min-h-0 p-3 sm:p-5 overflow-y-auto space-y-2.5 bg-[#F4F5F7]/50">
                         <template x-for="msg in chatMessages" :key="msg.id">
                             <div>
                                 <template x-if="msg.is_system">
@@ -831,7 +858,7 @@
 
                                 <template x-if="!msg.is_system">
                                     <div class="flex flex-col" :class="msg.sender_id === currentUserId ? 'items-end' : 'items-start'">
-                                        <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-3 rounded-2xl text-xs shadow-sm"
+                                        <div class="max-w-[85%] sm:max-w-md px-3.5 py-2 sm:py-2.5 rounded-2xl text-xs shadow-sm"
                                              :class="msg.sender_id === currentUserId
                                                  ? 'bg-[#0F0E47] text-white rounded-br-sm'
                                                  : 'bg-white text-[#272757] border border-[#8686AC]/30 rounded-bl-sm'">
@@ -852,7 +879,7 @@
                         </template>
                     </div>
 
-                    <form @submit.prevent="sendMessage()" class="p-2.5 sm:p-4 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 shrink-0">
+                    <form @submit.prevent="sendMessage()" class="p-2.5 sm:p-3.5 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 shrink-0">
                         <input type="text" x-model="newChatMessage" :disabled="sendingMessage"
                                placeholder="Write a message..."
                                class="flex-1 min-w-0 bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-3.5 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47]" required>
@@ -934,7 +961,9 @@
                         </form>
                     </template>
                 </div>
-                <button type="button" @click="detailsModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
+
+                <button type="button" @click="detailsModalOpen = false"
+                        class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
                     Done
                 </button>
             </div>
@@ -956,11 +985,13 @@ document.addEventListener('alpine:init', () => {
                 day: d.getDate()
             };
         };
+
         const getFacilityCap = (f) => {
             const val = f?.capacity ?? f?.max_capacity ?? f?.seats ?? f?.pax ?? 0;
             const num = Number(val);
             return Number.isFinite(num) && num > 0 ? num : 0;
         };
+
         const initialNow = getNowParts();
         const MAX_BOOKING_END = '20:00';
         const MAX_BOOKING_START = '19:59';
@@ -1003,7 +1034,6 @@ document.addEventListener('alpine:init', () => {
             rawNotifications: @json($notifications ?? []),
             facilitiesData: facilitiesList,
             equipmentData: equipmentList,
-
             currentUserId: {{ Auth::id() ?? 'null' }},
             chatMessages: [],
             newChatMessage: '',
@@ -1044,7 +1074,6 @@ document.addEventListener('alpine:init', () => {
                 } catch (e) {
                     this.readStudentAlertIds = [];
                 }
-
                 this.refreshClock();
                 this.syncTimeToNowIfToday();
                 this.refreshStudentAlerts();
@@ -1124,17 +1153,44 @@ document.addEventListener('alpine:init', () => {
                 } catch (e) {}
             },
 
+            extractDateISO(dtStr) {
+                if (!dtStr) return '';
+                const s = String(dtStr).trim();
+                const isoMatch = s.match(/(\d{4}-\d{2}-\d{2})/);
+                if (isoMatch) return isoMatch[1];
+                const parsed = new Date(s);
+                if (!Number.isNaN(parsed.getTime())) {
+                    return `${parsed.getFullYear()}-${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())}`;
+                }
+                return '';
+            },
+
             extractTimeHHMM(dtStr) {
                 if (!dtStr) return '';
-                const m = String(dtStr).match(/(\d{2}:\d{2})/);
-                return m ? m[1] : '';
+                const s = String(dtStr).trim();
+                const m24 = s.match(/(?:T|\s|^)(\d{1,2}:\d{2})(?::\d{2})?(?:\s*(AM|PM))?$/i);
+                if (m24) {
+                    let [hh, mm] = m24[1].split(':').map(Number);
+                    const mer = (m24[2] || '').toUpperCase();
+                    if (mer === 'PM' && hh < 12) hh += 12;
+                    if (mer === 'AM' && hh === 12) hh = 0;
+                    return `${pad(hh)}:${pad(mm)}`;
+                }
+                const mAny = s.match(/(\d{2}:\d{2})/);
+                return mAny ? mAny[1] : '';
+            },
+
+            sameName(a, b) {
+                return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
             },
 
             overlapsWindow(booking, dateStr, startHHMM, endHHMM) {
-                if (!booking) return false;
-                const status = (booking.status || '').toLowerCase();
+                if (!booking || !dateStr) return false;
+                const status = String(booking.status || '').trim().toLowerCase();
                 if (['rejected', 'cancelled', 'returned'].includes(status)) return false;
-                if (!String(booking.start_time || '').startsWith(dateStr)) return false;
+
+                const bookingDate = this.extractDateISO(booking.start_time) || this.extractDateISO(booking.end_time);
+                if (bookingDate !== dateStr) return false;
 
                 const bStart = this.extractTimeHHMM(booking.start_time);
                 const bEnd = this.extractTimeHHMM(booking.end_time) || bStart;
@@ -1160,14 +1216,16 @@ document.addEventListener('alpine:init', () => {
                 }
 
                 const overlapping = (this.recentReservations || []).filter(r =>
-                    r.resource_name === item.name &&
+                    this.sameName(r.resource_name, item.name) &&
                     this.overlapsWindow(r, dateStr, startHHMM, endHHMM)
                 );
 
                 if (item.kind === 'facility') {
                     const capText = item.capacityNumber > 0 ? `Up to ${item.capacityNumber} people` : 'Capacity not set';
                     if (overlapping.length > 0) {
-                        const slotText = overlapping.map(b => `${this.extractTimeHHMM(b.start_time)}-${this.extractTimeHHMM(b.end_time)} (${b.status})`).join(', ');
+                        const slotText = overlapping.map(b =>
+                            `${this.extractTimeHHMM(b.start_time)}-${this.extractTimeHHMM(b.end_time)} (${b.status})`
+                        ).join(', ');
                         return {
                             label: 'BOOKED',
                             badgeClass: 'bg-rose-50 text-rose-700 border-rose-300',
@@ -1181,7 +1239,7 @@ document.addEventListener('alpine:init', () => {
                         badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-300',
                         detail: `Open on ${dateStr} (${startHHMM}-${endHHMM}) • ${capText}`,
                         bookable: true,
-                        disabledText: 'Book this'
+                        disabledText: 'Book this →'
                     };
                 }
 
@@ -1192,7 +1250,7 @@ document.addEventListener('alpine:init', () => {
                     return {
                         label: 'BOOKED OUT',
                         badgeClass: 'bg-rose-50 text-rose-700 border-rose-300',
-                        detail: `0 of ${item.stockNumber} left on ${dateStr} (${reservedUnits} taken)`,
+                        detail: `0 of ${item.stockNumber} left on ${dateStr} (${startHHMM}-${endHHMM}) • ${reservedUnits} booked`,
                         bookable: false,
                         disabledText: 'None left'
                     };
@@ -1203,9 +1261,9 @@ document.addEventListener('alpine:init', () => {
                     badgeClass: reservedUnits > 0
                         ? 'bg-sky-50 text-sky-800 border-sky-300'
                         : 'bg-emerald-50 text-emerald-700 border-emerald-300',
-                    detail: `${leftUnits} of ${item.stockNumber} left on ${dateStr} (${startHHMM}-${endHHMM})`,
+                    detail: `${leftUnits} of ${item.stockNumber} left on ${dateStr} (${startHHMM}-${endHHMM})` + (reservedUnits > 0 ? ` • ${reservedUnits} booked` : ''),
                     bookable: true,
-                    disabledText: 'Book this'
+                    disabledText: 'Book this →'
                 };
             },
 
@@ -1221,7 +1279,6 @@ document.addEventListener('alpine:init', () => {
                 const isEq = (item.resource_type || '').toLowerCase() === 'equipment';
                 const isApproved = (item.status || '').toLowerCase() === 'approved';
                 if (!isEq || !isApproved) return false;
-
                 const endDt = this.parseScheduleDate(item.end_time) || this.parseScheduleDate(item.start_time);
                 if (!endDt) return false;
                 return Date.now() > endDt.getTime();
@@ -1233,7 +1290,6 @@ document.addEventListener('alpine:init', () => {
 
             refreshStudentAlerts() {
                 const alerts = [];
-
                 this.overdueEquipmentReservations.forEach(item => {
                     alerts.push({
                         id: 'return-reminder-' + item.id,
@@ -1293,9 +1349,7 @@ document.addEventListener('alpine:init', () => {
                         localStorage.setItem('student_read_alerts', JSON.stringify(this.readStudentAlertIds));
                     } catch (e) {}
                 }
-
                 this.notificationsOpen = false;
-
                 if (alert.reservationId) {
                     const match = (this.recentReservations || []).find(r => r.id === alert.reservationId);
                     if (match) {
@@ -1304,7 +1358,6 @@ document.addEventListener('alpine:init', () => {
                         return;
                     }
                 }
-
                 if (alert.targetView) {
                     this.currentView = alert.targetView;
                     if (alert.targetView === 'support-chat') {
@@ -1338,7 +1391,6 @@ document.addEventListener('alpine:init', () => {
                 const text = this.newChatMessage.trim();
                 if (!text || this.sendingMessage) return;
                 this.sendingMessage = true;
-
                 try {
                     const res = await fetch('{{ route('chat.store') }}', {
                         method: 'POST',
@@ -1368,22 +1420,28 @@ document.addEventListener('alpine:init', () => {
             get formattedDate() {
                 return `${this.currentYear}-${pad(this.currentMonth + 1)}-${pad(this.selectedDay)}`;
             },
+
             get canGoPrevMonth() {
                 return !(this.currentYear === this.activeCalendarYear && this.currentMonth <= this.activeCalendarMonth) && this.currentYear >= this.activeCalendarYear;
             },
+
             get monthName() {
                 return months[this.currentMonth];
             },
+
             get daysInMonth() {
                 return new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
             },
+
             get firstDayIndex() {
                 return new Date(this.currentYear, this.currentMonth, 1).getDay();
             },
+
             isPastDay(day) {
                 const candidateISO = `${this.currentYear}-${pad(this.currentMonth + 1)}-${pad(day)}`;
                 return candidateISO < this.todayISO;
             },
+
             prevMonth() {
                 if (!this.canGoPrevMonth) return;
                 if (this.currentMonth === 0) {
@@ -1393,6 +1451,7 @@ document.addEventListener('alpine:init', () => {
                     this.currentMonth--;
                 }
             },
+
             nextMonth() {
                 if (this.currentMonth === 11) {
                     this.currentMonth = 0;
@@ -1401,6 +1460,7 @@ document.addEventListener('alpine:init', () => {
                     this.currentMonth++;
                 }
             },
+
             selectDate(day) {
                 if (this.isPastDay(day)) return;
                 this.selectedDay = day;
@@ -1408,40 +1468,47 @@ document.addEventListener('alpine:init', () => {
                 this.formError = '';
                 this.syncTimeToNowIfToday();
             },
+
             get currentFacilityCapacity() {
-                const fac = this.facilitiesData.find(f => f.name === this.selectedFacility);
+                const fac = this.facilitiesData.find(f => this.sameName(f.name, this.selectedFacility));
                 return fac ? getFacilityCap(fac) : 0;
             },
+
             get currentEquipmentStock() {
-                const eq = this.equipmentData.find(e => e.name === this.selectedEquipment);
+                const eq = this.equipmentData.find(e => this.sameName(e.name, this.selectedEquipment));
                 return eq && eq.total_stock ? Number(eq.total_stock) : 0;
             },
+
             get currentAvailableEquipmentStock() {
                 const overlapping = (this.recentReservations || []).filter(r =>
-                    r.resource_name === this.selectedEquipment &&
+                    this.sameName(r.resource_name, this.selectedEquipment) &&
                     this.overlapsWindow(r, this.formattedDate, this.startTime, this.endTime)
                 );
                 const reserved = overlapping.reduce((sum, b) => sum + Number(b.quantity || 1), 0);
                 return Math.max(0, this.currentEquipmentStock - reserved);
             },
+
             get conflictingBookings() {
                 const targetName = this.resourceType === 'facility' ? this.selectedFacility : this.selectedEquipment;
-                return this.recentReservations.filter(r =>
+                return (this.recentReservations || []).filter(r =>
                     !['rejected', 'cancelled', 'returned'].includes((r.status || '').toLowerCase()) &&
-                    r.resource_name === targetName &&
-                    String(r.start_time || '').startsWith(this.formattedDate)
+                    this.sameName(r.resource_name, targetName) &&
+                    this.extractDateISO(r.start_time) === this.formattedDate
                 );
             },
+
             get bookedSlotsForDate() {
-                return this.recentReservations.filter(r =>
+                return (this.recentReservations || []).filter(r =>
                     this.overlapsWindow(r, this.availabilityFilterDate, this.availabilityFilterStart, this.availabilityFilterEnd)
                 );
             },
+
             get approvalRateText() {
                 if (!this.recentReservations.length) return '0%';
                 const approvedCount = this.recentReservations.filter(r => ['approved', 'returned'].includes((r.status || '').toLowerCase())).length;
                 return Math.round((approvedCount / this.recentReservations.length) * 100) + '%';
             },
+
             selectResourceForBooking(item) {
                 if (item.kind === 'facility') {
                     this.resourceType = 'facility';
@@ -1451,6 +1518,7 @@ document.addEventListener('alpine:init', () => {
                     this.selectedEquipment = item.name;
                 }
             },
+
             validateBeforeSubmit(event) {
                 this.refreshClock();
                 this.formError = '';
@@ -1500,9 +1568,11 @@ document.addEventListener('alpine:init', () => {
                     if (Number(this.equipmentQuantity) > this.currentAvailableEquipmentStock) {
                         event.preventDefault();
                         this.formError = `Only ${this.currentAvailableEquipmentStock} unit(s) available for this time slot.`;
+                        return;
                     }
                 }
             },
+
             get quickSearchResults() {
                 const q = this.searchQuery.trim().toLowerCase();
                 if (!q) return [];
@@ -1513,6 +1583,7 @@ document.addEventListener('alpine:init', () => {
                     )
                     .slice(0, 6);
             },
+
             pickSearchResult(item) {
                 this.selectResourceForBooking(item);
                 this.searchDropdownOpen = false;
@@ -1521,12 +1592,14 @@ document.addEventListener('alpine:init', () => {
                 this.bookingStep = 1;
                 this.syncTimeToNowIfToday();
             },
+
             submitTopSearch() {
                 this.searchDropdownOpen = false;
                 this.mobileMenuOpen = false;
                 this.activeTab = 'all';
                 this.currentView = 'availability-calendar';
             },
+
             get filteredResources() {
                 return this.resources.filter(item => {
                     const matchesCategory = (this.activeTab === 'all' || item.category === this.activeTab);
