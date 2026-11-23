@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Facility;
 use App\Models\Equipment;
+use App\Models\Facility;
 use App\Models\Message;
+use Illuminate\Http\Request;
 
 class ReservationController extends Controller
 {
@@ -35,7 +35,9 @@ class ReservationController extends Controller
         ]);
 
         // Create the reservation linked to the authenticated user
-        $request->user()->reservations()->create($validated);
+        $request->user()->reservations()->create(array_merge($validated, [
+            'status' => $validated['status'] ?? 'pending',
+        ]));
 
         return redirect()->route('dashboard')->with('success', 'Reservation submitted successfully!');
     }
