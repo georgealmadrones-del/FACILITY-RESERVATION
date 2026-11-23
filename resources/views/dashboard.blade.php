@@ -1,7 +1,8 @@
 <x-app-layout>
 <div class="h-screen bg-[#F4F5F7] text-[#272757] font-['Inter',sans-serif] flex overflow-hidden" x-data="reservationDashboard()" x-init="init()">
     <!-- Mobile Menu Backdrop -->
-    <div x-show="mobileMenuOpen" @click="mobileMenuOpen = false"
+    <div x-show="mobileMenuOpen"
+         @click="mobileMenuOpen = false"
          class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
          style="display: none;"></div>
 
@@ -230,7 +231,7 @@
 
             @if($errors->any())
                 <div class="mx-6 lg:mx-10 mt-6 bg-rose-50 border border-rose-300 text-rose-800 px-4 py-3 rounded-2xl text-xs font-bold space-y-1">
-                    @foreach ($errors->all() as $error)
+                    @foreach($errors->all() as $error)
                         <p>{{ $error }}</p>
                     @endforeach
                 </div>
@@ -247,8 +248,7 @@
                             Tap an item to open and return it:
                             <template x-for="(item, idx) in overdueReservations" :key="item.id">
                                 <span>
-                                    <button type="button"
-                                            @click="selectedReservation = item; detailsModalOpen = true;"
+                                    <button type="button" @click="selectedReservation = item; detailsModalOpen = true;"
                                             class="underline font-bold hover:text-amber-950" x-text="item.resource_name"></button><span x-show="idx < overdueReservations.length - 1">, </span>
                                 </span>
                             </template>
@@ -280,7 +280,7 @@
                          class="lg:col-span-5 bg-white backdrop-blur-xl p-6 rounded-3xl border border-[#8686AC]/30 shadow-xl flex items-center justify-between relative overflow-hidden cursor-pointer hover:border-[#0F0E47] transition">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-[#8686AC]/10 rounded-full blur-2xl pointer-events-none"></div>
                         <div class="flex items-center space-x-4 relative z-10">
-                            <div class="w-14 h-14 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-lg text-[#0F0E47] shadow-inner overflow-hidden">
+                            <div class="w-14 h-14 rounded-2xl bg-[#F4F5F7] flex items-center justify-center font-extrabold border border-[#8686AC]/40 text-lg text-[#0F0E47] shadow-inner overflow-hidden">
                                 @if(Auth::user()->avatar_url ?? false)
                                     <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                                 @elseif(Auth::user()->profile_photo ?? false)
@@ -406,6 +406,7 @@
             <main x-show="currentView === 'new-reservation'" class="p-6 lg:p-10 space-y-8" style="display: none;">
                 <form action="{{ route('reservations.store') }}" method="POST" @submit="validateBeforeSubmit($event)">
                     @csrf
+                    <!-- Fixed dynamic bindings (:) and field names -->
                     <input type="hidden" name="resource_type" :value="resourceType">
                     <input type="hidden" name="resource_name" :value="resourceType === 'facility' ? selectedFacility : selectedEquipment">
                     <input type="hidden" name="category" :value="resourceType === 'facility' ? 'rooms' : 'equipment'">
@@ -439,7 +440,7 @@
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">Room or Lab</label>
                                             <select x-model="selectedFacility" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
-                                                @foreach ($facilities ?? [] as $facility)
+                                                @foreach($facilities ?? [] as $facility)
                                                     @php
                                                         $cap = $facility->capacity ?? $facility->max_capacity ?? $facility->seats ?? $facility->pax ?? null;
                                                     @endphp
@@ -447,6 +448,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">
                                                 How many people? (Limit: <span x-text="currentFacilityCapacity || 'Not set'"></span>)
@@ -463,11 +465,12 @@
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">Equipment</label>
                                             <select x-model="selectedEquipment" class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]">
-                                                @foreach ($equipment ?? [] as $item)
+                                                @foreach($equipment ?? [] as $item)
                                                     <option value="{{ $item->name }}">{{ $item->name }} ({{ $item->total_stock }} total &bull; {{ ucfirst($item->status ?? 'available') }})</option>
                                                 @endforeach
                                             </select>
                                         </div>
+
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">
                                                 How many units? (<span x-text="currentAvailableEquipmentStock"></span> left for this slot, <span x-text="currentEquipmentStock"></span> total)
@@ -496,21 +499,25 @@
                                             <button type="button" @click="nextMonth()"
                                                     class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&rarr;</button>
                                         </div>
+
                                         <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-[#505081] font-semibold mb-2">
                                             <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
                                         </div>
+
                                         <div class="grid grid-cols-7 gap-1 text-center text-xs">
                                             <template x-for="i in firstDayIndex" :key="'empty-' + i">
                                                 <div></div>
                                             </template>
                                             <template x-for="day in daysInMonth" :key="day">
-                                                <button type="button" @click="selectDate(day)" :disabled="isPastDay(day)"
+                                                <button type="button"
+                                                        @click="selectDate(day)" :disabled="isPastDay(day)"
                                                         :class="isPastDay(day)
                                                             ? 'bg-zinc-200/60 text-zinc-400 cursor-not-allowed line-through'
                                                             : (selectedDay === day && currentMonth === activeCalendarMonth && currentYear === activeCalendarYear
                                                                 ? 'bg-[#0F0E47] text-white font-extrabold shadow-md'
                                                                 : 'bg-white text-[#272757] hover:bg-[#8686AC]/20 border border-[#8686AC]/30')"
-                                                        class="h-8 rounded-lg flex items-center justify-center transition" x-text="day"></button>
+                                                        class="h-8 rounded-lg flex items-center justify-center transition"
+                                                        x-text="day"></button>
                                             </template>
                                         </div>
                                     </div>
@@ -536,23 +543,23 @@
                                         <p class="text-[11px] text-[#505081] pt-2">Picked date: <strong class="text-[#0F0E47]" x-text="selectedDate"></strong></p>
                                     </div>
                                 </div>
+                            </div>
 
-                                <template x-if="conflictingBookings.length > 0">
-                                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-900 space-y-1">
-                                        <p class="font-bold">Other bookings on <span x-text="formattedDate"></span>:</p>
-                                        <template x-for="b in conflictingBookings" :key="b.id">
-                                            <p class="text-[11px]" x-text="b.resource_name + ' (' + extractTimeHHMM(b.start_time) + '-' + extractTimeHHMM(b.end_time) + ') [' + b.status + ' • Qty: ' + (b.quantity || 1) + ']'"></p>
-                                        </template>
-                                    </div>
-                                </template>
-
-                                <p x-show="formError" class="text-xs font-bold text-rose-600" x-text="formError"></p>
-
-                                <div>
-                                    <label class="block text-xs font-semibold text-[#505081] mb-1.5">What is it for?</label>
-                                    <textarea name="purpose" placeholder="e.g. Group study, class film shoot, org meeting..." x-model="purposeReason" rows="3"
-                                              class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
+                            <template x-if="conflictingBookings.length > 0">
+                                <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-900 space-y-1">
+                                    <p class="font-bold">Other bookings on <span x-text="formattedDate"></span>:</p>
+                                    <template x-for="b in conflictingBookings" :key="b.id">
+                                        <p class="text-[11px]" x-text="b.resource_name + ' (' + extractTimeHHMM(b.start_time) + '-' + extractTimeHHMM(b.end_time) + ') (' + b.status + ') [Qty:' + (b.quantity || 1) + ']'"></p>
+                                    </template>
                                 </div>
+                            </template>
+
+                            <p x-show="formError" class="text-xs font-bold text-rose-600" x-text="formError"></p>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-[#505081] mb-1.5">What is it for?</label>
+                                <textarea name="purpose" placeholder="e.g. Group study, class film shoot, org meeting..." x-model="purposeReason" rows="3"
+                                          class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-4 py-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                             </div>
 
                             <div class="pt-6 border-t border-[#8686AC]/30 flex justify-end">
@@ -571,8 +578,8 @@
                                 <p><strong>Time:</strong> <span x-text="startTime + ' to ' + endTime"></span></p>
                                 <p><strong>Count:</strong>
                                     <span x-text="resourceType === 'facility'
-                                        ? expectedAttendees + ' / ' + (currentFacilityCapacity > 0 ? currentFacilityCapacity + ' people' : 'people')
-                                        : equipmentQuantity + ' / ' + currentAvailableEquipmentStock + ' left'"></span>
+                                        ? expectedAttendees + '/' + (currentFacilityCapacity > 0 ? currentFacilityCapacity + ' people' : 'people')
+                                        : equipmentQuantity + '/' + currentAvailableEquipmentStock + ' left'"></span>
                                 </p>
                             </div>
                             <p class="text-[11px] text-[#505081]">The admin will review your request.</p>
@@ -668,13 +675,14 @@
                             <div class="relative h-44 w-full border-b border-[#8686AC]/30 bg-[#F4F5F7]">
                                 <img :src="item.image" :alt="item.name"
                                      class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90"
-                                     onerror="this.src='https://images.unsplash.com/photo-1497366216548-37520693626c?auto=format&fit=crop&w=600&q=80'">
+                                     onerror="this.src='https://images.unsplash.com/photo-1497366216548-37520693621c?auto=format&fit=crop&w=600&q=80'">
                                 <div class="absolute top-3 right-3">
                                     <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border shadow-sm backdrop-blur-md"
                                           :class="getLiveAvailability(item).badgeClass"
                                           x-text="getLiveAvailability(item).label"></span>
                                 </div>
                             </div>
+
                             <div class="p-6 space-y-4">
                                 <div>
                                     <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block" x-text="item.type"></span>
@@ -682,6 +690,7 @@
                                     <p class="text-xs text-[#505081] mt-1 font-semibold" x-text="getLiveAvailability(item).detail"></p>
                                 </div>
                             </div>
+
                             <div class="p-6 pt-0 space-y-4">
                                 <button type="button"
                                         :disabled="!getLiveAvailability(item).bookable"
@@ -690,7 +699,7 @@
                                             ? 'bg-[#0F0E47] hover:bg-[#272757] text-white cursor-pointer'
                                             : 'bg-zinc-200 text-zinc-500 cursor-not-allowed'"
                                         class="w-full py-2.5 text-xs font-bold rounded-xl transition block text-center shadow-lg"
-                                        x-text="getLiveAvailability(item).bookable ? 'Book this →' : getLiveAvailability(item).disabledText"></button>
+                                        x-text="getLiveAvailability(item).bookable ? 'Book this' : getLiveAvailability(item).disabledText"></button>
                             </div>
                         </div>
                     </template>
@@ -788,6 +797,7 @@
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
                     <h3 class="text-lg font-extrabold text-[#0F0E47]">All bookings</h3>
                     <p class="text-xs text-[#505081]">Click a booking to cancel a pending request or return an approved booking.</p>
+
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
@@ -939,30 +949,25 @@
             </div>
 
             <div class="pt-4 border-t border-[#8686AC]/30 flex items-center justify-between gap-3">
-                <!-- LEFT SIDE: Return (only when approved) OR Cancel Booking (only when pending) -->
                 <div class="flex items-center space-x-2">
                     <template x-if="selectedReservation && (selectedReservation.status || '').toLowerCase() === 'approved'">
                         <form :action="'/reservations/' + selectedReservation.id + '/return'" method="POST">
                             @csrf
-                            <button type="submit"
-                                    class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow">
+                            <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow">
                                 Return
                             </button>
                         </form>
                     </template>
-
                     <template x-if="selectedReservation && (selectedReservation.status || '').toLowerCase() === 'pending'">
                         <form :action="'/reservations/' + selectedReservation.id + '/cancel'" method="POST">
                             @csrf
-                            <button type="submit"
-                                    class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow">
+                            <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow">
                                 Cancel booking
                             </button>
                         </form>
                     </template>
                 </div>
 
-                <!-- RIGHT SIDE: Close modal button labeled "Cancel" -->
                 <button type="button" @click="detailsModalOpen = false"
                         class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
                     Cancel
@@ -976,6 +981,7 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('reservationDashboard', () => {
         const pad = n => String(n).padStart(2, '0');
+
         const getNowParts = () => {
             const d = new Date();
             return {
@@ -986,11 +992,13 @@ document.addEventListener('alpine:init', () => {
                 day: d.getDate()
             };
         };
+
         const getFacilityCap = (f) => {
             const val = f?.capacity ?? f?.max_capacity ?? f?.seats ?? f?.pax ?? 0;
             const num = Number(val);
             return Number.isFinite(num) && num > 0 ? num : 0;
         };
+
         const initialNow = getNowParts();
         const MAX_BOOKING_END = '20:00';
         const MAX_BOOKING_START = '19:59';
@@ -1029,6 +1037,7 @@ document.addEventListener('alpine:init', () => {
             purposeReason: '',
             detailsModalOpen: false,
             selectedReservation: null,
+            // Holds active bookings used for overlap checks; syncLiveDashboardData updates this
             recentReservations: @json($reservations ?? []),
             rawNotifications: @json($notifications ?? []),
             facilitiesData: facilitiesList,
@@ -1074,6 +1083,7 @@ document.addEventListener('alpine:init', () => {
                 } catch (e) {
                     this.readStudentAlertIds = [];
                 }
+
                 this.refreshClock();
                 this.syncTimeToNowIfToday();
                 this.refreshStudentAlerts();
@@ -1127,6 +1137,7 @@ document.addEventListener('alpine:init', () => {
                         headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/html' }
                     });
                     if (!res.ok) return;
+
                     const ct = res.headers.get('content-type') || '';
                     if (ct.includes('application/json')) {
                         const payload = await res.json();
@@ -1135,6 +1146,7 @@ document.addEventListener('alpine:init', () => {
                         if (Array.isArray(payload.equipment)) this.equipmentData = payload.equipment;
                         return;
                     }
+
                     const html = await res.text();
                     const doc = new DOMParser().parseFromString(html, 'text/html');
                     const scripts = Array.from(doc.querySelectorAll('script'));
@@ -1184,15 +1196,19 @@ document.addEventListener('alpine:init', () => {
                 return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
             },
 
+            // Checks if a booking blocks a given date + start/end HH:MM window
             overlapsWindow(booking, dateStr, startHHMM, endHHMM) {
                 if (!booking || !dateStr) return false;
                 const status = String(booking.status || '').trim().toLowerCase();
                 if (['rejected', 'cancelled', 'returned'].includes(status)) return false;
+
                 const bookingDate = this.extractDateISO(booking.start_time) || this.extractDateISO(booking.end_time);
                 if (bookingDate !== dateStr) return false;
+
                 const bStart = this.extractTimeHHMM(booking.start_time);
                 const bEnd = this.extractTimeHHMM(booking.end_time) || bStart;
                 if (!bStart || !startHHMM || !endHHMM) return true;
+
                 return bStart < endHHMM && bEnd > startHHMM;
             },
 
@@ -1521,6 +1537,7 @@ document.addEventListener('alpine:init', () => {
             validateBeforeSubmit(event) {
                 this.refreshClock();
                 this.formError = '';
+
                 if (this.formattedDate < this.todayISO) {
                     event.preventDefault();
                     this.formError = 'Pick today or a future date.';
