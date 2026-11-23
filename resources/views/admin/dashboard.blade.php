@@ -20,7 +20,7 @@
 
             <div class="space-y-6">
                 <nav class="space-y-1">
-                    <button type="button" @click.prevent="currentView = 'bookings'; mobileMenuOpen = false;"
+                    <button type="button" @click.prevent="currentView = 'bookings'; mobileMenuOpen = false; syncAdminReservations();"
                             :class="currentView === 'bookings' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                             class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
@@ -81,7 +81,6 @@
                     <span class="text-[10px] text-rose-600 truncate block font-bold">Edit photo</span>
                 </div>
             </button>
-
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" title="Log out" class="text-[#505081] hover:text-rose-600 transition shrink-0">
@@ -130,7 +129,7 @@
                             class="w-10 h-10 rounded-xl bg-[#F4F5F7] hover:bg-[#8686AC]/20 border border-[#8686AC]/30 text-[#272757] flex items-center justify-center transition relative"
                             aria-label="Notifications">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0.538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
                         <template x-if="unreadAlertCount > 0">
                             <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-extrabold flex items-center justify-center shadow"
@@ -158,9 +157,9 @@
                                         <span class="text-[11px] font-bold text-[#0F0E47] truncate" x-text="alert.title"></span>
                                         <span class="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase shrink-0"
                                               :class="alert.type === 'return'
-                                                  ? 'bg-amber-50 text-amber-800 border border-amber-300'
+                                                  ? 'bg-sky-50 text-sky-800 border border-sky-300'
                                                   : (alert.type === 'booking'
-                                                      ? 'bg-sky-50 text-sky-800 border border-sky-300'
+                                                      ? 'bg-amber-50 text-amber-800 border border-amber-300'
                                                       : 'bg-emerald-50 text-emerald-800 border border-emerald-300')"
                                               x-text="alert.badge"></span>
                                     </div>
@@ -195,8 +194,9 @@
             <main x-show="currentView === 'bookings'" class="p-4 sm:p-6 lg:p-10 space-y-8">
                 <div class="bg-white backdrop-blur-xl p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
                     <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Bookings</h2>
-                    <p class="text-xs text-[#505081]">Tap a box to filter requests.</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-2">
+                    <p class="text-xs text-[#505081]">Tap a box to filter requests. Returned equipment and rooms are marked RETURNED.</p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 pt-2">
                         <div @click="filterStatus = 'all'"
                              :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
@@ -218,9 +218,16 @@
                             <p class="text-2xl font-extrabold text-emerald-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'approved').length">0</p>
                         </div>
 
+                        <div @click="filterStatus = 'returned'"
+                             :class="filterStatus === 'returned' ? 'border-sky-500 bg-sky-50/50' : 'border-[#8686AC]/30 bg-white'"
+                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
+                            <span class="text-[10px] font-bold text-sky-600 uppercase">Returned</span>
+                            <p class="text-2xl font-extrabold text-sky-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'returned').length">0</p>
+                        </div>
+
                         <div @click="filterStatus = 'rejected'"
                              :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'"
-                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
+                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm col-span-2 sm:col-span-1">
                             <span class="text-[10px] font-bold text-rose-600 uppercase">Declined / Cancelled</span>
                             <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => ['rejected', 'cancelled'].includes((r.status || '').toLowerCase())).length">0</p>
                         </div>
@@ -232,6 +239,7 @@
                         <h3 class="text-sm font-extrabold text-[#0F0E47]">Requests</h3>
                         <span class="text-xs font-bold text-[#505081]" x-text="filterStatus.toUpperCase()"></span>
                     </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[640px]">
                             <thead>
@@ -248,7 +256,7 @@
                                     <tr class="hover:bg-[#F4F5F7]/80 transition">
                                         <td class="py-4 px-5">
                                             <div class="flex items-center space-x-3">
-                                                <div class="w-8 h-8 rounded-full bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-bold text-[10px] text-[#0F0E47] overflow-hidden shrink-0">
+                                                <div class="w-8 h-8 flex items-center justify-center text-[#0F0E47] overflow-hidden rounded-full bg-[#F4F5F7] border border-[#8686AC]/40 font-bold text-[10px] shrink-0">
                                                     <template x-if="getUserAvatar(item.user)">
                                                         <img :src="getUserAvatar(item.user)" :alt="item.user?.name || 'User'" class="w-full h-full object-cover">
                                                     </template>
@@ -262,15 +270,19 @@
                                                 </div>
                                             </div>
                                         </td>
+
                                         <td class="py-4 px-5">
                                             <span class="font-bold text-[#0F0E47] block" x-text="item.resource_name"></span>
-                                            <span class="text-[10px] text-[#505081]" x-text="item.resource_type + ' (' + (item.quantity || 1) + ')'"></span>
+                                            <span class="text-[10px] text-[#505081]" x-text="(item.resource_type || '') + ' (' + (item.quantity || 1) + ')'"></span>
                                         </td>
+
                                         <td class="py-4 px-5 text-[#272757] font-medium" x-text="(item.start_time || '') + ' to ' + (item.end_time || '')"></td>
+
                                         <td class="py-4 px-5">
                                             <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border uppercase inline-block"
                                                   :class="{
-                                                      'bg-emerald-50 text-emerald-700 border-emerald-300': ['approved', 'returned'].includes((item.status || '').toLowerCase()),
+                                                      'bg-sky-50 text-sky-700 border-sky-300': (item.status || '').toLowerCase() === 'returned',
+                                                      'bg-emerald-50 text-emerald-700 border-emerald-300': (item.status || '').toLowerCase() === 'approved',
                                                       'bg-amber-50 text-amber-700 border-amber-300': (item.status || '').toLowerCase() === 'pending',
                                                       'bg-rose-50 text-rose-700 border-rose-300': ['rejected', 'cancelled'].includes((item.status || '').toLowerCase())
                                                   }"
@@ -279,6 +291,7 @@
                                                 <p class="text-[10px] text-rose-600 mt-1 italic" x-text="'Note: ' + item.rejection_reason"></p>
                                             </template>
                                         </td>
+
                                         <td class="py-4 px-5 text-right">
                                             <template x-if="(item.status || '').toLowerCase() === 'pending'">
                                                 <div class="flex items-center justify-end space-x-2">
@@ -292,7 +305,9 @@
                                                 </div>
                                             </template>
                                             <template x-if="(item.status || '').toLowerCase() !== 'pending'">
-                                                <span class="text-[#505081] font-semibold text-[11px]" x-text="(item.status || '').toUpperCase()"></span>
+                                                <span class="font-bold text-[11px]"
+                                                      :class="(item.status || '').toLowerCase() === 'returned' ? 'text-sky-700' : 'text-[#505081]'"
+                                                      x-text="(item.status || '').toUpperCase()"></span>
                                             </template>
                                         </td>
                                     </tr>
@@ -385,8 +400,7 @@
                                             <button type="button"
                                                     @click="openEditFacility(fac)"
                                                     class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
-                                            <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline"
-                                                  onsubmit="return confirm('Remove this room?')">
+                                            <form :action="'/admin/facilities/' + fac.id" method="POST" class="inline" onsubmit="return confirm('Remove this room?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Remove</button>
@@ -421,8 +435,7 @@
                                             <button type="button"
                                                     @click="openEditEquipment(eq)"
                                                     class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-300 rounded-lg font-bold hover:bg-sky-100">Edit</button>
-                                            <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline"
-                                                  onsubmit="return confirm('Remove this item?')">
+                                            <form :action="'/admin/equipment/' + eq.id" method="POST" class="inline" onsubmit="return confirm('Remove this item?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 rounded-lg font-bold hover:bg-rose-100">Remove</button>
@@ -550,7 +563,7 @@
                             <template x-for="msg in threadMessages" :key="msg.id">
                                 <div>
                                     <template x-if="msg.is_system">
-                                        <div class="mx-auto max-w-xl my-1.5 px-3.5 py-2 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs text-center font-medium">
+                                        <div class="mx-auto max-w-xl my-1.5 px-3.5 py-2 rounded-2xl bg-sky-50 border border-sky-300 text-sky-900 text-xs text-center font-medium">
                                             <span class="font-bold uppercase text-[10px] tracking-wider block mb-0.5">Return Notice</span>
                                             <span x-text="msg.message"></span>
                                         </div>
@@ -590,13 +603,10 @@
                         </div>
 
                         <form @submit.prevent="sendAdminMessage()" class="p-2.5 sm:p-3.5 border-t border-[#8686AC]/30 bg-white flex items-center gap-2 shrink-0">
-                            <input type="text"
-                                   x-model="newAdminMessage"
-                                   :disabled="!activeThreadUserId || sendingMessage"
+                            <input type="text" x-model="newAdminMessage" :disabled="!activeThreadUserId || sendingMessage"
                                    placeholder="Write a reply..."
                                    class="flex-1 min-w-0 bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl px-3.5 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#0F0E47]">
-                            <button type="submit"
-                                    :disabled="!activeThreadUserId || sendingMessage || !newAdminMessage.trim()"
+                            <button type="submit" :disabled="!activeThreadUserId || sendingMessage || !newAdminMessage.trim()"
                                     class="px-4 sm:px-5 py-2 bg-[#0F0E47] hover:bg-[#272757] disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow shrink-0">
                                 Send
                             </button>
@@ -614,7 +624,7 @@
                             <p class="text-xs text-[#505081]">Download a PDF copy of all booking records.</p>
                         </div>
                         <a href="{{ route('admin.reports.pdf') }}"
-                           class="px-5 py-2.5 bg-[#0F0E47] text-white shadow-lg hover:bg-[#272757] text-xs font-bold rounded-xl transition">Download PDF</a>
+                           class="px-5 py-2.5 bg-[#0F0E47] text-white text-xs font-bold rounded-xl shadow-lg hover:bg-[#272757] transition">Download PDF</a>
                     </div>
                     <div class="bg-[#F4F5F7] p-4 rounded-2xl border border-[#8686AC]/30 flex items-center justify-between">
                         <div>
@@ -634,7 +644,6 @@
                 <h3 class="text-lg font-extrabold text-[#0F0E47]">Admin profile</h3>
                 <button type="button" @click="adminProfileModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
-
             <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div class="flex items-center gap-4">
@@ -648,10 +657,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <label class="block text-xs font-semibold text-[#505081] mb-1">Profile photo</label>
-                        <input type="file"
-                               name="profile_photo"
-                               accept="image/png,image/jpeg,image/webp"
-                               @change="previewAdminPhoto($event)"
+                        <input type="file" name="profile_photo" accept="image/png,image/jpeg,image/webp" @change="previewAdminPhoto($event)"
                                class="w-full text-xs text-[#505081] file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0F0E47] file:text-white hover:file:bg-[#272757]">
                     </div>
                 </div>
@@ -693,8 +699,7 @@
                 @csrf
                 <div>
                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">Note for the requester</label>
-                    <textarea name="rejection_reason" rows="4"
-                              placeholder="e.g. Room already taken at that hour..."
+                    <textarea name="rejection_reason" rows="4" placeholder="e.g. Room already taken at that hour..."
                               class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
@@ -805,19 +810,57 @@ document.addEventListener('alpine:init', () => {
 
         init() {
             try {
-                this.readAlertIds = JSON.parse(localStorage.getItem('admin_read_alerts') || '[]');
+                const parsed = JSON.parse(localStorage.getItem('admin_read_alerts') || '[]');
+                this.readAlertIds = Array.isArray(parsed) ? parsed : [];
             } catch (e) {
                 this.readAlertIds = [];
             }
             this.refreshAdminAlerts();
             this.fetchThreads();
+            this.syncAdminReservations();
+
             this.pollTimer = setInterval(() => {
                 this.fetchThreads();
                 this.refreshAdminAlerts();
+                this.syncAdminReservations();
                 if (this.currentView === 'messages' && this.activeThreadUserId) {
                     this.fetchAdminMessages();
                 }
             }, 3000);
+        },
+
+        async syncAdminReservations() {
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('live_sync', '1');
+                const res = await fetch(url.toString(), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/html' }
+                });
+                if (!res.ok) return;
+                const ct = res.headers.get('content-type') || '';
+                if (ct.includes('application/json')) {
+                    const payload = await res.json();
+                    if (Array.isArray(payload.reservations)) this.reservations = payload.reservations;
+                    if (Array.isArray(payload.facilities)) this.facilities = payload.facilities;
+                    if (Array.isArray(payload.equipment)) this.equipment = payload.equipment;
+                    return;
+                }
+                const html = await res.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const scripts = Array.from(doc.querySelectorAll('script'));
+                for (const s of scripts) {
+                    const txt = s.textContent || '';
+                    if (txt.includes('reservations:') && txt.includes('facilities:')) {
+                        const resMatch = txt.match(/reservations:\s*(\[[\s\S]*?\]),\s*users:/);
+                        const facMatch = txt.match(/facilities:\s*(\[[\s\S]*?\]),\s*equipment:/);
+                        const eqMatch = txt.match(/equipment:\s*(\[[\s\S]*?\]),\s*editFacilityModal:/);
+                        if (resMatch) this.reservations = JSON.parse(resMatch[1]);
+                        if (facMatch) this.facilities = JSON.parse(facMatch[1]);
+                        if (eqMatch) this.equipment = JSON.parse(eqMatch[1]);
+                        break;
+                    }
+                }
+            } catch (e) {}
         },
 
         initials(name) {
@@ -865,6 +908,21 @@ document.addEventListener('alpine:init', () => {
 
         refreshAdminAlerts() {
             const alerts = [];
+
+            (this.reservations || [])
+                .filter(r => (r.status || '').toLowerCase() === 'returned')
+                .forEach(r => {
+                    alerts.push({
+                        id: 'returned-' + r.id,
+                        type: 'return',
+                        badge: 'Returned',
+                        title: (r.user?.name || 'User') + ' returned ' + (r.resource_name || 'Item'),
+                        detail: (r.resource_type || 'item') + ' • Qty: ' + (r.quantity || 1),
+                        targetView: 'bookings',
+                        filter: 'returned'
+                    });
+                });
+
             (this.reservations || [])
                 .filter(r => (r.status || '').toLowerCase() === 'pending')
                 .forEach(r => {
@@ -948,8 +1006,8 @@ document.addEventListener('alpine:init', () => {
                 this.threads = Array.isArray(data) ? data : [];
                 if (!this.activeThreadUserId && this.threads.length > 0) {
                     this.activeThreadUserId = this.threads[0].id;
-                    this.fetchAdminMessages();
                 }
+                this.fetchAdminMessages();
                 this.refreshAdminAlerts();
             } catch (e) {
                 console.error('Threads fetch error:', e);
