@@ -80,6 +80,8 @@
                 <div class="w-8 h-8 shrink-0 rounded-xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-bold text-xs text-[#0F0E47] overflow-hidden">
                     @if(Auth::user()->avatar_url ?? false)
                         <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
+                    @elseif(Auth::user()->profile_photo ?? false)
+                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                     @else
                         {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
                     @endif
@@ -175,7 +177,7 @@
                     <button type="button" @click="notificationsOpen = !notificationsOpen; refreshStudentAlerts();"
                             class="w-10 h-10 rounded-xl bg-[#F4F5F7] hover:bg-[#8686AC]/20 border border-[#8686AC]/30 text-[#272757] flex items-center justify-center transition relative"
                             aria-label="Notifications">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0.538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                         <template x-if="unreadStudentAlertCount > 0">
                             <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-extrabold flex items-center justify-center shadow"
                                   x-text="unreadStudentAlertCount"></span>
@@ -281,6 +283,8 @@
                             <div class="w-14 h-14 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-lg text-[#0F0E47] shadow-inner overflow-hidden">
                                 @if(Auth::user()->avatar_url ?? false)
                                     <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
+                                @elseif(Auth::user()->profile_photo ?? false)
+                                    <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                                 @else
                                     {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
                                 @endif
@@ -333,7 +337,7 @@
                     <div class="flex justify-between items-center">
                         <div>
                             <h3 class="text-lg font-extrabold text-[#0F0E47]">Recent bookings</h3>
-                            <p class="text-xs text-[#505081]">Tap any row to check status, cancel pending requests, or return gear.</p>
+                            <p class="text-xs text-[#505081]">Tap any row to check status, cancel pending requests, or return approved equipment.</p>
                         </div>
                         <button type="button" @click="currentView = 'profile'; profileTab = 'history';" class="text-xs font-bold text-[#505081] hover:text-[#0F0E47] transition flex items-center space-x-1">
                             <span>See all</span>
@@ -442,7 +446,6 @@
                                                 @endforeach
                                             </select>
                                         </div>
-
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">
                                                 How many people? (Limit: <span x-text="currentFacilityCapacity || 'Not set'"></span>)
@@ -464,7 +467,6 @@
                                                 @endforeach
                                             </select>
                                         </div>
-
                                         <div>
                                             <label class="block text-xs font-semibold text-[#505081] mb-1.5">
                                                 How many units? (<span x-text="currentAvailableEquipmentStock"></span> left for this slot, <span x-text="currentEquipmentStock"></span> total)
@@ -493,11 +495,9 @@
                                             <button type="button" @click="nextMonth()"
                                                     class="text-[#505081] hover:text-[#0F0E47] px-2.5 py-1 bg-white rounded-lg border border-[#8686AC]/40">&rarr;</button>
                                         </div>
-
                                         <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-[#505081] font-semibold mb-2">
                                             <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
                                         </div>
-
                                         <div class="grid grid-cols-7 gap-1 text-center text-xs">
                                             <template x-for="i in firstDayIndex" :key="'empty-' + i">
                                                 <div></div>
@@ -509,8 +509,7 @@
                                                             : (selectedDay === day && currentMonth === activeCalendarMonth && currentYear === activeCalendarYear
                                                                 ? 'bg-[#0F0E47] text-white font-extrabold shadow-md'
                                                                 : 'bg-white text-[#272757] hover:bg-[#8686AC]/20 border border-[#8686AC]/30')"
-                                                        class="h-8 rounded-lg flex items-center justify-center transition"
-                                                        x-text="day"></button>
+                                                        class="h-8 rounded-lg flex items-center justify-center transition" x-text="day"></button>
                                             </template>
                                         </div>
                                     </div>
@@ -521,13 +520,15 @@
                                             <div>
                                                 <label class="block text-[11px] font-semibold text-[#505081] mb-1">Start</label>
                                                 <input type="time" x-model="startTime" @change="formError = ''"
-                                                       :min="formattedDate === todayISO ? currentTimeHHMM : '00:00'" max="19:59"
+                                                       :min="formattedDate === todayISO ? currentTimeHHMM : '00:00'"
+                                                       max="19:59"
                                                        class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
                                             </div>
                                             <div>
                                                 <label class="block text-[11px] font-semibold text-[#505081] mb-1">End</label>
                                                 <input type="time" x-model="endTime" @change="formError = ''"
-                                                       :min="startTime || '00:00'" max="20:00"
+                                                       :min="startTime || '00:00'"
+                                                       max="20:00"
                                                        class="w-full bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required>
                                             </div>
                                         </div>
@@ -539,7 +540,7 @@
                                     <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-900 space-y-1">
                                         <p class="font-bold">Other bookings on <span x-text="formattedDate"></span>:</p>
                                         <template x-for="b in conflictingBookings" :key="b.id">
-                                            <p class="text-[11px]" x-text="b.resource_name + ' (' + extractTimeHHMM(b.start_time) + '-' + extractTimeHHMM(b.end_time) + ') (' + b.status + ') • Qty: ' + (b.quantity || 1)"></p>
+                                            <p class="text-[11px]" x-text="b.resource_name + ' (' + extractTimeHHMM(b.start_time) + '-' + extractTimeHHMM(b.end_time) + ') [' + b.status + ' • Qty: ' + (b.quantity || 1) + ']'"></p>
                                         </template>
                                     </div>
                                 </template>
@@ -592,18 +593,20 @@
                         <input type="date" x-model="availabilityFilterDate" :min="todayISO"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-3 py-2 text-xs font-bold text-[#0F0E47]">
                         <input type="time" x-model="availabilityFilterStart"
-                               :min="availabilityFilterDate === todayISO ? currentTimeHHMM : '00:00'" max="19:59"
+                               :min="availabilityFilterDate === todayISO ? currentTimeHHMM : '00:00'"
+                               max="19:59"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0F0E47]">
                         <span class="text-xs text-[#505081] font-bold">-</span>
                         <input type="time" x-model="availabilityFilterEnd"
-                               :min="availabilityFilterStart || '00:00'" max="20:00"
+                               :min="availabilityFilterStart || '00:00'"
+                               max="20:00"
                                class="bg-white border border-[#8686AC]/40 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0F0E47]">
                     </div>
                 </div>
 
                 <div class="bg-white rounded-3xl border border-[#8686AC]/30 p-6 shadow-xl space-y-4">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Taken on <span x-text="availabilityFilterDate"></span> (<span x-text="availabilityFilterStart + ' - ' + availabilityFilterEnd"></span>)</h3>
+                        <h3 class="text-sm font-extrabold text-[#0F0E47]">Taken on <span x-text="availabilityFilterDate"></span> (<span x-text="availabilityFilterStart + '-' + availabilityFilterEnd"></span>)</h3>
                         <span class="text-[11px] font-bold text-[#505081]" x-text="bookedSlotsForDate.length + ' overlapping booking(s)'"></span>
                     </div>
                     <div class="overflow-x-auto">
@@ -620,7 +623,7 @@
                                 <template x-for="slot in bookedSlotsForDate" :key="slot.id">
                                     <tr>
                                         <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="slot.resource_name"></td>
-                                        <td class="py-3 px-4" x-text="extractTimeHHMM(slot.start_time) + ' - ' + extractTimeHHMM(slot.end_time)"></td>
+                                        <td class="py-3 px-4" x-text="extractTimeHHMM(slot.start_time) + '-' + extractTimeHHMM(slot.end_time)"></td>
                                         <td class="py-3 px-4" x-text="(slot.quantity || 1) + ((slot.resource_type || '').toLowerCase() === 'equipment' ? ' unit(s)' : ' people')"></td>
                                         <td class="py-3 px-4">
                                             <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border uppercase"
@@ -664,14 +667,13 @@
                             <div class="relative h-44 w-full border-b border-[#8686AC]/30 bg-[#F4F5F7]">
                                 <img :src="item.image" :alt="item.name"
                                      class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90"
-                                     onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80'">
+                                     onerror="this.src='https://images.unsplash.com/photo-1497366216548-37520693626c?auto=format&fit=crop&w=600&q=80'">
                                 <div class="absolute top-3 right-3">
                                     <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border shadow-sm backdrop-blur-md"
                                           :class="getLiveAvailability(item).badgeClass"
                                           x-text="getLiveAvailability(item).label"></span>
                                 </div>
                             </div>
-
                             <div class="p-6 space-y-4">
                                 <div>
                                     <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block" x-text="item.type"></span>
@@ -679,7 +681,6 @@
                                     <p class="text-xs text-[#505081] mt-1 font-semibold" x-text="getLiveAvailability(item).detail"></p>
                                 </div>
                             </div>
-
                             <div class="p-6 pt-0 space-y-4">
                                 <button type="button"
                                         :disabled="!getLiveAvailability(item).bookable"
@@ -688,7 +689,7 @@
                                             ? 'bg-[#0F0E47] hover:bg-[#272757] text-white cursor-pointer'
                                             : 'bg-zinc-200 text-zinc-500 cursor-not-allowed'"
                                         class="w-full py-2.5 text-xs font-bold rounded-xl transition block text-center shadow-lg"
-                                        x-text="getLiveAvailability(item).bookable ? 'Book this' : getLiveAvailability(item).disabledText"></button>
+                                        x-text="getLiveAvailability(item).bookable ? 'Book this →' : getLiveAvailability(item).disabledText"></button>
                             </div>
                         </div>
                     </template>
@@ -702,6 +703,8 @@
                         <div class="w-16 h-16 rounded-2xl bg-[#F4F5F7] border border-[#8686AC]/40 flex items-center justify-center font-extrabold text-xl text-[#0F0E47] overflow-hidden shadow-inner">
                             @if(Auth::user()->avatar_url ?? false)
                                 <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
+                            @elseif(Auth::user()->profile_photo ?? false)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name ?? 'User' }}" class="w-full h-full object-cover">
                             @else
                                 {{ strtoupper(substr(Auth::user()->name ?? 'JD', 0, 2)) }}
                             @endif
@@ -783,12 +786,12 @@
                 <!-- Past Bookings Tab -->
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
                     <h3 class="text-lg font-extrabold text-[#0F0E47]">All bookings</h3>
-                    <p class="text-xs text-[#505081]">Click a booking to cancel a pending request or return borrowed equipment.</p>
+                    <p class="text-xs text-[#505081]">Click a booking to cancel a pending request or return approved equipment.</p>
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
                                 <div @click="selectedReservation = item; detailsModalOpen = true;" class="p-5 flex items-center justify-between hover:bg-[#F4F5F7] transition cursor-pointer">
-                                    <div class="gap-2 flex-wrap">
+                                    <div class="space-y-1">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <h4 class="text-sm font-bold text-[#0F0E47]" x-text="item.resource_name"></h4>
                                             <template x-if="isOverdueEquipment(item)">
@@ -940,15 +943,15 @@
                             <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition">Cancel request</button>
                         </form>
                     </template>
-                    <template x-if="selectedReservation && (selectedReservation.status || '').toLowerCase() === 'approved' && (selectedReservation.resource_type || '').toLowerCase() === 'equipment'">
+                    <template x-if="selectedReservation && canReturnApprovedEquipment(selectedReservation)">
                         <form :action="'/reservations/' + selectedReservation.id + '/return'" method="POST">
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow">Mark returned</button>
                         </form>
                     </template>
                 </div>
-
-                <button type="button" @click="detailsModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
+                <button type="button" @click="detailsModalOpen = false"
+                        class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
                     Done
                 </button>
             </div>
@@ -1053,7 +1056,8 @@ document.addEventListener('alpine:init', () => {
 
             init() {
                 try {
-                    this.readStudentAlertIds = JSON.parse(localStorage.getItem('student_read_alerts') || '[]');
+                    const saved = JSON.parse(localStorage.getItem('student_read_alerts') || '[]');
+                    this.readStudentAlertIds = Array.isArray(saved) ? saved : [];
                 } catch (e) {
                     this.readStudentAlertIds = [];
                 }
@@ -1062,9 +1066,11 @@ document.addEventListener('alpine:init', () => {
                 this.refreshStudentAlerts();
                 this.fetchMessages();
                 this.syncLiveDashboardData();
+
                 this.clockTimer = setInterval(() => {
                     this.refreshClock();
                 }, 15000);
+
                 this.pollTimer = setInterval(() => {
                     this.fetchMessages();
                     this.refreshStudentAlerts();
@@ -1251,11 +1257,15 @@ document.addEventListener('alpine:init', () => {
                 return Number.isNaN(parsed.getTime()) ? null : parsed;
             },
 
-            isOverdueEquipment(item) {
+            canReturnApprovedEquipment(item) {
                 if (!item) return false;
                 const isEq = (item.resource_type || '').toLowerCase() === 'equipment';
                 const isApproved = (item.status || '').toLowerCase() === 'approved';
-                if (!isEq || !isApproved) return false;
+                return isEq && isApproved;
+            },
+
+            isOverdueEquipment(item) {
+                if (!this.canReturnApprovedEquipment(item)) return false;
                 const endDt = this.parseScheduleDate(item.end_time) || this.parseScheduleDate(item.start_time);
                 if (!endDt) return false;
                 return Date.now() > endDt.getTime();
@@ -1277,6 +1287,7 @@ document.addEventListener('alpine:init', () => {
                         reservationId: item.id
                     });
                 });
+
                 (this.rawNotifications || []).forEach(n => {
                     alerts.push({
                         id: 'db-notif-' + n.id,
@@ -1287,6 +1298,7 @@ document.addEventListener('alpine:init', () => {
                         targetView: 'overview'
                     });
                 });
+
                 const latestOtherMsg = [...(this.chatMessages || [])]
                     .reverse()
                     .find(m => !m.is_system && Number(m.sender_id) !== Number(this.currentUserId));
@@ -1300,6 +1312,7 @@ document.addEventListener('alpine:init', () => {
                         targetView: 'support-chat'
                     });
                 }
+
                 this.studentAlerts = alerts.slice(0, 12);
             },
 
@@ -1566,11 +1579,10 @@ document.addEventListener('alpine:init', () => {
             },
 
             get filteredResources() {
+                const q = this.searchQuery.trim().toLowerCase();
                 return this.resources.filter(item => {
                     const matchesCategory = this.activeTab === 'all' || item.category === this.activeTab;
-                    const matchesSearch = this.searchQuery === '' ||
-                        item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                        item.type.toLowerCase().includes(this.searchQuery.toLowerCase());
+                    const matchesSearch = !q || item.name.toLowerCase().includes(q) || item.type.toLowerCase().includes(q);
                     return matchesCategory && matchesSearch;
                 });
             }

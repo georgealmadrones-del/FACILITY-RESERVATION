@@ -61,6 +61,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Reports & PDF Export
     Route::get('/admin/reports/pdf', [AdminController::class, 'exportPdf'])->name('admin.reports.pdf');
+
+    // routes/web.php
+Route::post('/reservations/{reservation}/return', [ReservationController::class, 'returnEquipment'])
+    ->middleware('auth')
+    ->name('reservations.return');
 });
 
 require __DIR__ . '/auth.php';
