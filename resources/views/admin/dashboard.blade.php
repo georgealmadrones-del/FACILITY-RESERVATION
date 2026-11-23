@@ -27,7 +27,7 @@
                         <span>Bookings</span>
                     </button>
 
-                    <button type="button" @click.prevent="currentView = 'inventory'; mobileMenuOpen = false;"
+                    <button type="button" @click.prevent="currentView = 'inventory'; mobileMenuOpen = false; syncAdminReservations();"
                             :class="currentView === 'inventory' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'text-[#505081] hover:text-[#0F0E47] hover:bg-[#F4F5F7] border-transparent'"
                             class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition shadow-sm">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
@@ -196,7 +196,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Bookings</h2>
-                            <p class="text-xs text-[#505081]">Tap a status box to filter requests. Both rooms and equipment appear below.</p>
+                            <p class="text-xs text-[#505081]">Tap a status box to filter requests. Returned items notify you and restock automatically.</p>
                         </div>
                         <div class="flex items-center space-x-2">
                             <button type="button"
@@ -214,7 +214,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 pt-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 pt-2">
                         <div @click="filterStatus = 'all'"
                              :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
@@ -236,13 +236,6 @@
                             <p class="text-2xl font-extrabold text-emerald-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'approved').length">0</p>
                         </div>
 
-                        <div @click="filterStatus = 'returned'"
-                             :class="filterStatus === 'returned' ? 'border-sky-500 bg-sky-50/50' : 'border-[#8686AC]/30 bg-white'"
-                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
-                            <span class="text-[10px] font-bold text-sky-600 uppercase">Returned</span>
-                            <p class="text-2xl font-extrabold text-sky-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'returned').length">0</p>
-                        </div>
-
                         <div @click="filterStatus = 'rejected'"
                              :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
@@ -252,7 +245,7 @@
 
                         <div @click="filterStatus = 'declined_cancelled'"
                              :class="filterStatus === 'declined_cancelled' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'"
-                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
+                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm col-span-2 sm:col-span-1">
                             <span class="text-[10px] font-bold text-rose-600 uppercase">Declined / Cancelled</span>
                             <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => ['rejected', 'cancelled'].includes((r.status || '').toLowerCase())).length">0</p>
                         </div>
@@ -338,7 +331,7 @@
             <main x-show="currentView === 'inventory'" class="p-4 sm:p-6 lg:p-10 space-y-8" style="display: none;">
                 <div class="bg-white p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-2">
                     <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Rooms &amp; Gear</h2>
-                    <p class="text-xs text-[#505081]">Add, edit, or remove rooms and equipment counts.</p>
+                    <p class="text-xs text-[#505081]">Add, edit, or remove rooms and equipment counts. Returned gear updates stock automatically.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
@@ -431,7 +424,7 @@
                             <thead>
                                 <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase bg-[#F4F5F7]">
                                     <th class="py-3 px-4">Name</th>
-                                    <th class="py-3 px-4">Count</th>
+                                    <th class="py-3 px-4">Available / Total Units</th>
                                     <th class="py-3 px-4">Status</th>
                                     <th class="py-3 px-4 text-right">Actions</th>
                                 </tr>
@@ -440,7 +433,7 @@
                                 <template x-for="eq in equipment" :key="eq.id">
                                     <tr class="hover:bg-[#F4F5F7]/50">
                                         <td class="py-3 px-4 font-bold text-[#0F0E47]" x-text="eq.name"></td>
-                                        <td class="py-3 px-4" x-text="(eq.total_stock ?? 0) + ' units'"></td>
+                                        <td class="py-3 px-4" x-text="(eq.available_stock ?? eq.total_stock ?? 0) + ' / ' + (eq.total_stock ?? 0) + ' units'"></td>
                                         <td class="py-3 px-4 uppercase font-semibold" x-text="eq.status"></td>
                                         <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
                                             <button type="button"
@@ -514,7 +507,7 @@
                     <div class="space-y-0.5">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Chats</span>
                         <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47] tracking-tight">Messages</h2>
-                        <p class="hidden sm:block text-xs text-[#505081]">Reply to students or check return notes.</p>
+                        <p class="hidden sm:block text-xs text-[#505081]">Newest messages appear at the top. Reply to students or check return notes.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">
                         Live
@@ -523,7 +516,7 @@
 
                 <div class="h-[calc(100vh-14.5rem)] min-h-[340px] grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden">
                     <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#8686AC]/30 max-h-28 sm:max-h-36 lg:max-h-full overflow-y-auto divide-y divide-[#8686AC]/20 bg-[#F4F5F7]/40 shrink-0">
-                        <template x-for="thread in threads" :key="thread.id">
+                        <template x-for="thread in orderedThreads" :key="thread.id">
                             <button type="button"
                                     @click="selectThread(thread.id)"
                                     :class="activeThreadUserId === thread.id ? 'bg-[#0F0E47] text-white' : 'hover:bg-white text-[#272757]'"
@@ -545,7 +538,7 @@
                                 </div>
                             </button>
                         </template>
-                        <template x-if="threads.length === 0">
+                        <template x-if="orderedThreads.length === 0">
                             <div class="p-3 text-xs text-center text-[#505081]">No chats yet.</div>
                         </template>
                     </div>
@@ -571,7 +564,7 @@
                         </div>
 
                         <div id="admin-chat-feed" class="flex-1 min-h-0 p-3 sm:p-5 overflow-y-auto space-y-2.5 bg-[#F4F5F7]/50">
-                            <template x-for="msg in threadMessages" :key="msg.id">
+                            <template x-for="msg in orderedMessages" :key="msg.id">
                                 <div>
                                     <template x-if="msg.is_system">
                                         <div class="mx-auto max-w-xl my-1.5 px-3.5 py-2 rounded-2xl bg-sky-50 border border-sky-300 text-sky-900 text-xs text-center font-medium">
@@ -929,9 +922,9 @@ document.addEventListener('alpine:init', () => {
                         type: 'return',
                         badge: 'Returned',
                         title: (r.user?.name || 'User') + ' returned ' + (r.resource_name || 'Item'),
-                        detail: (r.resource_type || 'item') + ' • Qty: ' + (r.quantity || 1),
+                        detail: ((r.resource_type || 'item').toLowerCase() === 'equipment' ? 'Equipment' : 'Facility') + ' • Qty restored: ' + (r.quantity || 1),
                         targetView: 'bookings',
-                        filter: 'returned'
+                        filter: 'all'
                     });
                 });
 
@@ -1008,6 +1001,26 @@ document.addEventListener('alpine:init', () => {
             return this.threads.find(t => t.id === this.activeThreadUserId) || null;
         },
 
+        get orderedThreads() {
+            const list = Array.isArray(this.threads) ? [...this.threads] : [];
+            return list.sort((a, b) => {
+                const aTime = a.last_timestamp ? new Date(a.last_timestamp).getTime() : 0;
+                const bTime = b.last_timestamp ? new Date(b.last_timestamp).getTime() : 0;
+                if (bTime !== aTime) return bTime - aTime;
+                return Number(b.id || 0) - Number(a.id || 0);
+            });
+        },
+
+        get orderedMessages() {
+            const msgs = Array.isArray(this.threadMessages) ? [...this.threadMessages] : [];
+            return msgs.sort((a, b) => {
+                const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+                const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+                if (bTime !== aTime) return bTime - aTime;
+                return Number(b.id || 0) - Number(a.id || 0);
+            });
+        },
+
         async fetchThreads() {
             try {
                 const res = await fetch('{{ route('chat.threads') }}', {
@@ -1016,8 +1029,8 @@ document.addEventListener('alpine:init', () => {
                 if (!res.ok) return;
                 const data = await res.json();
                 this.threads = Array.isArray(data) ? data : [];
-                if (!this.activeThreadUserId && this.threads.length > 0) {
-                    this.activeThreadUserId = this.threads[0].id;
+                if (!this.activeThreadUserId && this.orderedThreads.length > 0) {
+                    this.activeThreadUserId = this.orderedThreads[0].id;
                 }
                 this.fetchAdminMessages();
                 this.refreshAdminAlerts();
@@ -1045,7 +1058,7 @@ document.addEventListener('alpine:init', () => {
                 if (this.threadMessages.length !== prevLen) {
                     this.$nextTick(() => {
                         const feed = document.getElementById('admin-chat-feed');
-                        if (feed) feed.scrollTop = feed.scrollHeight;
+                        if (feed) feed.scrollTop = 0;
                     });
                 }
             } catch (e) {
@@ -1077,7 +1090,7 @@ document.addEventListener('alpine:init', () => {
                     this.fetchThreads();
                     this.$nextTick(() => {
                         const feed = document.getElementById('admin-chat-feed');
-                        if (feed) feed.scrollTop = feed.scrollHeight;
+                        if (feed) feed.scrollTop = 0;
                     });
                 }
             } catch (e) {
