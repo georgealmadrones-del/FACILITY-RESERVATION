@@ -193,10 +193,28 @@
             <!-- VIEW 1: BOOKINGS -->
             <main x-show="currentView === 'bookings'" class="p-4 sm:p-6 lg:p-10 space-y-8">
                 <div class="bg-white backdrop-blur-xl p-5 sm:p-8 rounded-3xl border border-[#8686AC]/30 shadow-xl space-y-4">
-                    <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Bookings</h2>
-                    <p class="text-xs text-[#505081]">Tap a box to filter requests. Returned equipment and rooms are marked RETURNED.</p>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Bookings</h2>
+                            <p class="text-xs text-[#505081]">Tap a status box to filter requests. Both rooms and equipment appear below.</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button type="button"
+                                    @click="resourceKindFilter = 'all'"
+                                    :class="resourceKindFilter === 'all' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'bg-[#F4F5F7] text-[#505081] border-[#8686AC]/30'"
+                                    class="px-3 py-1.5 rounded-xl border text-[11px] font-bold transition">All Types</button>
+                            <button type="button"
+                                    @click="resourceKindFilter = 'facility'"
+                                    :class="resourceKindFilter === 'facility' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'bg-[#F4F5F7] text-[#505081] border-[#8686AC]/30'"
+                                    class="px-3 py-1.5 rounded-xl border text-[11px] font-bold transition">Rooms</button>
+                            <button type="button"
+                                    @click="resourceKindFilter = 'equipment'"
+                                    :class="resourceKindFilter === 'equipment' ? 'bg-[#0F0E47] text-white border-[#0F0E47]' : 'bg-[#F4F5F7] text-[#505081] border-[#8686AC]/30'"
+                                    class="px-3 py-1.5 rounded-xl border text-[11px] font-bold transition">Equipment</button>
+                        </div>
+                    </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 pt-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 pt-2">
                         <div @click="filterStatus = 'all'"
                              :class="filterStatus === 'all' ? 'border-[#0F0E47] bg-[#F4F5F7]' : 'border-[#8686AC]/30 bg-white'"
                              class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
@@ -227,7 +245,14 @@
 
                         <div @click="filterStatus = 'rejected'"
                              :class="filterStatus === 'rejected' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'"
-                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm col-span-2 sm:col-span-1">
+                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
+                            <span class="text-[10px] font-bold text-rose-600 uppercase">Rejected</span>
+                            <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => (r.status || '').toLowerCase() === 'rejected').length">0</p>
+                        </div>
+
+                        <div @click="filterStatus = 'declined_cancelled'"
+                             :class="filterStatus === 'declined_cancelled' ? 'border-rose-500 bg-rose-50/50' : 'border-[#8686AC]/30 bg-white'"
+                             class="p-4 rounded-2xl border cursor-pointer transition shadow-sm">
                             <span class="text-[10px] font-bold text-rose-600 uppercase">Declined / Cancelled</span>
                             <p class="text-2xl font-extrabold text-rose-700 mt-1" x-text="reservations.filter(r => ['rejected', 'cancelled'].includes((r.status || '').toLowerCase())).length">0</p>
                         </div>
@@ -237,18 +262,17 @@
                 <div class="bg-white backdrop-blur-xl rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                     <div class="p-5 sm:p-6 border-b border-[#8686AC]/30 flex justify-between items-center">
                         <h3 class="text-sm font-extrabold text-[#0F0E47]">Requests</h3>
-                        <span class="text-xs font-bold text-[#505081]" x-text="filterStatus.toUpperCase()"></span>
+                        <span class="text-xs font-bold text-[#505081]" x-text="filterStatus.replace('_', ' ').toUpperCase()"></span>
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[640px]">
+                        <table class="w-full text-left border-collapse min-w-[580px]">
                             <thead>
                                 <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase tracking-wider bg-[#F4F5F7]">
                                     <th class="py-4 px-5">Student / Faculty</th>
-                                    <th class="py-4 px-5">Item / Room</th>
+                                    <th class="py-4 px-5">Item / Room / Equipment</th>
                                     <th class="py-4 px-5">When</th>
-                                    <th class="py-4 px-5">Status</th>
-                                    <th class="py-4 px-5 text-right">Action</th>
+                                    <th class="py-4 px-5 text-right">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-[#8686AC]/20 text-xs">
@@ -272,13 +296,19 @@
                                         </td>
 
                                         <td class="py-4 px-5">
-                                            <span class="font-bold text-[#0F0E47] block" x-text="item.resource_name"></span>
-                                            <span class="text-[10px] text-[#505081]" x-text="(item.resource_type || '') + ' (' + (item.quantity || 1) + ')'"></span>
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <span class="font-bold text-[#0F0E47]" x-text="item.resource_name"></span>
+                                                <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase border"
+                                                      :class="(item.resource_type || '').toLowerCase() === 'equipment'
+                                                          ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                                                          : 'bg-slate-100 text-slate-700 border-slate-200'"
+                                                      x-text="((item.resource_type || 'item').toLowerCase() === 'equipment' ? 'Equipment' : 'Facility') + ' (' + (item.quantity || 1) + ')'"></span>
+                                            </div>
                                         </td>
 
                                         <td class="py-4 px-5 text-[#272757] font-medium" x-text="(item.start_time || '') + ' to ' + (item.end_time || '')"></td>
 
-                                        <td class="py-4 px-5">
+                                        <td class="py-4 px-5 text-right">
                                             <span class="px-2.5 py-1 text-[9px] font-bold rounded-full border uppercase inline-block"
                                                   :class="{
                                                       'bg-sky-50 text-sky-700 border-sky-300': (item.status || '').toLowerCase() === 'returned',
@@ -291,30 +321,11 @@
                                                 <p class="text-[10px] text-rose-600 mt-1 italic" x-text="'Note: ' + item.rejection_reason"></p>
                                             </template>
                                         </td>
-
-                                        <td class="py-4 px-5 text-right">
-                                            <template x-if="(item.status || '').toLowerCase() === 'pending'">
-                                                <div class="flex items-center justify-end space-x-2">
-                                                    <form :action="'/admin/reservations/' + item.id + '/approve'" method="POST" class="inline">
-                                                        @csrf
-                                                        <button type="submit" class="px-3 py-1.5 bg-emerald-700 text-white rounded-xl font-bold text-[11px] hover:bg-emerald-800 transition">Approve</button>
-                                                    </form>
-                                                    <button type="button"
-                                                            @click="openRejectModal(item.id)"
-                                                            class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-[11px] hover:bg-rose-700 transition">Decline</button>
-                                                </div>
-                                            </template>
-                                            <template x-if="(item.status || '').toLowerCase() !== 'pending'">
-                                                <span class="font-bold text-[11px]"
-                                                      :class="(item.status || '').toLowerCase() === 'returned' ? 'text-sky-700' : 'text-[#505081]'"
-                                                      x-text="(item.status || '').toUpperCase()"></span>
-                                            </template>
-                                        </td>
                                     </tr>
                                 </template>
                                 <template x-if="filteredReservations.length === 0">
                                     <tr>
-                                        <td colspan="5" class="py-8 text-center text-[#505081] text-xs">Nothing here yet.</td>
+                                        <td colspan="4" class="py-8 text-center text-[#505081] text-xs">Nothing here yet.</td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -782,6 +793,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('adminDashboard', () => ({
         currentView: 'bookings',
         filterStatus: 'all',
+        resourceKindFilter: 'all',
         mobileMenuOpen: false,
         notificationsOpen: false,
         adminProfileModalOpen: false,
@@ -1091,11 +1103,19 @@ document.addEventListener('alpine:init', () => {
         },
 
         get filteredReservations() {
-            if (this.filterStatus === 'all') return this.reservations;
-            if (this.filterStatus === 'rejected') {
-                return this.reservations.filter(r => ['rejected', 'cancelled'].includes((r.status || '').toLowerCase()));
-            }
-            return this.reservations.filter(r => (r.status || '').toLowerCase() === this.filterStatus);
+            return (this.reservations || []).filter(r => {
+                const st = (r.status || '').toLowerCase();
+                const kind = (r.resource_type || '').toLowerCase();
+
+                const matchesKind = this.resourceKindFilter === 'all' || kind === this.resourceKindFilter;
+                if (!matchesKind) return false;
+
+                if (this.filterStatus === 'all') return true;
+                if (this.filterStatus === 'declined_cancelled') {
+                    return ['rejected', 'cancelled'].includes(st);
+                }
+                return st === this.filterStatus;
+            });
         }
     }));
 });
