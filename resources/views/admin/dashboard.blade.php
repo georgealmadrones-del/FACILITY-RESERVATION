@@ -196,7 +196,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47]">Bookings</h2>
-                            <p class="text-xs text-[#505081]">Tap a status box to filter requests. Returned items notify you and restock automatically.</p>
+                            <p class="text-xs text-[#505081]">Tap a status box to filter requests. Approve or reject waiting requests below.</p>
                         </div>
                         <div class="flex items-center space-x-2">
                             <button type="button"
@@ -259,13 +259,13 @@
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[580px]">
+                        <table class="w-full text-left border-collapse min-w-[640px]">
                             <thead>
                                 <tr class="border-b border-[#8686AC]/30 text-[10px] font-bold text-[#505081] uppercase tracking-wider bg-[#F4F5F7]">
                                     <th class="py-4 px-5">Student / Faculty</th>
                                     <th class="py-4 px-5">Item / Room / Equipment</th>
                                     <th class="py-4 px-5">When</th>
-                                    <th class="py-4 px-5 text-right">Status</th>
+                                    <th class="py-4 px-5 text-right">Status &amp; Decision</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-[#8686AC]/20 text-xs">
@@ -310,8 +310,21 @@
                                                       'bg-rose-50 text-rose-700 border-rose-300': ['rejected', 'cancelled'].includes((item.status || '').toLowerCase())
                                                   }"
                                                   x-text="item.status"></span>
+
+                                            <template x-if="(item.status || '').toLowerCase() === 'pending'">
+                                                <div class="flex items-center justify-end gap-2 mt-2">
+                                                    <form :action="'/admin/reservations/' + item.id + '/approve'" method="POST" class="inline">
+                                                        @csrf
+                                                        <button type="submit" class="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-[11px] transition">Approve</button>
+                                                    </form>
+                                                    <button type="button"
+                                                            @click="openRejectModal(item.id)"
+                                                            class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold text-[11px] transition">Reject</button>
+                                                </div>
+                                            </template>
+
                                             <template x-if="item.rejection_reason">
-                                                <p class="text-[10px] text-rose-600 mt-1 italic" x-text="'Note: ' + item.rejection_reason"></p>
+                                                <p class="text-[10px] text-rose-600 mt-1 italic" x-text="'Reason: ' + item.rejection_reason"></p>
                                             </template>
                                         </td>
                                     </tr>
@@ -507,7 +520,7 @@
                     <div class="space-y-0.5">
                         <span class="text-[10px] font-bold text-[#505081] uppercase tracking-widest block">Chats</span>
                         <h2 class="text-xl sm:text-2xl font-extrabold text-[#0F0E47] tracking-tight">Messages</h2>
-                        <p class="hidden sm:block text-xs text-[#505081]">Newest messages appear at the top. Reply to students or check return notes.</p>
+                        <p class="hidden sm:block text-xs text-[#505081]">Latest senders pop to the top like Messenger. Reply to students or check return notes.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shrink-0">
                         Live
@@ -515,6 +528,7 @@
                 </div>
 
                 <div class="h-[calc(100vh-14.5rem)] min-h-[340px] grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-[#8686AC]/30 shadow-xl overflow-hidden">
+                    <!-- Thread list on the left: newest sender pops to the top -->
                     <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#8686AC]/30 max-h-28 sm:max-h-36 lg:max-h-full overflow-y-auto divide-y divide-[#8686AC]/20 bg-[#F4F5F7]/40 shrink-0">
                         <template x-for="thread in orderedThreads" :key="thread.id">
                             <button type="button"
@@ -543,6 +557,7 @@
                         </template>
                     </div>
 
+                    <!-- Conversation feed: chronological top-to-bottom, newest at bottom -->
                     <div class="lg:col-span-8 flex-1 flex flex-col min-h-0">
                         <div class="px-4 py-2 sm:px-6 sm:py-3 border-b border-[#8686AC]/30 bg-white flex items-center justify-between shrink-0">
                             <div class="flex items-center gap-3 min-w-0">
@@ -692,23 +707,23 @@
         </div>
     </div>
 
-    <!-- DECLINE MODAL -->
+    <!-- REJECT REASON MODAL -->
     <div x-show="rejectModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="display: none;">
         <div @click.away="rejectModalOpen = false" class="bg-white border border-[#8686AC]/40 w-full max-w-md rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative">
             <div class="flex justify-between items-center border-b border-[#8686AC]/30 pb-4">
-                <h3 class="text-lg font-extrabold text-[#0F0E47]">Why decline?</h3>
+                <h3 class="text-lg font-extrabold text-[#0F0E47]">Reason for rejecting</h3>
                 <button type="button" @click="rejectModalOpen = false" class="text-zinc-400 hover:text-[#0F0E47] font-bold text-lg">&times;</button>
             </div>
             <form :action="'/admin/reservations/' + selectedReservationId + '/reject'" method="POST" class="space-y-4">
                 @csrf
                 <div>
                     <label class="block text-xs font-semibold text-[#505081] mb-1.5">Note for the requester</label>
-                    <textarea name="rejection_reason" rows="4" placeholder="e.g. Room already taken at that hour..."
+                    <textarea name="rejection_reason" rows="4" placeholder="e.g. Room already taken at that hour or equipment unavailable..."
                               class="w-full bg-[#F4F5F7] border border-[#8686AC]/40 rounded-xl p-3 text-xs text-[#272757] focus:outline-none focus:border-[#505081]" required></textarea>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" @click="rejectModalOpen = false" class="px-4 py-2 bg-[#F4F5F7] text-[#272757] text-xs font-bold rounded-xl border border-[#8686AC]/30">Cancel</button>
-                    <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition">Decline request</button>
+                    <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition">Reject request</button>
                 </div>
             </form>
         </div>
@@ -942,7 +957,7 @@ document.addEventListener('alpine:init', () => {
                     });
                 });
 
-            (this.threads || []).forEach(t => {
+            (this.orderedThreads || []).forEach(t => {
                 if (!t.last_message) return;
                 const isReturn = Boolean(t.last_is_system);
                 alerts.push({
@@ -1001,23 +1016,45 @@ document.addEventListener('alpine:init', () => {
             return this.threads.find(t => t.id === this.activeThreadUserId) || null;
         },
 
+        parseActivityTime(thread) {
+            const raw = thread.last_timestamp || thread.last_message_at || thread.updated_at || null;
+            if (raw) {
+                const parsed = new Date(raw).getTime();
+                if (!Number.isNaN(parsed)) return parsed;
+            }
+            // Fallback for formatted strings like "03:18 PM" or "1 day ago"
+            if (typeof thread.last_time === 'string' && thread.last_time.trim()) {
+                const todayClock = new Date(`${new Date().toDateString()} ${thread.last_time}`).getTime();
+                if (!Number.isNaN(todayClock)) return todayClock;
+                const dayMatch = thread.last_time.match(/(\d+)\s*day/i);
+                if (dayMatch) return Date.now() - (Number(dayMatch[1]) * 86400000);
+            }
+            return thread.last_message ? 1 : 0;
+        },
+
+        // Messenger-style thread sorting: whoever sent the latest message pops to the top
         get orderedThreads() {
             const list = Array.isArray(this.threads) ? [...this.threads] : [];
             return list.sort((a, b) => {
-                const aTime = a.last_timestamp ? new Date(a.last_timestamp).getTime() : 0;
-                const bTime = b.last_timestamp ? new Date(b.last_timestamp).getTime() : 0;
-                if (bTime !== aTime) return bTime - aTime;
+                const aHasMsg = a.last_message ? 1 : 0;
+                const bHasMsg = b.last_message ? 1 : 0;
+                if (bHasMsg !== aHasMsg) return bHasMsg - aHasMsg;
+
+                const timeDiff = this.parseActivityTime(b) - this.parseActivityTime(a);
+                if (timeDiff !== 0) return timeDiff;
+
                 return Number(b.id || 0) - Number(a.id || 0);
             });
         },
 
+        // Chronological order inside the chat window (oldest at top, newest at bottom)
         get orderedMessages() {
             const msgs = Array.isArray(this.threadMessages) ? [...this.threadMessages] : [];
             return msgs.sort((a, b) => {
                 const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
                 const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
-                if (bTime !== aTime) return bTime - aTime;
-                return Number(b.id || 0) - Number(a.id || 0);
+                if (aTime !== bTime) return aTime - bTime;
+                return Number(a.id || 0) - Number(b.id || 0);
             });
         },
 
@@ -1058,7 +1095,7 @@ document.addEventListener('alpine:init', () => {
                 if (this.threadMessages.length !== prevLen) {
                     this.$nextTick(() => {
                         const feed = document.getElementById('admin-chat-feed');
-                        if (feed) feed.scrollTop = 0;
+                        if (feed) feed.scrollTop = feed.scrollHeight;
                     });
                 }
             } catch (e) {
@@ -1090,7 +1127,7 @@ document.addEventListener('alpine:init', () => {
                     this.fetchThreads();
                     this.$nextTick(() => {
                         const feed = document.getElementById('admin-chat-feed');
-                        if (feed) feed.scrollTop = 0;
+                        if (feed) feed.scrollTop = feed.scrollHeight;
                     });
                 }
             } catch (e) {
