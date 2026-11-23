@@ -237,19 +237,19 @@
             @endif
 
             <!-- Return Reminder Banner -->
-            <template x-if="overdueEquipmentReservations.length > 0">
+            <template x-if="overdueReservations.length > 0">
                 <div class="mx-6 lg:mx-10 mt-6 bg-amber-50 border border-amber-300 text-amber-950 px-5 py-4 rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="space-y-0.5 text-xs">
                         <p class="font-extrabold text-amber-900">
-                            Heads up: <span x-text="overdueEquipmentReservations.length"></span> borrowed item(s) are past their end time.
+                            Heads up: <span x-text="overdueReservations.length"></span> approved booking(s) are past their end time.
                         </p>
                         <p class="text-[11px] text-amber-800">
                             Tap an item to open and return it:
-                            <template x-for="(item, idx) in overdueEquipmentReservations" :key="item.id">
+                            <template x-for="(item, idx) in overdueReservations" :key="item.id">
                                 <span>
                                     <button type="button"
                                             @click="selectedReservation = item; detailsModalOpen = true;"
-                                            class="underline font-bold hover:text-amber-950" x-text="item.resource_name"></button><span x-show="idx < overdueEquipmentReservations.length - 1">, </span>
+                                            class="underline font-bold hover:text-amber-950" x-text="item.resource_name"></button><span x-show="idx < overdueReservations.length - 1">, </span>
                                 </span>
                             </template>
                         </p>
@@ -337,7 +337,7 @@
                     <div class="flex justify-between items-center">
                         <div>
                             <h3 class="text-lg font-extrabold text-[#0F0E47]">Recent bookings</h3>
-                            <p class="text-xs text-[#505081]">Tap any row to check status, cancel pending requests, or return approved equipment.</p>
+                            <p class="text-xs text-[#505081]">Tap any row to check status, cancel pending requests, or return approved bookings.</p>
                         </div>
                         <button type="button" @click="currentView = 'profile'; profileTab = 'history';" class="text-xs font-bold text-[#505081] hover:text-[#0F0E47] transition flex items-center space-x-1">
                             <span>See all</span>
@@ -366,7 +366,7 @@
                                                     <div>
                                                         <div class="flex items-center gap-2 flex-wrap">
                                                             <span class="font-bold text-[#0F0E47]" x-text="item.resource_name"></span>
-                                                            <template x-if="isOverdueEquipment(item)">
+                                                            <template x-if="isOverdueBooking(item)">
                                                                 <span class="px-2 py-0.5 text-[9px] font-extrabold rounded-full bg-rose-50 text-rose-700 border border-rose-300 uppercase">Return Due</span>
                                                             </template>
                                                         </div>
@@ -381,7 +381,8 @@
                                             <td class="py-4 px-6 text-right">
                                                 <span class="px-3 py-1 text-[10px] font-bold rounded-full border shadow-sm"
                                                       :class="{
-                                                          'bg-emerald-50 text-emerald-700 border-emerald-300': ['approved', 'returned'].includes((item.status || '').toLowerCase()),
+                                                          'bg-sky-50 text-sky-700 border-sky-300': (item.status || '').toLowerCase() === 'returned',
+                                                          'bg-emerald-50 text-emerald-700 border-emerald-300': (item.status || '').toLowerCase() === 'approved',
                                                           'bg-amber-50 text-amber-700 border-amber-300': (item.status || '').toLowerCase() === 'pending',
                                                           'bg-rose-50 text-rose-700 border-rose-300': ['rejected', 'cancelled'].includes((item.status || '').toLowerCase())
                                                       }"
@@ -786,7 +787,7 @@
                 <!-- Past Bookings Tab -->
                 <div x-show="profileTab === 'history'" class="space-y-6" style="display: none;">
                     <h3 class="text-lg font-extrabold text-[#0F0E47]">All bookings</h3>
-                    <p class="text-xs text-[#505081]">Click a booking to cancel a pending request or return approved equipment.</p>
+                    <p class="text-xs text-[#505081]">Click a booking to cancel a pending request or return an approved booking.</p>
                     <div class="bg-white rounded-3xl border border-[#8686AC]/30 overflow-hidden shadow-xl">
                         <div class="divide-y divide-[#8686AC]/20">
                             <template x-for="item in recentReservations" :key="item.id">
@@ -794,7 +795,7 @@
                                     <div class="space-y-1">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <h4 class="text-sm font-bold text-[#0F0E47]" x-text="item.resource_name"></h4>
-                                            <template x-if="isOverdueEquipment(item)">
+                                            <template x-if="isOverdueBooking(item)">
                                                 <span class="px-2 py-0.5 text-[9px] font-extrabold rounded-full bg-rose-50 text-rose-700 border border-rose-300 uppercase">Return Due</span>
                                             </template>
                                         </div>
@@ -807,7 +808,8 @@
                                         <span class="text-xs text-[#272757] font-medium" x-text="item.start_time"></span>
                                         <span class="px-3 py-1 text-[10px] font-bold rounded-full border"
                                               :class="{
-                                                  'bg-emerald-50 text-emerald-700 border-emerald-300': ['approved', 'returned'].includes((item.status || '').toLowerCase()),
+                                                  'bg-sky-50 text-sky-700 border-sky-300': (item.status || '').toLowerCase() === 'returned',
+                                                  'bg-emerald-50 text-emerald-700 border-emerald-300': (item.status || '').toLowerCase() === 'approved',
                                                   'bg-amber-50 text-amber-700 border-amber-300': (item.status || '').toLowerCase() === 'pending',
                                                   'bg-rose-50 text-rose-700 border-rose-300': ['cancelled', 'rejected'].includes((item.status || '').toLowerCase())
                                               }"
@@ -823,7 +825,7 @@
                 </div>
             </main>
 
-            <!-- VIEW 5: ASK ADMIN (PC-VISIBLE CHAT BAR) -->
+            <!-- VIEW 5: ASK ADMIN -->
             <main x-show="currentView === 'support-chat'" class="p-3 sm:p-5 lg:px-8 lg:py-6 flex flex-col gap-3 sm:gap-4" style="display: none;">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#8686AC]/30 pb-3 shrink-0">
                     <div class="space-y-0.5">
@@ -899,7 +901,8 @@
                         <span class="text-[10px] font-bold text-[#505081] uppercase">Status</span>
                         <p class="font-bold mt-0.5 uppercase"
                            :class="{
-                               'text-emerald-700': ['approved', 'returned'].includes((selectedReservation?.status || '').toLowerCase()),
+                               'text-sky-700': (selectedReservation?.status || '').toLowerCase() === 'returned',
+                               'text-emerald-700': (selectedReservation?.status || '').toLowerCase() === 'approved',
                                'text-amber-700': (selectedReservation?.status || '').toLowerCase() === 'pending',
                                'text-rose-700': ['cancelled', 'rejected'].includes((selectedReservation?.status || '').toLowerCase())
                            }"
@@ -916,9 +919,9 @@
                     <p class="text-[#272757] font-medium" x-text="(selectedReservation?.start_time || '') + ' to ' + (selectedReservation?.end_time || '')"></p>
                 </div>
 
-                <template x-if="selectedReservation && isOverdueEquipment(selectedReservation)">
+                <template x-if="selectedReservation && isOverdueBooking(selectedReservation)">
                     <div class="bg-rose-50 border border-rose-300 text-rose-900 p-3.5 rounded-2xl text-[11px] font-semibold">
-                        This borrowed item is past its end time. Please return it below.
+                        This approved booking is past its end time. Please return it below.
                     </div>
                 </template>
 
@@ -936,23 +939,33 @@
             </div>
 
             <div class="pt-4 border-t border-[#8686AC]/30 flex items-center justify-between gap-3">
+                <!-- LEFT SIDE: Return (only when approved) OR Cancel Booking (only when pending) -->
                 <div class="flex items-center space-x-2">
+                    <template x-if="selectedReservation && (selectedReservation.status || '').toLowerCase() === 'approved'">
+                        <form :action="'/reservations/' + selectedReservation.id + '/return'" method="POST">
+                            @csrf
+                            <button type="submit"
+                                    class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow">
+                                Return
+                            </button>
+                        </form>
+                    </template>
+
                     <template x-if="selectedReservation && (selectedReservation.status || '').toLowerCase() === 'pending'">
                         <form :action="'/reservations/' + selectedReservation.id + '/cancel'" method="POST">
                             @csrf
-                            <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition">Cancel request</button>
-                        </form>
-                    </template>
-                    <template x-if="selectedReservation && canReturnApprovedEquipment(selectedReservation)">
-                        <form :action="'/reservations/' + selectedReservation.id + '/return'" method="POST">
-                            @csrf
-                            <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow">Mark returned</button>
+                            <button type="submit"
+                                    class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow">
+                                Cancel booking
+                            </button>
                         </form>
                     </template>
                 </div>
+
+                <!-- RIGHT SIDE: Close modal button labeled "Cancel" -->
                 <button type="button" @click="detailsModalOpen = false"
                         class="px-4 py-2 bg-[#F4F5F7] hover:bg-[#8686AC]/20 text-[#272757] text-xs font-bold rounded-xl transition border border-[#8686AC]/30">
-                    Done
+                    Cancel
                 </button>
             </div>
         </div>
@@ -1257,27 +1270,25 @@ document.addEventListener('alpine:init', () => {
                 return Number.isNaN(parsed.getTime()) ? null : parsed;
             },
 
-            canReturnApprovedEquipment(item) {
+            canReturnApprovedBooking(item) {
                 if (!item) return false;
-                const isEq = (item.resource_type || '').toLowerCase() === 'equipment';
-                const isApproved = (item.status || '').toLowerCase() === 'approved';
-                return isEq && isApproved;
+                return (item.status || '').toLowerCase() === 'approved';
             },
 
-            isOverdueEquipment(item) {
-                if (!this.canReturnApprovedEquipment(item)) return false;
+            isOverdueBooking(item) {
+                if (!this.canReturnApprovedBooking(item)) return false;
                 const endDt = this.parseScheduleDate(item.end_time) || this.parseScheduleDate(item.start_time);
                 if (!endDt) return false;
                 return Date.now() > endDt.getTime();
             },
 
-            get overdueEquipmentReservations() {
-                return (this.recentReservations || []).filter(r => this.isOverdueEquipment(r));
+            get overdueReservations() {
+                return (this.recentReservations || []).filter(r => this.isOverdueBooking(r));
             },
 
             refreshStudentAlerts() {
                 const alerts = [];
-                this.overdueEquipmentReservations.forEach(item => {
+                this.overdueReservations.forEach(item => {
                     alerts.push({
                         id: 'return-reminder-' + item.id,
                         type: 'reminder',
